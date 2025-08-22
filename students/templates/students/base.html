@@ -2,13 +2,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queuing System</title>
+  <link href="{% static 'src/output.css' %}" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <title>{% block title %} {% endblock %}</title>
+  <style>
+    .font-medula {
+        font-family: 'Medula One', cursive;
+        }
 
+        .font-poppins {
+    font-family: 'Poppins', sans-serif;
+    }
+    
+    
+    
+  </style>
 </head>
-<body>
-    <h1 class="bg-red-400 underline" > Hello Students </h1>
+<body class="bg-gray-100 text-gray-900 h-screen  ">
+
+    <!-- Header -->
+
+    <div class="relative z-10 flex justify-between items-center p-4 md:p-2 bg-white border-b-[12px]" style="border-color: #10934F;">
+        <div class="flex items-center gap-4 max-w-7xl">
+            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+        </div>
+    </div>
+
+    <div class="flex-grow flex p-4 md:p-8 overflow-auto  h-[800px] bg-cover bg-center bg-white/70">
+    {% block content %}
+    {% endblock %}
+    </div>
+
+    <footer class="bg-green-600">
+        <h1>FOOTER</h1>
+    </footer>
+    
 </body>
 </html>

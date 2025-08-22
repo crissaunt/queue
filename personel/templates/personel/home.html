@@ -38,7 +38,7 @@
                     </button>
 
                     <!-- Confirm Form -->
-                    <form method="post" action="">
+                    <form method="post" action="{% url 'end_all_appointments' %}">
                         {% csrf_token %}
                         <button type="submit" 
                             class="px-4 py-2 text-sm bg-[#bb2124] cursor-pointer text-white  hover:bg-[#bb2124]/80">

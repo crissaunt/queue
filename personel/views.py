@@ -114,14 +114,14 @@ def home(request):
             # FIRST: Check for PRIORITY standby students
             priority_standby = StudentAppointments.objects.filter(
                 status="standby",
-                is_priority="yes",  # 👈 ADD THIS
+                is_priority="yes",  
                 datetime__date=today
             ).order_by("datetime").first()
 
             # SECOND: Check for REGULAR standby students
             regular_standby = StudentAppointments.objects.filter(
                 status="standby",
-                is_priority="no",   # 👈 ADD THIS
+                is_priority="no",   
                 datetime__date=today
             ).order_by("datetime").first()
 
@@ -190,7 +190,7 @@ def done_current_number(request):
                     elif current_number.skip_count == 1:
                         # First skip → set countdown (1 hour)
                         current_number.status = 'skip'
-                        current_number.skip_until = timezone.now() + timedelta(seconds=30)
+                        current_number.skip_until = timezone.now() + timedelta(hours=1)
                     else:
                         # 2nd skip → still skip, but update time if needed
                         current_number.status = 'skip'
@@ -261,3 +261,11 @@ def priority_standby(request):
 
     return redirect("personel")  
 
+
+
+def end_all_appointments(request):
+    if request.method == "POST":
+        # cancel ALL pending only
+        StudentAppointments.objects.filter(status="pending").update(status="cancel")
+        return redirect("personel")  
+    return redirect("personel")

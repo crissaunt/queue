@@ -1,0 +1,151 @@
+{% extends 'students/base.html' %}
+
+{% block title %}
+Home Students
+{% endblock  %}
+
+{% block content %}
+{% load static %}
+<!-- Content -->
+
+
+
+      <div class="absolute inset-0 bg-white/90"></div>
+
+    <!-- Left Section -->
+    <div class="flex-1 flex flex-col items-center relative z-10">
+        <p class="font-poppins font-medium text-[24px] leading-[100%] tracking-[0%] text-[#FFCC00]">
+            Current Serving
+        </p>
+        <h2 class="font-medula font-normal text-[120px] leading-[100%] tracking-[0%] text-green-700">
+            Token Number
+        </h2>
+        <div class="mt-9 bg-white shadow-[0.5px_5px_10px_4px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center w-[402px] h-[293px] rounded-[31px] top-[338px] left-[130px]">
+            {% if get_current_number %}
+                <p class="font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]">
+                    {{ get_current_number.ticket_number }}  </p>
+          
+       
+                <p class="font-poppins font-normal text-[22px] leading-[100%] tracking-[0%] text-[#10934F] self-start ml-9">
+                    Student
+                </p>
+            {% else %}
+            <p class="font-poppins font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]"
+                >NONE</p>
+                
+            {% endif %}    
+        </div>
+        <div class="mt-9 flex flex-col items-center justify-center">
+        <p class="font-poppins font-normal text-[18px] leading-[100%] tracking-[0%] text-[#10934F]">
+            Serving Time
+        </p>
+        <p class="font-medula font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]">
+            00 : 47 : 12
+        </p>
+        </div>
+    </div>
+    
+<!---------------------------------------------------------------->
+            <div class="relative z-10 w-px bg-gray-300 mx-6"></div>
+
+    <!-- Right Section -->
+    <div class="relative z-10 flex-1 flex  gap-9">
+        
+    <!-- Left: Token Queue -->
+    <div class="w-[350px] p-4">
+        {% for in_line in next_in_line %}
+        <div class="w-[180px] mt-0 flex flex-col">
+            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                {{ in_line.ticket_number }}
+            </span>
+            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                 {{ in_line.requestType }}
+            </span>
+        </div>
+        {% endfor %}
+
+        <!-- <div class="w-[180px] mt-0">
+            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                G-004
+            </span>
+            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                Payment
+            </span>
+        </div>
+
+        <div class="w-[180px] mt-0">
+            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                G-005
+            </span>
+            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                Payment
+            </span>
+        </div>
+
+        <div class="w-[180px] mt-0">
+            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                G-006
+            </span>
+            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                Idemtification Card
+            </span>
+        </div>
+
+        <div class="w-[180px] mt-0">
+            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                <span class="text-[#FF3C00]">P</span>-007
+            </span>
+            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                Payment
+            </span>
+        </div> -->
+    </div>
+
+    <!-- Right: Date, Instruction, Buttons -->
+    <div class="">
+        <!-- Date & Time -->
+        <div>
+            <p class="text-[32px] font-bold leading-none text-[#10934F]" style="font-family: 'Poppins', sans-serif;">
+                WEDNESDAY
+            </p>
+            <p class="text-[32px] leading-none text-[#10934F]" style="font-family: 'Medula One', cursive; font-weight: 400;">
+                August 20 2025
+            </p>
+            <p class="text-[64px] leading-none text-[#FFCC00]" style="font-family: 'Medula One', cursive;">
+                9:37 
+            <span class="text-[#10934F] text-[30px]">
+                AM
+            </span>
+            </p>
+
+        </div>
+
+        <!-- Instruction -->
+        <div class="bg-white shadow-lg rounded p-4 my-4 w-[270px] h-[239px] top-[372px] left-[1143px]">
+        <h3 class="font-medula text-[32px] leading-[100%] tracking-[0%] text-[#10934F] text-center">
+            Instruction
+        </h3>
+        <p class="font-poppins mt-3 text-[15px] leading-[100%] text-center text-justify">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-9">
+        <button class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
+            Student
+        </button>
+        </div>
+        <div class="mt-9">
+        <button class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
+            Guest
+        </button>
+        </div>
+    </div>
+    </div>
+
+
+
+
+{% endblock  %}
