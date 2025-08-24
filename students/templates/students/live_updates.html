@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Live Updates</title>
+</head>
+<body>
+    <h1>Current Student</h1>
+    <p id="current"></p>
+
+    <h2>Next in Line</h2>
+    <ul id="queue-list"></ul>
+
+    <script>
+        const socket = new WebSocket(
+            "ws://" + window.location.host + "/ws/students/live_updates/"
+        );
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            // Show current
+            const currentDiv = document.getElementById("current");
+            if (data.current) {
+                currentDiv.textContent =
+                    `${data.current.firstName} ${data.current.lastName} (${data.current.status}) at ${data.current.datetime}`;
+            } else {
+                currentDiv.textContent = "No one currently being served.";
+            }
+
+            // Show next in line
+            const ul = document.getElementById("queue-list");
+            ul.innerHTML = "";
+            if (data.next_in_line) {
+                data.next_in_line.forEach(student => {
+                    const li = document.createElement("li");
+                    li.textContent =
+                        `${student.firstName} ${student.lastName} (${student.status}) at ${student.datetime}`;
+                    ul.appendChild(li);
+                });
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.error("WebSocket closed unexpectedly");
+        };
+
+        // ⏳ Send ping every 0.5 seconds
+        setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({"message": "ping"}));
+            }
+        }, 500);  // 500ms = 0.5s
+
+
+    </script>
+</body>
+</html>

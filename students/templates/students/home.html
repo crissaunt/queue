@@ -10,7 +10,7 @@ Home Students
 
 
 
-      <div class="absolute inset-0 bg-white/90"></div>
+    <div class="absolute inset-0 bg-white/90"></div>
 
     <!-- Left Section -->
     <div class="flex-1 flex flex-col items-center relative z-10">
@@ -21,19 +21,13 @@ Home Students
             Token Number
         </h2>
         <div class="mt-9 bg-white shadow-[0.5px_5px_10px_4px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center w-[402px] h-[293px] rounded-[31px] top-[338px] left-[130px]">
-            {% if get_current_number %}
-                <p class="font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]">
-                    {{ get_current_number.ticket_number }}  </p>
+                <p id="current" class="font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]">
+                     </p>
           
        
-                <p class="font-poppins font-normal text-[22px] leading-[100%] tracking-[0%] text-[#10934F] self-start ml-9">
+                <p id="user_type" class="font-poppins font-normal text-[22px] leading-[100%] tracking-[0%] text-[#10934F] self-start ml-9">
                     Student
-                </p>
-            {% else %}
-            <p class="font-poppins font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]"
-                >NONE</p>
-                
-            {% endif %}    
+                </p>   
         </div>
         <div class="mt-9 flex flex-col items-center justify-center">
         <p class="font-poppins font-normal text-[18px] leading-[100%] tracking-[0%] text-[#10934F]">
@@ -53,16 +47,15 @@ Home Students
         
     <!-- Left: Token Queue -->
     <div class="w-[350px] p-4">
-        {% for in_line in next_in_line %}
-        <div class="w-[180px] mt-0 flex flex-col">
-            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                {{ in_line.ticket_number }}
+        <div id="next_line" class="w-[180px] mt-0 flex flex-col">
+            <!-- <span id="nl_ticket_number" class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                ticket number
             </span>
-            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                 {{ in_line.requestType }}
-            </span>
+            <span id="nl_request_type" class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                request type
+            </span> -->
         </div>
-        {% endfor %}
+
 
         <!-- <div class="w-[180px] mt-0">
             <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
@@ -145,7 +138,75 @@ Home Students
     </div>
     </div>
 
+    <script>
+        const socket = new WebSocket(
+            "ws://" + window.location.host + "/ws/students/"
+        );
 
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            console.log("Received from server:", data);
+
+            // Show current
+            const currentDiv = document.getElementById("current");
+            const userType = document.getElementById("user_type");
+            // Always show ONLY the current ticket
+            if (data.current && data.current.ticket_number) {
+                currentDiv.className = "font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]";
+                userType.textContent = "Student";
+                currentDiv.textContent = data.current.ticket_number;
+            } else {
+                userType.textContent = "";
+                currentDiv.className = "font-poppins font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]";
+                currentDiv.textContent = "NONE";
+            }
+
+            
+            const nextLineContainer = document.getElementById('next_line');
+            nextLineContainer.innerHTML = "";
+
+            if(data.next_in_line && data.next_in_line.length > 0){
+                data.next_in_line.forEach(student => {
+                    const div = document.createElement("div");
+                    console.log("Next in line student:", student);
+
+                    div.className = "flex flex-col w-[180px]";
+
+                    div.innerHTML = `
+                                        <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                                            ${student.ticket_number}
+                                        </span>
+                                        <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                                            ${student.requestType}
+                                        </span>
+                                    `;
+
+                    nextLineContainer.appendChild(div);
+                                        
+                });
+            }else {
+            nextLineContainer.innerHTML = `
+                <span class="font-poppins text-[36px] text-gray-500">No one in line</span>
+                    `;
+                }
+            };
+
+
+
+        socket.onclose = function(e) {
+            console.error("WebSocket closed unexpectedly");
+        };
+
+        // ⏳ Send ping every 0.5 seconds
+        setInterval(() => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({"message": "ping"}));
+            }
+        }, 500);  // 500ms = 0.5s
+
+
+    </script>
 
 
 {% endblock  %}
