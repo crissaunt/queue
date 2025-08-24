@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Queuing System</title>
-  <link href="{% static 'src/output.css' %}" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queuing System</title>
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   <title>{% block title %} {% endblock %}</title>
   <style>
     .font-medula {
@@ -18,12 +18,56 @@
         .font-poppins {
     font-family: 'Poppins', sans-serif;
     }
+    .inria-sans-light {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    }
+
+    .inria-sans-regular {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    }
+
+    .inria-sans-bold {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    }
+
+    .inria-sans-light-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    }
+
+    .inria-sans-regular-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    }
+
+    .inria-sans-bold-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    }
+
+       .custom-bg {
+                background-image: url("{% static 'images/bg-image.svg' %}");
+                background-size: cover;        /* fill the screen */
+                /* background-position: center;   center the image */
+                background-repeat: no-repeat;  /* don’t repeat */
+                background-attachment: scroll; /* make background scroll with content */
+                }
+    
     
     
     
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900 h-screen  ">
+<body class="bg-gray-100 text-gray-900 h-screen  custom-bg">
 
     <!-- Header -->
 
@@ -33,10 +77,10 @@
         </div>
     </div>
 
-    <div class="flex-grow flex p-4 md:p-8 overflow-auto  h-[800px] bg-cover bg-center bg-white/70">
+
     {% block content %}
     {% endblock %}
-    </div>
+
 
     <footer class="bg-green-600">
         <h1>FOOTER</h1>

@@ -44,7 +44,7 @@ class StudentAppointments(models.Model):
     lastName = models.CharField(max_length=50)
     # email = models.CharField(max_length=50)
     datetime = models.DateTimeField(default=timezone.now)
-    ticket_number = models.IntegerField(null=True)
+    ticket_number = models.CharField(max_length=10, null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
 
     is_priority = models.CharField(max_length=50, choices=[('yes','Yes'),('no','No')], default='no')

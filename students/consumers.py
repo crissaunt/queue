@@ -49,7 +49,8 @@ class StudentsConsumer(WebsocketConsumer):
         """
         Collects 'next in line' students and sends them as JSON.
         """
-        today = timezone.now().date()
+        now_ph = localtime(timezone.now())
+        today = now_ph.date()
 
         # Find current student
         get_current_number = StudentAppointments.objects.filter(

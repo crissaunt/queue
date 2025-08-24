@@ -81,7 +81,7 @@
                     <p class="text-gray-500 mb-4 text-sm">
                     No request appointment now
                     </p>
-                    <form action="{% url 'start_btn' %}" method="POST">
+                    <form action="{% url 'personel' %}" method="POST">
                         {% csrf_token %}
                         <button class="bg-[#10934F] text-sm text-white px-10 py-1"
                             type="submit" name="start" value="start">
@@ -135,7 +135,7 @@
                         <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}" >
                         <button type="submit" name="action" value="done"
                             class="bg-[#10934F] hover:bg-[#10934F]/80  text-white px-10 py-1 cursor-pointer" >
-                        Process</button>
+                        Done</button>
                         <button  type="submit" name="action" value="skip"
                         class="bg-[#FFCC00] hover:bg-[#FFCC00]/80  text-black px-10 py-1 cursor-pointer" >Skip</button>
                     {% endif %}

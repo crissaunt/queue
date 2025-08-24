@@ -8,205 +8,280 @@ Home Students
 {% load static %}
 <!-- Content -->
 
+<div class="flex-grow flex p-4 md:p-8    h-[800px]  ">
 
+<div class="absolute inset-0 "></div>
 
-    <div class="absolute inset-0 bg-white/90"></div>
-
-    <!-- Left Section -->
-    <div class="flex-1 flex flex-col items-center relative z-10">
-        <p class="font-poppins font-medium text-[24px] leading-[100%] tracking-[0%] text-[#FFCC00]">
-            Current Serving
-        </p>
-        <h2 class="font-medula font-normal text-[120px] leading-[100%] tracking-[0%] text-green-700">
-            Token Number
-        </h2>
-        <div class="mt-9 bg-white shadow-[0.5px_5px_10px_4px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center w-[402px] h-[293px] rounded-[31px] top-[338px] left-[130px]">
-                <p id="current" class="font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]">
-                     </p>
-          
-       
-                <p id="user_type" class="font-poppins font-normal text-[22px] leading-[100%] tracking-[0%] text-[#10934F] self-start ml-9">
-                    Student
-                </p>   
-        </div>
-        <div class="mt-9 flex flex-col items-center justify-center">
-        <p class="font-poppins font-normal text-[18px] leading-[100%] tracking-[0%] text-[#10934F]">
-            Serving Time
-        </p>
-        <p class="font-medula font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]">
-            00 : 47 : 12
-        </p>
-        </div>
+<!-- Left Section -->
+<div class="flex-1 flex flex-col items-center relative ">
+    <p class="font-poppins font-medium text-[24px] leading-[100%] tracking-[0%] text-[#FFCC00]">
+        Current Serving
+    </p>
+    <h2 class="font-medula font-normal text-[120px] leading-[100%] tracking-[0%] text-green-700">
+        Token Number
+    </h2>
+    <div class="mt-9 bg-white shadow-[0.5px_5px_10px_4px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center w-[402px] h-[293px] rounded-[31px] top-[338px] left-[130px]">
+            <p id="current" class="font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]">
+                 </p>
+      
+   
+            <p id="user_type" class="font-poppins font-normal text-[22px] leading-[100%] tracking-[0%] text-[#10934F] self-start ml-9">
+                Student
+            </p>   
     </div>
-    
+    <div class="mt-9 flex flex-col items-center justify-center">
+    <p class="font-poppins font-normal text-[18px] leading-[100%] tracking-[0%] text-[#10934F]">
+        Serving Time
+    </p>
+    <p class="font-medula font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]">
+        00 : 47 : 12
+    </p>
+    </div>
+</div>
+
 <!---------------------------------------------------------------->
-            <div class="relative z-10 w-px bg-gray-300 mx-6"></div>
+        <div class="relative z-10 border-1 border-gray-400 mx-6"></div>
 
-    <!-- Right Section -->
-    <div class="relative z-10 flex-1 flex  gap-9">
-        
-    <!-- Left: Token Queue -->
-    <div class="w-[350px] p-4">
-        <div id="next_line" class="w-[180px] mt-0 flex flex-col">
-            <!-- <span id="nl_ticket_number" class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                ticket number
-            </span>
-            <span id="nl_request_type" class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                request type
-            </span> -->
-        </div>
-
-
-        <!-- <div class="w-[180px] mt-0">
-            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                G-004
-            </span>
-            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                Payment
-            </span>
-        </div>
-
-        <div class="w-[180px] mt-0">
-            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                G-005
-            </span>
-            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                Payment
-            </span>
-        </div>
-
-        <div class="w-[180px] mt-0">
-            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                G-006
-            </span>
-            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                Idemtification Card
-            </span>
-        </div>
-
-        <div class="w-[180px] mt-0">
-            <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                <span class="text-[#FF3C00]">P</span>-007
-            </span>
-            <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                Payment
-            </span>
-        </div> -->
+<!-- Right Section -->
+<div class="relative z-10 flex-1 flex  gap-9">
+    
+<!-- Left: Token Queue -->
+<div class="w-[350px] p-4">
+    <div id="next_line" class="w-[180px] mt-0 flex flex-col">
+        <!-- Next in line tokens will appear here -->
     </div>
+</div>
 
-    <!-- Right: Date, Instruction, Buttons -->
-    <div class="">
-        <!-- Date & Time -->
-        <div>
-            <p class="text-[32px] font-bold leading-none text-[#10934F]" style="font-family: 'Poppins', sans-serif;">
-                WEDNESDAY
-            </p>
-            <p class="text-[32px] leading-none text-[#10934F]" style="font-family: 'Medula One', cursive; font-weight: 400;">
-                August 20 2025
-            </p>
-            <p class="text-[64px] leading-none text-[#FFCC00]" style="font-family: 'Medula One', cursive;">
-                9:37 
-            <span class="text-[#10934F] text-[30px]">
-                AM
-            </span>
-            </p>
-
-        </div>
-
-        <!-- Instruction -->
-        <div class="bg-white shadow-lg rounded p-4 my-4 w-[270px] h-[239px] top-[372px] left-[1143px]">
-        <h3 class="font-medula text-[32px] leading-[100%] tracking-[0%] text-[#10934F] text-center">
-            Instruction
-        </h3>
-        <p class="font-poppins mt-3 text-[15px] leading-[100%] text-center text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+<!-- Right: Date, Instruction, Buttons -->
+<div class="">
+    <!-- Date & Time -->
+    <div>
+        <p class="text-[32px] font-bold leading-none text-[#10934F]" style="font-family: 'Poppins', sans-serif;">
+            WEDNESDAY
+        </p>
+        <p class="text-[32px] leading-none text-[#10934F]" style="font-family: 'Medula One', cursive; font-weight: 400;">
+            August 20 2025
+        </p>
+        <p class="text-[64px] leading-none text-[#FFCC00]" style="font-family: 'Medula One', cursive;">
+            9:37 
+        <span class="text-[#10934F] text-[30px]">
+            AM
+        </span>
         </p>
 
-        </div>
+    </div>
 
-        <!-- Buttons -->
-        <div class="mt-9">
-        <button class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
+    <!-- Instruction -->
+    <div class="bg-white shadow-lg rounded p-4 my-4 w-[270px] h-[239px] top-[372px] left-[1143px]">
+    <h3 class="font-medula text-[32px] leading-[100%] tracking-[0%] text-[#10934F] text-center">
+        Instruction
+    </h3>
+    <p class="font-poppins mt-3 text-[15px] leading-[100%] text-center text-justify">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="mt-9">
+        <button type="button" onclick="openModal()" 
+        class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
             Student
         </button>
-        </div>
-        <div class="mt-9">
+    </div>
+    <div class="mt-9">
         <button class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
             Guest
         </button>
+    </div>
+</div>
+</div>
+
+<!-- Student Modal -->
+<div id="studentModal" class="fixed inset-0 bg-black/20 backdrop-blur-sm hidden  flex items-center justify-center z-50 ">
+    <div class="bg-white shadow-xl w-[450px] h-[546px] max-w-md  py-5 px-12 text-black">
+        <!-- Modal Header -->
+       
+        <p class="inria-sans-regular text-sm text-black text-center">Please enter your  information to login</p>
+        <button onclick="closeModal()" class="text-white text-xl">&times;</button>
+      
+        
+        <!-- Modal Form -->
+        <form id="studentForm" action="{% url 'student_submit' %}" method="post">
+        {% csrf_token %}
+        
+        <!-- ID Number -->
+        <div class="mb-2">
+            <label class="block mb-2" for="idNumber">ID Number</label>
+            <input type="text" id="idNumber" name="idNumber" required
+                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
         </div>
+
+        <div class="flex flex-row gap-2">
+            <!-- First Name -->
+            <div class="mb-2">
+                <label class="block mb-2" for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" required
+                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+            </div>
+
+            <!-- Middle Name -->
+            <div class="mb-2">
+                <label class="block mb-2" for="middleName">M.I.</label>
+                <input type="text" id="middleName" name="middleName" maxlength="1"
+                    class="w-10 p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-2">
+                <label class="block mb-2" for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required
+                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+            </div>
+        </div>
+
+        <!-- Course -->
+        <div class="mb-2">
+            <label class="block mb-2" for="course">Course</label>
+            <select id="course" name="course" required
+                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="">Select Course</option>
+                {% for c in courses %}
+                <option value="{{ c.id }}">{{ c.courses }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Request Type -->
+        <div class="mb-3">
+            <label class="block mb-2" for="request">Request Type</label>
+            <select id="request" name="request" required
+                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="">Select Request</option>
+                {% for r in requests %}
+                <option value="{{ r.id }}">{{ r.request }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Priority -->
+        <div class="mb-6 flex items-center">
+            <input type="checkbox" id="is_priority" name="is_priority"
+                class="mr-2 text-[#10934F] border-gray-300 rounded">
+            <label for="is_priority">Priority (PWD/Senior)</label>
+        </div>
+
+        <!-- Submit -->
+        <div>
+            <button type="submit"
+                    class="px-4 py-2 bg-[#10934F] w-full text-white hover:bg-[#10934F]/80 cursor-pointer transition">
+                Submit
+            </button>
+        </div>
+    </form>
+
     </div>
-    </div>
+</div>
 
-    <script>
-        const socket = new WebSocket(
-            "ws://" + window.location.host + "/ws/students/"
-        );
+</div>
+<script>
 
-        socket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
+    const studentForm = document.getElementById('studentForm');
+    // Modal functions
+    function openModal() {
+        document.getElementById('studentModal').classList.remove('hidden');
+    }
+    
+    function closeModal() {
+        document.getElementById('studentModal').classList.add('hidden');
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('studentModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+    
+    // Form submission
+    document.getElementById('studentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
 
-            console.log("Received from server:", data);
+        const response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+        });
 
-            // Show current
-            const currentDiv = document.getElementById("current");
-            const userType = document.getElementById("user_type");
-            // Always show ONLY the current ticket
-            if (data.current && data.current.ticket_number) {
-                currentDiv.className = "font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]";
-                userType.textContent = "Student";
-                currentDiv.textContent = data.current.ticket_number;
-            } else {
-                userType.textContent = "";
-                currentDiv.className = "font-poppins font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]";
-                currentDiv.textContent = "NONE";
-            }
+        const data = await response.json();
 
-            
-            const nextLineContainer = document.getElementById('next_line');
-            nextLineContainer.innerHTML = "";
+        if (data.success) {
+            alert("Ticket created: " + data.ticket);
+            form.reset();
+            closeModal();
+            location.reload()
+        } else {
+            alert("Failed to submit form!");
+        }
+    });
 
-            if(data.next_in_line && data.next_in_line.length > 0){
-                data.next_in_line.forEach(student => {
-                    const div = document.createElement("div");
-                    console.log("Next in line student:", student);
 
-                    div.className = "flex flex-col w-[180px]";
 
-                    div.innerHTML = `
-                                        <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                                            ${student.ticket_number}
-                                        </span>
-                                        <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                                            ${student.requestType}
-                                        </span>
-                                    `;
+    const socket = new WebSocket(
+        "ws://" + window.location.host + "/ws/students/"
+    );
 
-                    nextLineContainer.appendChild(div);
-                                        
-                });
-            }else {
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log("Received from server:", data);
+
+        // Show current
+        const currentDiv = document.getElementById("current");
+        const userType = document.getElementById("user_type");
+        // Always show ONLY the current ticket
+        if (data.current && data.current.ticket_number) {
+            currentDiv.className = "font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]";
+            userType.textContent = "Student";
+            currentDiv.textContent = data.current.ticket_number;
+        } 
+        else {
+            currentDiv.className = "font-poppins font-normal text-[100px] leading-[100%] tracking-[0%] text-[#10934F]";
+            userType.textContent = "";
+            currentDiv.textContent = "NONE";
+        }
+
+        const nextLineContainer = document.getElementById('next_line');
+        nextLineContainer.innerHTML = "";
+
+        if(data.next_in_line && data.next_in_line.length > 0){
+            data.next_in_line.forEach(student => {
+                const div = document.createElement("div");
+                console.log("Next in line student:", student);
+
+                div.className = "flex flex-col w-[180px]";
+
+                div.innerHTML = `
+                                    <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
+                                        ${student.ticket_number}
+                                    </span>
+                                    <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
+                                        ${student.requestType}
+                                    </span>
+                                `;
+
+                nextLineContainer.appendChild(div);
+            });
+        } else {
             nextLineContainer.innerHTML = `
                 <span class="font-poppins text-[36px] text-gray-500">No one in line</span>
-                    `;
-                }
-            };
+            `;
+        }
+    };
 
+    socket.onclose = function(e) {
+        console.error("WebSocket closed unexpectedly");
+    };
+</script>
 
-
-        socket.onclose = function(e) {
-            console.error("WebSocket closed unexpectedly");
-        };
-
-        // ⏳ Send ping every 0.5 seconds
-        setInterval(() => {
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({"message": "ping"}));
-            }
-        }, 500);  // 500ms = 0.5s
-
-
-    </script>
-
-
-{% endblock  %}
+{% endblock %}

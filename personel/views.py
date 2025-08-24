@@ -5,10 +5,24 @@ from .models import StudentAppointments
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
+from django.shortcuts import redirect, get_object_or_404
 
 
-today = timezone.now().date()
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def broadcast_update():
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "students_live_updates",   # must match consumer group_name
+        {"type": "chat_message", "message": "update"}
+    )
+
+
+
+
 def home(request):
+    today = timezone.now().date()
     now_ph = localtime(timezone.now())
     # Auto-cancel expired skips
     expired = StudentAppointments.objects.filter(
@@ -86,11 +100,11 @@ def home(request):
     ).order_by("datetime").first()
 
     # 3. Then check for PRIORITY pending
-    # priority_pending = StudentAppointments.objects.filter(
-    #     is_priority="yes",
-    #     status="pending",
-    #     datetime__date=today
-    # ).order_by("datetime").first()
+    priority_pending = StudentAppointments.objects.filter(
+        is_priority="yes",
+        status="pending",
+        datetime__date=today
+    ).order_by("datetime").first()
 
      # 4. Finally check for REGULAR pending
     regular_pending = StudentAppointments.objects.filter(
@@ -102,10 +116,12 @@ def home(request):
     # Determine next in line based on priority order
     if priority_standby:
         next_in_line = priority_standby
+        
+        
     elif regular_standby:
         next_in_line = regular_standby
-    # elif priority_pending:
-    #     next_in_line = priority_pending
+    elif priority_pending:
+        next_in_line = priority_pending
     elif regular_pending:
         next_in_line = regular_pending
 
@@ -136,19 +152,24 @@ def home(request):
             if priority_standby:
                 priority_standby.status = "current"
                 priority_standby.save()
+                broadcast_update()
                 print(f"Started priority standby: {priority_standby.ticket_number}")
             elif regular_standby:
                 regular_standby.status = "current"
                 regular_standby.save()
+                broadcast_update()
                 print(f"Started regular standby: {regular_standby.ticket_number}")
             elif next_pending:
                 next_pending.status = "current"
                 next_pending.save()
+                broadcast_update()
                 print(f"Started pending: {next_pending.ticket_number}")
             else:
                 print("No students available to start")
-
+            
             return redirect("personel")
+        
+        broadcast_update()
         return redirect("personel")
                                                            
     template = loader.get_template('personel/home.html')
@@ -166,66 +187,82 @@ def home(request):
 def done_current_number(request):
     if request.method == 'POST':
         action = request.POST.get('action')
-        ticket_id = request.POST.get('ticket_number')  # get ID from form
+        ticket_id = request.POST.get('ticket_number')
 
         current_number = get_object_or_404(StudentAppointments, id=ticket_id)
+        
+        today = timezone.now().date()
+        now_ph = localtime(timezone.now())
 
         if current_number:
-
             if action == 'done':
                 current_number.status = 'done'
+                current_number.skip_until = None
+                current_number.skip_count = "0"
                 current_number.save()
+                broadcast_update()
             elif action == 'skip':
                 if current_number.is_priority == 'yes':
                     current_number.status ='pending'
                     current_number.save()
+                    broadcast_update()
                 else:
-                   # Regular → count skip
-                    current_number.skip_count += 1
-
-                    if current_number.skip_count >= 3:
-                        # Cancel immediately if skipped 3 times
+                   current_number.skip_count += 1
+                   if current_number.skip_count >= 3:
                         current_number.status = 'cancel'
                         current_number.skip_until = None
-                    elif current_number.skip_count == 1:
-                        # First skip → set countdown (1 hour)
+                   elif current_number.skip_count == 1:
                         current_number.status = 'skip'
                         current_number.skip_until = timezone.now() + timedelta(hours=1)
-                    else:
-                        # 2nd skip → still skip, but update time if needed
+                   else:
                         current_number.status = 'skip'
-                    current_number.save()    
+                   current_number.save()  
+                   broadcast_update()  
 
-            # 1. Priority Standby → 2. Regular Standby → 3. Pending
+            # Determine next in line using the correct priority order:
+            # 1. Priority Standby → 2. Regular Standby → 3. Priority Pending → 4. Regular Pending
             
             priority_standby = StudentAppointments.objects.filter(
                 status="standby",
                 is_priority="yes",
-                datetime__date=today
+                datetime__date=now_ph
             ).order_by("datetime").first()
 
             regular_standby = StudentAppointments.objects.filter(
                 status="standby",
                 is_priority="no",
-                datetime__date=today
+                datetime__date=now_ph
             ).order_by("datetime").first()
 
-            next_pending = StudentAppointments.objects.filter(
+            priority_pending = StudentAppointments.objects.filter(
+                is_priority="yes",
                 status="pending",
+                datetime__date=now_ph
+            ).order_by("datetime").first()
+
+            regular_pending = StudentAppointments.objects.filter(
                 is_priority="no",
-                datetime__date=today
+                status="pending",
+                datetime__date=now_ph
             ).order_by("datetime").first()
             
             # Set next current number in priority order
+            next_student = None
             if priority_standby:
-                priority_standby.status = "current"
-                priority_standby.save()
+                next_student = priority_standby
             elif regular_standby:
-                regular_standby.status = "current"
-                regular_standby.save()
-            elif next_pending:
-                next_pending.status = "current"
-                next_pending.save()  
+                next_student = regular_standby
+            elif priority_pending:
+                next_student = priority_pending
+            elif regular_pending:
+                next_student = regular_pending
+            
+            # If we found a next student, set them as current
+            if next_student:
+                next_student.status = "current"
+                next_student.save()
+                broadcast_update()
+                
         return redirect('personel')
     return redirect('personel')
 
@@ -240,13 +277,13 @@ def standby(request):
             if action == 'standby':
                 current_number.status = 'standby'
                 current_number.save()
+                broadcast_update()
 
 
         return redirect('personel')
     
-from django.shortcuts import redirect, get_object_or_404
-from django.utils import timezone
-from .models import StudentAppointments
+
+
 
 def priority_standby(request):
     if request.method == "POST":
@@ -258,6 +295,7 @@ def priority_standby(request):
         if action == "standby":
             student.status = "standby"
             student.save()
+            broadcast_update()
 
     return redirect("personel")  
 
@@ -265,7 +303,16 @@ def priority_standby(request):
 
 def end_all_appointments(request):
     if request.method == "POST":
-        # cancel ALL pending only
-        StudentAppointments.objects.filter(status="pending").update(status="cancel")
+        # Get today's date
+        today = timezone.now().date()
+        now_ph = localtime(timezone.now())
+        
+        # Cancel only today's pending and skip appointments
+        StudentAppointments.objects.filter(
+            datetime__date=now_ph,
+            status__in=["pending", "skip", "current",]
+        ).update(status="cancel")
+        
+        broadcast_update()
         return redirect("personel")  
     return redirect("personel")
