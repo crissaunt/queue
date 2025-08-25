@@ -184,6 +184,8 @@ Home Students
 </div>
 
 </div>
+
+
 <script>
 
     const studentForm = document.getElementById('studentForm');
@@ -242,7 +244,7 @@ Home Students
         // Always show ONLY the current ticket
         if (data.current && data.current.ticket_number) {
             currentDiv.className = "font-medula font-normal text-[200px] leading-[100%] tracking-[0%] text-[#10934F]";
-            userType.textContent = "Student";
+            userType.textContent = data.current.status;
             currentDiv.textContent = data.current.ticket_number;
         } 
         else {
@@ -266,7 +268,7 @@ Home Students
                                         ${student.ticket_number}
                                     </span>
                                     <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                                        ${student.requestType}
+                                        ${student.requestType}  
                                     </span>
                                 `;
 

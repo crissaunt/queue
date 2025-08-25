@@ -40,7 +40,7 @@ class StudentAppointments(models.Model):
     ]
     idNumber= models.CharField(max_length=50, null=True)
     firstName = models.CharField(max_length=50)
-    middleName = models.CharField(max_length=1)
+    middleName = models.CharField(max_length=1, blank=True)
     lastName = models.CharField(max_length=50)
     # email = models.CharField(max_length=50)
     datetime = models.DateTimeField(default=timezone.now)
@@ -50,7 +50,6 @@ class StudentAppointments(models.Model):
     is_priority = models.CharField(max_length=50, choices=[('yes','Yes'),('no','No')], default='no')
     # relationship 
     requestType = models.ForeignKey(RequestType, on_delete=models.CASCADE, null=True, blank=True)
-    userType = models.ForeignKey(UserType, on_delete=models.CASCADE, null=True, blank=True)
     courses = models.ForeignKey(Courses, on_delete=models.CASCADE, null=True, blank=True)
 
     # NEW FIELDS

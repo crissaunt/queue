@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
-from personel.models import StudentAppointments, RequestType, Courses,UserType
+from personel.models import StudentAppointments, RequestType, Courses
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
@@ -39,7 +39,6 @@ def student_submit(request):
 
         # Get related objects safely
         course = Courses.objects.filter(id=course_id).first()
-        user_type = UserType.objects.filter(name='student').first()
         request_type = RequestType.objects.filter(id=request_id).first()
 
         # ----- Generate ticket number -----
@@ -70,7 +69,7 @@ def student_submit(request):
             requestType=request_type,
             ticket_number=new_ticket_number,
             status="pending",
-            userType=user_type,
+         
             is_priority=is_priority,
             datetime=today,
         )
