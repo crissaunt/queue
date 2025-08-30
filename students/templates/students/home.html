@@ -43,18 +43,11 @@ Home Students
         <div class="relative z-10 border-1 border-gray-400 mx-6"></div>
 
 <!-- Right Section -->
-<div class="relative z-10 flex-1 flex  gap-9">
-    
-<!-- Left: Token Queue -->
-<div class="w-[350px] p-4">
-    <div id="next_line" class="w-[180px] mt-0 flex flex-col">
-        <!-- Next in line tokens will appear here -->
-    </div>
-</div>
+<div class="z-10 flex-1 flex  justify-center ">
 
 <!-- Right: Date, Instruction, Buttons -->
 <div class="">
-    <!-- Date & Time -->
+    <!-- Date  Time -->
     <div>
         <p class="text-[32px] font-bold leading-none text-[#10934F]" style="font-family: 'Poppins', sans-serif;">
             WEDNESDAY
@@ -90,98 +83,169 @@ Home Students
         </button>
     </div>
     <div class="mt-9">
-        <button class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
+        <button type="button" onclick="openGuestModal()"
+         class="w-[270px] h-[71px] top-[657px] left-[1143px] bg-[#10934F] text-white shadow-md font-medula text-[32px] leading-[100%] tracking-[0%]">
             Guest
         </button>
     </div>
 </div>
 </div>
 
-<!-- Student Modal -->
-<div id="studentModal" class="fixed inset-0 bg-black/20 backdrop-blur-sm hidden  flex items-center justify-center z-50 ">
-    <div class="bg-white shadow-xl w-[450px] h-[546px] max-w-md  py-5 px-12 text-black">
-        <!-- Modal Header -->
-       
-        <p class="inria-sans-regular text-sm text-black text-center">Please enter your  information to login</p>
-        <button onclick="closeModal()" class="text-white text-xl">&times;</button>
-      
+    <!-- Student Modal -->
+    <div id="studentModal" class="fixed inset-0 bg-black/20 backdrop-blur-sm hidden  flex items-center justify-center z-50 ">
+        <div class="bg-white shadow-xl w-[450px] h-[546px] max-w-md  py-5 px-12 text-black">
+            <!-- Modal Header -->
         
-        <!-- Modal Form -->
-        <form id="studentForm" action="{% url 'student_submit' %}" method="post">
-        {% csrf_token %}
+            <p class="inria-sans-regular text-sm text-black text-center">Please enter your  information to login</p>
+            <button onclick="closeModal()" class="text-white text-xl">&times;</button>
         
-        <!-- ID Number -->
-        <div class="mb-2">
-            <label class="block mb-2" for="idNumber">ID Number</label>
-            <input type="text" id="idNumber" name="idNumber" required
-                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
-        </div>
-
-        <div class="flex flex-row gap-2">
-            <!-- First Name -->
+            
+            <!-- Modal Form -->
+            <form id="studentForm" action="{% url 'student_submit' %}" method="post">
+            {% csrf_token %}
+            
+            <!-- ID Number -->
             <div class="mb-2">
-                <label class="block mb-2" for="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" required
+                <label class="block mb-2" for="idNumber">ID Number</label>
+                <input type="text" id="idNumber" name="idNumber" required
                     class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
             </div>
 
-            <!-- Middle Name -->
-            <div class="mb-2">
-                <label class="block mb-2" for="middleName">M.I.</label>
-                <input type="text" id="middleName" name="middleName" maxlength="1"
-                    class="w-10 p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+            <div class="flex flex-row gap-2">
+                <!-- First Name -->
+                <div class="mb-2">
+                    <label class="block mb-2" for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required
+                        class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+
+                <!-- Middle Name -->
+                <div class="mb-2">
+                    <label class="block mb-2" for="middleName">M.I.</label>
+                    <input type="text" id="middleName" name="middleName" maxlength="1"
+                        class="w-10 p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-2">
+                    <label class="block mb-2" for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required
+                        class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
             </div>
 
-            <!-- Last Name -->
+            <!-- Course -->
             <div class="mb-2">
-                <label class="block mb-2" for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" required
-                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                <label class="block mb-2" for="course">Course</label>
+                <select id="course" name="course" required
+                        class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    <option value="">Select Course</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}">{{ c.courses }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
 
-        <!-- Course -->
-        <div class="mb-2">
-            <label class="block mb-2" for="course">Course</label>
-            <select id="course" name="course" required
-                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
-                <option value="">Select Course</option>
-                {% for c in courses %}
-                <option value="{{ c.id }}">{{ c.courses }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <!-- Request Type -->
+            <div class="mb-3">
+                <label class="block mb-2" for="request">Request Type</label>
+                <select id="request" name="request" required
+                        class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    <option value="">Select Request</option>
+                    {% for r in requests %}
+                    <option value="{{ r.id }}">{{ r.request }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <!-- Request Type -->
-        <div class="mb-3">
-            <label class="block mb-2" for="request">Request Type</label>
-            <select id="request" name="request" required
-                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
-                <option value="">Select Request</option>
-                {% for r in requests %}
-                <option value="{{ r.id }}">{{ r.request }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <!-- Priority -->
+            <div class="mb-6 flex items-center">
+                <input type="checkbox" id="is_priority" name="is_priority"
+                    class="mr-2 text-[#10934F] border-gray-300 rounded">
+                <label for="is_priority">Priority (PWD/Senior)</label>
+            </div>
 
-        <!-- Priority -->
-        <div class="mb-6 flex items-center">
-            <input type="checkbox" id="is_priority" name="is_priority"
-                class="mr-2 text-[#10934F] border-gray-300 rounded">
-            <label for="is_priority">Priority (PWD/Senior)</label>
-        </div>
+            <!-- Submit -->
+            <div>
+                <button type="submit"
+                        class="px-4 py-2 bg-[#10934F] w-full text-white hover:bg-[#10934F]/80 cursor-pointer transition">
+                    Submit
+                </button>
+            </div>
+        </form>
 
-        <!-- Submit -->
-        <div>
-            <button type="submit"
-                    class="px-4 py-2 bg-[#10934F] w-full text-white hover:bg-[#10934F]/80 cursor-pointer transition">
-                Submit
-            </button>
         </div>
-    </form>
-
     </div>
-</div>
+
+
+    <!-- Guest Modal -->
+    <div id="guestModal" class="fixed inset-0 bg-black/20 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white shadow-xl w-[450px] h-[389px] max-w-md py-5 px-12 text-black relative">
+            
+            <!-- Close Button -->
+            <button onclick="closeGuestModal()" 
+                class="absolute top-2 right-4 text-3xl font-bold text-[#10934F]">&times;</button>
+
+            <p class="inria-sans-regular text-sm text-black text-center mb-10">
+                Please enter your information to make a request
+            </p>
+            
+            <!-- Modal Form -->
+            <form id="guestForm" action="" method="post">
+                {% csrf_token %}
+
+                <div class="flex flex-row gap-2">
+                    <!-- First Name -->
+                    <div class="mb-2 flex-1">
+                        <label class="block mb-2" for="guestFirstName">First Name</label>
+                        <input type="text" id="guestFirstName" name="firstName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+                    <!-- Middle Name -->
+                    <div class="mb-2 w-16">
+                        <label class="block mb-2" for="guestMiddleName">M.I.</label>
+                        <input type="text" id="guestMiddleName" name="middleName" maxlength="1"
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="mb-2 flex-1">
+                        <label class="block mb-2" for="guestLastName">Last Name</label>
+                        <input type="text" id="guestLastName" name="lastName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                </div>
+
+                <!-- Request Type -->
+                <div class="mb-3">
+                    <label class="block mb-2" for="guestRequest">Request Type</label>
+                    <select id="guestRequest" name="request" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        <option value="">Select Request</option>
+                        {% for r in requests %}
+                        <option value="{{ r.id }}">{{ r.request }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Priority -->
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="guestPriority" name="is_priority"
+                        class="mr-2 text-[#10934F] border-gray-300 rounded">
+                    <label for="guestPriority">Priority (PWD/Senior)</label>
+                </div>
+
+                <!-- Submit -->
+                <div>
+                    <button type="submit"
+                            class="px-4 py-2 bg-[#10934F] w-full text-white hover:bg-[#10934F]/80 cursor-pointer transition">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </div>
 
@@ -229,6 +293,47 @@ Home Students
     });
 
 
+    // Guest Modal functions
+        function openGuestModal() {
+            document.getElementById('guestModal').classList.remove('hidden');
+        }
+
+        function closeGuestModal() {
+            document.getElementById('guestModal').classList.add('hidden');
+        }
+
+        // Close when clicking outside
+        document.getElementById('guestModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeGuestModal();
+            }
+        });
+
+        // Guest form submission
+        document.getElementById('guestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert("Guest ticket created: " + data.ticket);
+                form.reset();
+                closeGuestModal();
+                location.reload();
+            } else {
+                alert("Failed to submit guest form!");
+            }
+        });
+
+
+
 
     const socket = new WebSocket(
         "ws://" + window.location.host + "/ws/students/"
@@ -253,32 +358,7 @@ Home Students
             currentDiv.textContent = "NONE";
         }
 
-        const nextLineContainer = document.getElementById('next_line');
-        nextLineContainer.innerHTML = "";
-
-        if(data.next_in_line && data.next_in_line.length > 0){
-            data.next_in_line.forEach(student => {
-                const div = document.createElement("div");
-                console.log("Next in line student:", student);
-
-                div.className = "flex flex-col w-[180px]";
-
-                div.innerHTML = `
-                                    <span class="font-medula text-[100px] font-normal leading-[100%] tracking-[0] text-green-700">
-                                        ${student.ticket_number}
-                                    </span>
-                                    <span class="font-medula text-[36px] font-normal leading-[100%] tracking-[0] text-[#10934F]">
-                                        ${student.requestType}  
-                                    </span>
-                                `;
-
-                nextLineContainer.appendChild(div);
-            });
-        } else {
-            nextLineContainer.innerHTML = `
-                <span class="font-poppins text-[36px] text-gray-500">No one in line</span>
-            `;
-        }
+        
     };
 
     socket.onclose = function(e) {

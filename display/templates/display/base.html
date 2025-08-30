@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queuing System</title>
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <title>{% block title %} {% endblock %}</title>
+  <style>
+    .font-medula {
+        font-family: 'Medula One', cursive;
+        }
+
+    .font-poppins {
+    font-family: 'Poppins', sans-serif;
+    }
+
+    .inria-sans-light {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    }
+
+    .inria-sans-regular {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    }
+
+    .inria-sans-bold {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    }
+
+    .inria-sans-light-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    }
+
+    .inria-sans-regular-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    }
+
+    .inria-sans-bold-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    }
+
+.custom-bg {
+    background-image: 
+        linear-gradient(rgba(16, 147, 79, 92), rgba(16, 147, 79, 92)), 
+        url("{% static 'images/bg-image.svg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-blend-mode: overlay;
+}
+
+
+
+    
+  </style>
+</head>
+<body class=" min-h-screen  bg-gray-800/70    custom-bg font-poppins flex flex-col">
+
+    <!-- Header -->
+
+    <div class="relative z-10 flex justify-between items-center p-4 md:p-2 bg-white border-b-[12px]" style="border-color: #10934F;">
+        <div class="flex items-center gap-4 max-w-7xl">
+            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+        </div>
+    </div>
+
+    <main class="flex-1 ">
+    {% block content %}
+    {% endblock %}
+    </main>
+
+    <footer class="bg-[#10934F] border-t-10 border-t-white mt-15 py-5">
+        <div class="flex ml-10 gap-10 max-w-7xl mt-5">
+            <img src="{% static 'images/site-logo.svg' %}" alt="Logo" class="pl-9 h-15 md:h-30">
+            <p class=" text-white text-sm w-[550px]">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+        </div>
+    </footer>
+    
+</body>
+</html>

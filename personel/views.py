@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
-from .models import StudentAppointments
+from .models import StudentAppointments, Personel
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q, Case, When, Value, IntegerField
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password, check_password
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -19,7 +21,7 @@ def broadcast_update():
     )
 
 def get_next_in_line(today, next_should_be_priority):
-    """Get the next student in line based on priority pattern with standby insertion"""
+    """Get the next student in line - EXCLUDE priority pending students"""
     
     # First check for any standby students (they take highest priority and cut in line)
     standby_student = StudentAppointments.objects.filter(
@@ -30,132 +32,61 @@ def get_next_in_line(today, next_should_be_priority):
     if standby_student:
         return standby_student
     
-    # If no standby, follow the priority pattern using the provided parameter
-    # REMOVE THIS BLOCK - don't recalculate served_today and next_should_be_priority
-    # served_today = StudentAppointments.objects.filter(
-    #     status__in=["done", "current"],
-    #     datetime__date=today
-    # ).count()
-    # next_should_be_priority = (served_today % 3) == 2
+    # If no standby, ONLY consider non-priority students (exclude priority pending)
+    # Regardless of the pattern, we only pick from non-priority students
     
-    if next_should_be_priority:
-        # Try priority pending students first
-        priority_pending = StudentAppointments.objects.filter(
-            status="pending",
-            is_priority="yes",
-            datetime__date=today
-        ).order_by("datetime").first()
-        
-        if priority_pending:
-            return priority_pending
-        
-        # Fallback to regular pending if no priority available
-        regular_pending = StudentAppointments.objects.filter(
-            status="pending",
-            is_priority="no",
-            datetime__date=today
-        ).order_by("datetime").first()
-        
-        if regular_pending:
-            return regular_pending
-        
-    else:
-        # Try regular pending students first
-        regular_pending = StudentAppointments.objects.filter(
-            status="pending",
-            is_priority="no",
-            datetime__date=today
-        ).order_by("datetime").first()
-        
-        if regular_pending:
-            return regular_pending
-        
-        # Fallback to priority pending if no regular available
-        priority_pending = StudentAppointments.objects.filter(
-            status="pending",
-            is_priority="yes",
-            datetime__date=today
-        ).order_by("datetime").first()
-        
-        if priority_pending:
-            return priority_pending
+    non_priority_pending = StudentAppointments.objects.filter(
+        status="pending",
+        is_priority="no",  # Only non-priority
+        datetime__date=today
+    ).order_by("datetime").first()
     
+    if non_priority_pending:
+        return non_priority_pending
+    
+    # If no non-priority students available, return None
+    # (We're excluding priority pending students completely)
     return None
 
-def get_display_queue(today, limit=5):
+def get_display_queue(today, limit=8):
     """
-    Build the display queue by simulating get_next_in_line multiple times
+    Build the display queue with:
+    - All standby students
+    - Non-priority pending students (is_priority="no")
+    - EXCLUDE priority pending students (is_priority="yes")
     """
     queue = []
     
-    # Make a copy of the current state to simulate without affecting the database
-    served_today = StudentAppointments.objects.filter(
-        status__in=["done", "current"],
-        datetime__date=today
-    ).count()
-    
-    # Simulate the next 'limit' students that would be chosen
-    for i in range(limit):
-        # Calculate what the pattern would be for the next student
-        next_should_be_priority = ((served_today + i) % 3) == 2
-        
-        # Simulate get_next_in_line logic
-        # First check for standby
-        standby_student = StudentAppointments.objects.filter(
+    # 1) Add all standby students first (they cut in line)
+    standby_students = list(
+        StudentAppointments.objects.filter(
             status="standby",
             datetime__date=today
-        ).exclude(id__in=[s.id for s in queue]).order_by("datetime").first()
-        
-        if standby_student:
-            queue.append(standby_student)
-            continue
-            
-        # Then follow priority pattern
-        if next_should_be_priority:
-            priority_pending = StudentAppointments.objects.filter(
-                status="pending",
-                is_priority="yes",
-                datetime__date=today
-            ).exclude(id__in=[s.id for s in queue]).order_by("datetime").first()
-            
-            if priority_pending:
-                queue.append(priority_pending)
-                continue
-                
-            # Fallback to regular
-            regular_pending = StudentAppointments.objects.filter(
-                status="pending",
-                is_priority="no",
-                datetime__date=today
-            ).exclude(id__in=[s.id for s in queue]).order_by("datetime").first()
-            
-            if regular_pending:
-                queue.append(regular_pending)
-                continue
-                
-        else:
-            regular_pending = StudentAppointments.objects.filter(
-                status="pending",
-                is_priority="no",
-                datetime__date=today
-            ).exclude(id__in=[s.id for s in queue]).order_by("datetime").first()
-            
-            if regular_pending:
-                queue.append(regular_pending)
-                continue
-                
-            # Fallback to priority
-            priority_pending = StudentAppointments.objects.filter(
-                status="pending",
-                is_priority="yes",
-                datetime__date=today
-            ).exclude(id__in=[s.id for s in queue]).order_by("datetime").first()
-            
-            if priority_pending:
-                queue.append(priority_pending)
-                continue
+        ).order_by("datetime")
+    )
+    queue.extend(standby_students)
     
-    return queue
+    # If we already have enough standby students, return them
+    if len(queue) >= limit:
+        return queue[:limit]
+    
+    # 2) Add non-priority pending students only (exclude priority pending)
+    non_priority_students = list(
+        StudentAppointments.objects.filter(
+            status="pending",
+            is_priority="no",  # Only non-priority
+            datetime__date=today
+        ).order_by("datetime")
+    )
+    
+    # Add non-priority students until we reach the limit
+    for student in non_priority_students:
+        if len(queue) >= limit:
+            break
+        queue.append(student)
+    
+    return queue[:limit]
+
 
 def home(request):
     today = timezone.now().date()
@@ -251,14 +182,15 @@ def home(request):
                 next_student.save()
                 broadcast_update()
                 print(f"Started: {next_student.ticket_number} (Priority: {next_student.is_priority})")            
-            else:
-                print("No students available to start")
+            
             
             return redirect("personel")
         
         broadcast_update()
         return redirect("personel")
-                                                           
+
+    display_queues  = get_display_queue(today, limit=8)
+
     template = loader.get_template('personel/home.html')
     context = {
         'non_priority_students': non_priority_students,
@@ -267,6 +199,7 @@ def home(request):
         'get_current_number': get_current_number,
         'skip_non_priority_students': skip_non_priority_students,
         'next_in_line': next_in_line,
+        'display_queues' : display_queues ,
         'next_should_be_priority': next_should_be_priority,
         'get_first_non_priority_students': get_non_priority_students,
     }
@@ -372,16 +305,33 @@ def end_all_appointments(request):
         # Cancel only today's pending and skip appointments
         StudentAppointments.objects.filter(
             datetime__date=now_ph,
-            status__in=["pending", "skip", "current",]
-        ).update(status="cancel")
+            status__in=["pending", "skip", "current",'done', 'cancel']
+        ).update(status="pending")
         
         broadcast_update()
         return redirect("personel")  
     return redirect("personel")
 
 
-def test(request):
-    template = loader.get_template('personel/test.html')
-    context = {}
+def login(request):
 
+        
+    template = loader.get_template('personel/auth/login.html')
+    context = {
+    }
     return HttpResponse(template.render(context, request))
+
+
+def register(request):
+   
+
+    template = loader.get_template('personel/auth/register.html')
+    context = {
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def logout(request):
+    request.session.flush()  # clears all session data
+    messages.success(request, "Logged out successfully.")
+    return redirect("auth_login")

@@ -54,80 +54,108 @@
     
 </div>
 
-<section id="student">
-    <div class="flex justify-between mt-7 gap-6 max-h-[224px]">
-            <!-- Centered content (p + button) -->
-            {% if get_current_number %}
-                <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px] min-h-[200px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-                    <h2 class="text-gray-700 text-sm font-semibold ">
-                        Current Serving Number
-                    </h2>
+<section id="student" class="flex mt-6 gap-8">
+    <!-- left -->
+    <div class="flex flex-col bg-white flex-1 p-3  max-w-[314px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+        <!-- current -->
+        <h2 class="text-gray-700 text-sm font-semibold ">
+                    Current Serving Number
+        </h2>
+        {% if get_current_number %}
+            <div class="min-h-[200px] flex justify-center items-center ">
 
-                    <div class="flex flex-col items-center "> 
-                        <p class=" {% if get_current_number.skip_count > 0 %} text-[#FFCC00]
-                                                    {% elif get_current_number.is_priority == 'yes' %} text-[#ED7676]
-                                                    {% else %}text-[#10934F]
-                                                    {% endif %}
-                         text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                        {{ get_current_number.ticket_number }}
-                        </p>
-                    </div>
-
+                <div class="flex items-center "> 
+                    <p class="text-[#10934F]  
+                        text-9xl medula-one-regular  text-shadow-lg/30">
+                    {{ get_current_number.ticket_number }}
+                    </p>
                 </div>
-            {% else %}
-                <div class="flex flex-col bg-white flex-1 px-2 py-1  max-w-[255px] min-h-[200px]  shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+            </div>
+        {% else %}
+            <div class="min-h-[200px] flex flex-col  justify-center items-center ">
+                <div class="flex flex-col items-center gap-4 ">
+                    <p class="text-gray-500 text-sm ">
+                    No request appointment now
+                    </p>
+                    <form action="{% url 'personel' %}" method="POST">
+                        {% csrf_token %}
+                        <button class="bg-[#10934F] hover:bg-[#10934F]/80 text-sm text-white px-17 py-2 cursor-pointer"
+                            type="submit" name="start" value="start">
+                            Start
+                        </button>
+                    </form>
+                    
+                </div>
+            </div>
+        {% endif %}        
 
-                    <h2 class="text-gray-700 text-sm">
-                        Non-Priority Current Number
-                    </h2>
-                    <div class="flex flex-col items-center mt-15">
-                        <p class="text-gray-500 mb-4 text-sm">
-                        No request appointment now
-                        </p>
-                        <form action="{% url 'personel' %}" method="POST">
-                            {% csrf_token %}
-                            <button class="bg-[#10934F] text-sm text-white px-10 py-1"
-                                type="submit" name="start" value="start">
-                                Start
-                            </button>
-                        </form>
+        <div class="border-1 border-gray-400 "></div>
+
+        <div class="flex-col ">
+            <!-- <h1 class="text-center text-base font-bold text-[#10934F]">Waiting List</h1> -->
+            <h1  class="text-center mt-2 px-4 py-2  text-base font-bold text-white bg-[#76B3ED]">Waiting List</h1>
+
+            <table class="w-full mt-4  ">
+                    <thead class="text-base">
                         
-                    </div>
-                </div>
-            {% endif %}
-    
+                        <tr class="" >
+                            <th class="text-left px-4 py-1">Full Name</th>
+                            <th class="text-center px-4 py-1">Number</th>
+                        </tr>
+                    </thead>
+                    <tbody class=" ">
+                        {% for display_queue in display_queues  %}
+                        <tr class="bg-[#76B3ED]/20 {% if display_queue.status == 'standby' and display_queue.is_priority == 'no'  %} bg-[#FFCC00]/20 
+                                                    {% elif display_queue.status == 'standby' and display_queue.is_priority == 'yes'  %} bg-[#ED7676]/20
+                                                    {% else %}bg-[#76B3ED]/20
+                                                    {% endif %} ">  <!-- Highlight first -->
+                            <td class="text-left text-sm px-4 py-2 ">{{ display_queue.firstName }} {{ display_queue.middleName }} {{ display_queue.lastName }}</td>
+                            <td class="px-4 py-2 text-sm ">{{ display_queue.ticket_number }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+        </div>
+        
+
+    </div>
+
+   
 
 
-
-        <div class="flex-1 bg-white justify-center w-[650px] shadow-[0_4px_10px_rgba(0,0,0,0.6)] ">
+    <!-- right  -->
+     
+    <div class="flex-1">
+        <div class=" bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)] min-h-[200px]">
             <div class="bg-[#10934F] text-white text-base p-2 text-center">
                 <h2>Information</h2>
             </div>
             <div class="mx-4 ">
-            <table class="w-full border-collapse mt-4">
-                <thead class="text-base">
-                    <tr class="border-b border-[#DEDEDE]">
-                        <th class="text-left px-4 py-2">ID Number</th>
-                        <th class="text-left px-4 py-2">Full Name</th>
-                        <th class="text-left px-4 py-2">Course</th>
-                        <th class="text-left px-4 py-2">Request</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                    {% if get_current_number %}
-                    <tr>
-                        <td class="px-4 py-2 ">{{ get_current_number.idNumber }}</td>
-                        <td class="px-4 py-2 ">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
-                        <td class="px-4 py-2 ">{{ get_current_number.courses }}</td>
-                        <td class="px-4 py-2">{{ get_current_number.requestType }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td class="px-4 py-2 text-center " colspan="4">NO REQUEST RIGHT NOW</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                <table class="w-full border-collapse mt-4">
+                    <thead class="text-base">
+                        <tr class="border-b border-[#DEDEDE]">
+                            <th class="text-left px-4 py-2">ID Number</th>
+                            <th class="text-left px-4 py-2">Full Name</th>
+                            <th class="text-left px-4 py-2">Course</th>
+                            <th class="text-left px-4 py-2">Request</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% if get_current_number %}
+                        <tr>
+                            <td class="px-4 py-2 ">{{ get_current_number.idNumber }}</td>
+                            <td class="px-4 py-2 ">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
+                            <td class="px-4 py-2 ">{{ get_current_number.courses }}</td>
+                            <td class="px-4 py-2">{{ get_current_number.requestType }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td class="px-4 py-2 text-center " colspan="4">NO REQUEST RIGHT NOW</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
 
             <div class="flex justify-center mt-5 px-4 text-sm">
@@ -146,147 +174,69 @@
                 
                 </form>
             </div>
-        </div>
+        </div>  
+        
+        <!-- skip and priority -->
 
-        <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px]   text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-            
-            {% if next_in_line %}
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                <div class="flex flex-col items-center ">
-                <p class="{% if next_in_line.skip_count > 0 %} text-[#FFCC00]
-                                                    {% elif next_in_line.is_priority == 'yes' %} text-[#ED7676]
-                                                    {% else %}text-[#10934F]
-                                                    {% endif %}
-                medula-one-regular mb-2 text-shadow-lg/30 text-9xl">
-                    {{ next_in_line.ticket_number }}
-                </p>
-                <p>Next Queue</p>
-
-    
-            {% else %}    
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                    <div class="flex flex-col items-center mt-15">
-                        <p class="text-gray-500 mb-4 text-sm">
-                        No Pending request Numbers
-                        </p>
-                    </div>
-                </div>
-            {% endif %}    
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-    <div class="flex justify-between mt-7 gap-6">
-        <div class="flex flex-1 bg-white  divide-x divide-gray-300 shadow-[0_4px_10px_rgba(0,0,0,0.6)] " >
-
-            <!-- Non Priority Students -->
-            <div class="flex-1 max-w-[350px] min-h-[513px] ">
-
-                <div class="bg-[#10934F] text-white p-2 text-center text-base">
-                    <h2 class="font-semibold tracking-wide">WAITING LIST</h2>
-                </div>
-
-                
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% if non_priority_students %}
-                            {% for non_priority_student in non_priority_students %}
-                                {% if non_priority_student == get_first_non_priority_students %}
-                                    <tr class="bg-[#10934F]/20">  <!-- Highlight first -->
-                                        <td class="px-4 py-2 font-semibold">{{ non_priority_student.firstName }} {{ non_priority_student.middleName }} {{ non_priority_student.lastName }}</td>
-                                        <td class="px-4 py-2 font-semibold">{{ non_priority_student.ticket_number }}</td>
-                                    </tr>
-                                {% else %}
-                                    <tr class="">
-                                        <td class="px-4 py-2">{{ non_priority_student.firstName }} {{ non_priority_student.middleName }} {{ non_priority_student.lastName }}</td>
-                                        <td class="px-4 py-2">{{ non_priority_student.ticket_number }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}    
-                        {% else %}
-
-                            <tr class="">
-                                <td class="px-4 py-2" colspan="2">No Pending Right Now</td>
-                            </tr>
-                        {% endif %}
-                        
-                    </tbody>
-                </table>
-            </div>
-
-            
-            <div class="flex-1">
-                <div class="bg-[#10934F] text-white p-2 text-center">
+        <div class="mt-6 flex gap-4">
+            <div class="flex-1 min-h-[418px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
+                <!-- Header -->
+                <div class="bg-[#FFCC00] text-black p-2 text-center">
                     <h2 class="font-semibold tracking-wide">SKIPPED LIST</h2>
                 </div>
 
-                <div class="mr-8">
-                <table class="w-full mt-2 " >
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% for skip_non_priority_student in skip_non_priority_students %}
-                        <tr class="">
-                            <td class="px-4 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
-                            <td class="px-4 py-2">{{ skip_non_priority_student.ticket_number }}</td>
-                            <td class="px-4 py-2">
-                                <form action="{% url 'standby' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="ticket_number" value="{{skip_non_priority_student.id}}">
-                                    <button type="submit" name="action" value="standby"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                        Standby
-                                    </button>
-                                </form>
-                                
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <!-- Table in the middle -->
+                <div class="flex-1 flex justify-center items-start overflow-y-auto">
+                    <table class="w-full mt-2">
+                        <thead class="text-base">
+                            <tr>
+                                <th class="text-left px-4 py-2">Full Name</th>
+                                <th class="text-left px-4 py-2">Number</th>
+                                <th class="text-left px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            {% for skip_non_priority_student in skip_non_priority_students %}
+                                <tr class="">
+                                    <td class="px-4 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
+                                    <td class="px-4 py-2">{{ skip_non_priority_student.ticket_number }}</td>
+                                    <td class="px-4 py-2">
+                                        <form action="{% url 'standby' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="ticket_number" value="{{skip_non_priority_student.id}}">
+                                            <button type="submit" name="action" value="standby"
+                                                class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
+                                                Standby
+                                            </button>
+                                        </form>
+                                        
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
-            
+            <!-- priority -->
+             <div class="flex-1 min-h-[418px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
+                <!-- Header -->
+                <div class="bg-[#ED7676] text-white p-2 text-center">
+                    <h2 class="font-semibold tracking-wide">PRIORITY QUEUE’S</h2>
+                </div>
 
-        <div class="w-[403px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
-            <!-- Header -->
-            <div class="bg-[#ED7676] text-white p-2 text-center">
-                <h2 class="font-semibold tracking-wide">PRIORITY LIST</h2>
-            </div>
-
-            <!-- Table in the middle -->
-            <div class="flex-1 flex justify-center items-start overflow-y-auto">
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr>
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% if priority_students %}
+                <!-- Table in the middle -->
+                <div class="flex-1 flex justify-center items-start overflow-y-auto">
+                    <table class="w-full mt-2">
+                        <thead class="text-base">
+                            <tr>
+                                <th class="text-left px-4 py-2">Full Name</th>
+                                <th class="text-left px-4 py-2">Number</th>
+                                <th class="text-left px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            {% if priority_students %}
                                 {% for priority_student in priority_students %}
                                     <tr class="">
                                         <td class="px-4 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
@@ -306,238 +256,26 @@
                                 {% endfor %}    
                             {% else %}
                                 <tr class="">
-                                    <td class="px-4 py-2" colspan="2">No Pending Right Now</td>
+                                    <td class="px-4 py-2 text-center" colspan="3">No Pending Right Now</td>
                                 </tr>
                             {% endif %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- Button at bottom -->
-            <!-- <div class="p-4 flex justify-center text-sm">
-                <form action="">
-                    <button class="px-15 bg-[#FFCC00] text-black py-2 "> Standby </button> 
-                </form>
-                
-            </div> -->
+
+
         </div>
 
 
+
     </div>
+
+    
 </section>    
 
 
-
-<section id="guest" class="hidden">
-    <div class="flex justify-between mt-7 gap-6 max-h-[224px]">
-            <!-- Centered content (p + button) -->
-    
-                <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px] min-h-[200px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-                    <h2 class="text-gray-700 text-sm font-semibold ">
-                        Current Serving Number
-                    </h2>
-
-                    <div class="flex flex-col items-center ">
-                        <p class="text-[#10934F] text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                            0-000
-                        </p>
-
-                
-                    </div>
-
-                </div>
-            
-    
-
-
-
-        <div class="flex-1 bg-white justify-center w-[650px] shadow-[0_4px_10px_rgba(0,0,0,0.6)] ">
-            <div class="bg-[#10934F] text-white text-base p-2 text-center">
-                <h2>Information</h2>
-            </div>
-            <div class="mx-4 ">
-            <table class="w-full border-collapse mt-4">
-                <thead class="text-base">
-                    <tr class="border-b border-[#DEDEDE]">
-                        <th class="text-left px-4 py-2">ID Number</th>
-                        <th class="text-left px-4 py-2">Full Name</th>
-                        <th class="text-left px-4 py-2">Course</th>
-                        <th class="text-left px-4 py-2">Request</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                  
-                    <tr>
-                        <td class="px-4 py-2 ">000-0000d</td>
-                        <td class="px-4 py-2 ">Florence Craid Sasdad</td>
-                        <td class="px-4 py-2 ">BSIT</td>
-                        <td class="px-4 py-2">Request 1</td>
-                    </tr>
-                    
-                </tbody>
-            </table>
-            </div>
-
-            <div class="flex justify-center mt-5 px-4 text-sm">
-                <form action="" method="post">
-                    
-                    <div class="flex gap-8">
-                       
-                            <input type="hidden" name="ticket_number" value="" >
-                            <button type="submit" name="action" value="done"
-                                class="bg-[#10934F] hover:bg-[#10934F]/80  text-white px-10 py-1 cursor-pointer" >
-                            Done</button>
-                            <button  type="submit" name="action" value="skip"
-                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80  text-black px-10 py-1 cursor-pointer" >Skip</button>
-                       
-                    </div>
-                
-                </form>
-            </div>
-        </div>
-
-        <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px]   text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-            
-          
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                <div class="flex flex-col items-center ">
-                <p class="text-[#10934F] text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                    0-000
-                </p>
-                <p>Next Queue</p>
-
-    
-              
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-    <div class="flex justify-between mt-7 gap-6">
-        <div class="flex flex-1 bg-white  divide-x divide-gray-300 shadow-[0_4px_10px_rgba(0,0,0,0.6)] " >
-
-            <!-- Non Priority Students -->
-            <div class="flex-1 max-w-[350px] min-h-[513px] ">
-
-                <div class="bg-[#10934F] text-white p-2 text-center text-base">
-                    <h2 class="font-semibold tracking-wide">WAITING LIST</h2>
-                </div>
-
-                
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        
-                            <tr class="bg-[#10934F]/20">  <!-- Highlight first -->
-                                <td class="px-4 py-2 font-semibold">Florence Casdas Aafsdf</td>
-                                <td class="px-4 py-2 font-semibold">0-500</td>
-                            </tr>
-                                
-                        
-                    </tbody>
-                </table>
-            </div>
-
-            
-            <div class="flex-1">
-                <div class="bg-[#10934F] text-white p-2 text-center">
-                    <h2 class="font-semibold tracking-wide">SKIPPED LIST</h2>
-                </div>
-
-                <div class="mr-8">
-                <table class="w-full mt-2 " >
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                       
-                        <tr class="">
-                            <td class="px-4 py-2">Florence Casdn SDFDSF</td>
-                            <td class="px-4 py-2">0-000</td>
-                            <td class="px-4 py-2">
-                                <form action="" method="post">
-                                    <input type="hidden" name="ticket_number" value="">
-                                    <button type="submit" name="action" value="standby"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                        Standby
-                                    </button>
-                                </form>
-                                
-                            </td>
-                        </tr>
-                      
-                    </tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-
-            
-
-        <div class="w-[403px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
-            <!-- Header -->
-            <div class="bg-[#ED7676] text-white p-2 text-center">
-                <h2 class="font-semibold tracking-wide">PRIORITY LIST</h2>
-            </div>
-
-            <!-- Table in the middle -->
-            <div class="flex-1 flex justify-center items-start overflow-y-auto">
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr>
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                      
-                                    <tr class="">
-                                        <td class="px-4 py-2">floasdfdfn Fsdfdsf Bcvb</td>
-                                        <td class="px-4 py-2">0-000</td>
-                                        <td class="px-4 py-2">
-                                            <form action="" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="ticket_number" value="">
-                                                <!-- <input type="hidden" name="ticket_number" value="{{priority_student.ticket_number}}"> -->
-                                                <button type="submit" name="action" value="standby"
-                                                    class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                                    Standby
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Button at bottom -->
-            <!-- <div class="p-4 flex justify-center text-sm">
-                <form action="">
-                    <button class="px-15 bg-[#FFCC00] text-black py-2 "> Standby </button> 
-                </form>
-                
-            </div> -->
-        </div>
-
-
-    </div>
-</section>    
 
 
 {% endblock  %}

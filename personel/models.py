@@ -38,6 +38,11 @@ class StudentAppointments(models.Model):
         ('cancel', 'Cancel'),
         ('standby', 'Standby' )
     ]
+    USER_TYPE = [
+        ('student', 'Student'),
+        ('guest', 'Guest'),
+    ]
+
     idNumber= models.CharField(max_length=50, null=True)
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=1, blank=True)
@@ -46,6 +51,8 @@ class StudentAppointments(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
     ticket_number = models.CharField(max_length=10, null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+
+    user_type = models.CharField(max_length=50, choices=USER_TYPE, default='student')
 
     is_priority = models.CharField(max_length=50, choices=[('yes','Yes'),('no','No')], default='no')
     # relationship 
@@ -71,6 +78,7 @@ class StudentAppointments(models.Model):
             # Give 1 hour countdown
             self.skip_until = timezone.now() + timedelta(hours=1)
         self.save()
+        
     def check_expiration(self):
         """
         Called by cron job / periodic task to check if skip timer expired.
@@ -83,8 +91,11 @@ class StudentAppointments(models.Model):
         return f'{self.firstName} {self.middleName} {self.lastName}'
 
 
-# offices
-class Offices(models.Model):
-    name = models.CharField(max_length=100, null=True)
-    def __str__(self):
-        return f"{self.name}"
+class Personel(models.Model):
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def _str__(self):
+        return f'{self.username}'
+    

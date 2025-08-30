@@ -75,7 +75,7 @@ def student_submit(request):
         )
         return JsonResponse({"success": True, "ticket": student.ticket_number})
 
-        return redirect("home")
+    return redirect("home")
 
 
 

@@ -10,50 +10,29 @@ from personel.views import get_display_queue
 
 class StudentsConsumer(WebsocketConsumer):
     def connect(self):
-        # We'll just use a fixed group name (all live updates go here)
         self.group_name = "students_live_updates"
-
-        # Join the group
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name,
-            self.channel_name
-        )
-
+        async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
         self.accept()
 
-        # Send initial data immediately when someone connects
+        # Send initial data
         self.send_updates("Connected")
 
     def disconnect(self, close_code):
-        # Leave group when disconnected
-        async_to_sync(self.channel_layer.group_discard)(
-            self.group_name,
-            self.channel_name
-        )
+        async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
 
     def receive(self, text_data):
-        """
-        When frontend sends a message, you can choose what to do.
-        For now, we'll just trigger an update broadcast.
-        """
         data = json.loads(text_data)
         message = data.get("message", "update")
         self.send_updates(message)
 
     def chat_message(self, event):
-        """
-        Called when group_send sends a message.
-        """
         self.send_updates(event["message"])
 
     def send_updates(self, message):
-        """
-        Collects data using the exact same logic as personel/views.py
-        """
         now_ph = localtime(timezone.now())
         today = now_ph.date()
 
-        # Auto-cancel expired skips (same as views.py)
+        # Auto-cancel expired skips
         expired = StudentAppointments.objects.filter(
             status="skip", skip_until__lt=now_ph
         )
@@ -61,43 +40,44 @@ class StudentsConsumer(WebsocketConsumer):
             appt.status = "cancel"
             appt.save()
 
-        # Get current student (same as views.py)
+        # Current student
         get_current_number = StudentAppointments.objects.filter(
             status="current",
             datetime__date=today
         ).order_by("datetime").first()
 
-        # Get served count (FIXED: should count "done" and "current", not "pending" and "standby")
+        # Served count (done + current)
         served_today = StudentAppointments.objects.filter(
             status__in=["done", "current"],
             datetime__date=today
         ).count()
 
+        # Determine 2:1 serving order
         next_should_be_priority = (served_today % 3) == 2
 
-        # Get next in line using the new function
+        # Unified queue function (2:1 applied)
         next_in_line_students = get_display_queue(today, limit=5)
 
-        # Get additional data for display
+        # Stats
         non_priority_students = StudentAppointments.objects.filter(
             is_priority="no",
             status="pending",
             datetime__date=today
-        ).order_by("datetime")
+        )
 
         priority_students = StudentAppointments.objects.filter(
             is_priority="yes",
             status__in=["pending", "skip"],
             datetime__date=today
-        ).order_by("datetime")
+        )
 
         skip_non_priority_students = StudentAppointments.objects.filter(
             is_priority="no",
             status="skip",
             datetime__date=today
-        ).order_by("datetime")
+        )
 
-        # Prepare JSON response
+        # Build payload
         payload = {
             "message": message,
             "current": {
@@ -112,7 +92,6 @@ class StudentsConsumer(WebsocketConsumer):
                 "datetime": localtime(get_current_number.datetime).strftime("%H:%M")
                 if get_current_number else None,
             } if get_current_number else None,
-            # Send list of up to 5 students following the 2:1 pattern
             "next_in_line": [
                 {
                     "id": s.id,
