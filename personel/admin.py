@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import  UserType,  RequestType, Courses, UserType, StudentAppointments
+from .models import  UserType,  RequestType, Courses, UserType, StudentAppointments, Personel, Survey
 
 # from .models import students
 
@@ -27,6 +27,15 @@ admin.site.register(RequestType, RequestTypeAdmin)
 class CoursesAdmin(admin.ModelAdmin):
     list_display = ('courses',)   
 admin.site.register(Courses, CoursesAdmin)
+
+class PersonelAdmin(admin.ModelAdmin):
+    list_display= ('username',)
+admin.site.register(Personel, PersonelAdmin)
+
+
+class SurveyAdmin(admin.ModelAdmin):
+    list_display= ('student_appointment','code',)
+admin.site.register(Survey, SurveyAdmin)
 
 
 

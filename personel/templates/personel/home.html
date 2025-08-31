@@ -10,6 +10,97 @@
 <!-- #FFCC00 -->
 <!-- #bb2124 -->
 
+<style>
+/* Hide badge by default */
+#notification-badge {
+  display: none;
+}
+
+/* Swing like a real bell */
+@keyframes swing-bell {
+  0%   { transform: rotate(0deg); }
+  10%  { transform: rotate(20deg); }
+  20%  { transform: rotate(-18deg); }
+  30%  { transform: rotate(16deg); }
+  40%  { transform: rotate(-14deg); }
+  50%  { transform: rotate(12deg); }
+  60%  { transform: rotate(-10deg); }
+  70%  { transform: rotate(8deg); }
+  80%  { transform: rotate(-6deg); }
+  90%  { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.ringing {
+  animation: swing-bell 1s ease-in-out;
+  transform-origin: top center; /* pivot at the top like a real bell */
+}
+
+/* Pulse for notification badge */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#notification-badge.active {
+  display: flex !important;
+  animation: pulse 1s infinite;
+}
+
+/* Pagination styles */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: auto; /* Push to bottom */
+  padding: 10px 5px;
+  background: white;
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.pagination-btn {
+  background-color: #10934F;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #10934F;
+}
+
+.pagination-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  margin: 0 10px;
+  padding: 5px 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+/* Container styles for proper sticky footer */
+.table-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 300px; /* Ensure minimum height */
+}
+
+.table-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+</style>
+{% load static %}
 <div class="flex mt-7 justify-between">
     <div class="flex gap-10">
         <a href="#" class="text-sm ">Dashboard</a>
@@ -54,80 +145,117 @@
     
 </div>
 
-<section id="student">
-    <div class="flex justify-between mt-7 gap-6 max-h-[224px]">
-            <!-- Centered content (p + button) -->
-            {% if get_current_number %}
-                <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px] min-h-[200px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-                    <h2 class="text-gray-700 text-sm font-semibold ">
-                        Current Serving Number
-                    </h2>
+<section id="student" class="flex mt-6 gap-8">
+    <div class="relative">
+        <i id="bell-icon" class="fa fa-bell text-3xl cursor-pointer text-gray-700"></i>
+        <span id="notification-badge"
+            class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+        </span>
+    </div>
+    <audio id="bell-sound" src="{% static 'sound/relapse.mp3' %}" preload="auto"></audio>
 
-                    <div class="flex flex-col items-center "> 
-                        <p class=" {% if get_current_number.skip_count > 0 %} text-[#FFCC00]
-                                                    {% elif get_current_number.is_priority == 'yes' %} text-[#ED7676]
-                                                    {% else %}text-[#10934F]
-                                                    {% endif %}
-                         text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                        {{ get_current_number.ticket_number }}
-                        </p>
-                    </div>
+    <!-- left -->
+    <div class="flex flex-col bg-white flex-1 py-2 px-1  max-w-[314px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+        <!-- current -->
+        <h2 class="text-gray-700 text-sm font-semibold ">
+                    Current Serving Number
+        </h2>
+        {% if get_current_number %}
+            <div class="min-h-[200px] flex justify-center items-center ">
 
+                <div class="flex items-center "> 
+                    <p class="text-[#10934F]  
+                        text-9xl medula-one-regular  text-shadow-lg/30">
+                    {{ get_current_number.ticket_number }}
+                    </p>
                 </div>
-            {% else %}
-                <div class="flex flex-col bg-white flex-1 px-2 py-1  max-w-[255px] min-h-[200px]  shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-
-                    <h2 class="text-gray-700 text-sm">
-                        Non-Priority Current Number
-                    </h2>
-                    <div class="flex flex-col items-center mt-15">
-                        <p class="text-gray-500 mb-4 text-sm">
-                        No request appointment now
-                        </p>
-                        <form action="{% url 'personel' %}" method="POST">
-                            {% csrf_token %}
-                            <button class="bg-[#10934F] text-sm text-white px-10 py-1"
-                                type="submit" name="start" value="start">
-                                Start
-                            </button>
-                        </form>
-                        
-                    </div>
+            </div>
+        {% else %}
+            <div class="min-h-[200px] flex flex-col  justify-center items-center ">
+                <div class="flex flex-col items-center gap-4 ">
+                    <p class="text-gray-500 text-sm ">
+                    No request appointment now
+                    </p>
+                    <form action="{% url 'personel' %}" method="POST">
+                        {% csrf_token %}
+                        <button class="bg-[#10934F] hover:bg-[#10934F]/80 text-sm text-white px-17 py-2 cursor-pointer"
+                            type="submit" name="start" value="start">
+                            Start
+                        </button>
+                    </form>
+                    
                 </div>
-            {% endif %}
-    
+            </div>
+        {% endif %}        
 
+        <div class="border-1 border-gray-400 "></div>
 
+        <div class="flex-col table-container">
+            <h1  class="text-center mt-2 px-4 py-2  text-base font-bold text-white bg-[#10934F]">Waiting List</h1>
 
-        <div class="flex-1 bg-white justify-center w-[650px] shadow-[0_4px_10px_rgba(0,0,0,0.6)] ">
+            <div class="table-scroll">
+                <table class="w-full mt-2">
+                    <thead class="text-base">
+                        <tr>
+                            <th class="text-left px-4 py-1">Number</th>
+                            <th class="text-center px-4 py-1">User</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wait-body">
+                        {% for display_queue in display_queues  %}
+                        <tr class="bg-[#76B3ED]/20 {% if display_queue.status == 'standby' and display_queue.is_priority == 'no'  %} bg-[#FFCC00]/20 
+                                                    {% elif display_queue.status == 'standby' and display_queue.is_priority == 'yes'  %} bg-[#ED7676]/20
+                                                    {% else %}bg-[#10934F]/20
+                                                    {% endif %} ">
+                            <td class="text-left px-4 py-2 text-sm ">{{ display_queue.ticket_number }}</td>
+                            <td class="px-4 py-2 text-sm ">{{ display_queue.user_type }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+           
+                <div class="pagination-container" id="wait-pagination">
+                    <button class="pagination-btn" id="wait-prev-btn" disabled>Prev</button>
+                    <span class="pagination-info" id="wait-page-info">Page 1</span>
+                    <button class="pagination-btn" id="wait-next-btn">Next</button>
+                </div>
+         
+        </div>
+    </div>
+
+    <!-- right  -->
+    <div class="flex-1">
+        <div class=" bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)] min-h-[230px]">
             <div class="bg-[#10934F] text-white text-base p-2 text-center">
                 <h2>Information</h2>
             </div>
             <div class="mx-4 ">
-            <table class="w-full border-collapse mt-4">
-                <thead class="text-base">
-                    <tr class="border-b border-[#DEDEDE]">
-                        <th class="text-left px-4 py-2">ID Number</th>
-                        <th class="text-left px-4 py-2">Full Name</th>
-                        <th class="text-left px-4 py-2">Course</th>
-                        <th class="text-left px-4 py-2">Request</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                    {% if get_current_number %}
-                    <tr>
-                        <td class="px-4 py-2 ">{{ get_current_number.idNumber }}</td>
-                        <td class="px-4 py-2 ">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
-                        <td class="px-4 py-2 ">{{ get_current_number.courses }}</td>
-                        <td class="px-4 py-2">{{ get_current_number.requestType }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td class="px-4 py-2 text-center " colspan="4">NO REQUEST RIGHT NOW</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                <table class="w-full border-collapse mt-6">
+                    <thead class="text-base">
+                        <tr class="border-b border-[#DEDEDE]">
+                            <th class="text-left px-4 py-2">ID Number</th>
+                            <th class="text-left px-4 py-2">Full Name</th>
+                            <th class="text-left px-4 py-2">Course</th>
+                            <th class="text-left px-4 py-2">Request</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% if get_current_number %}
+                        <tr>
+                            <td class="px-4 py-2 ">{{ get_current_number.idNumber }}</td>
+                            <td class="px-4 py-2 ">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
+                            <td class="px-4 py-2 ">{{ get_current_number.courses }}</td>
+                            <td class="px-4 py-2">{{ get_current_number.requestType }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td class="px-4 py-2 text-center " colspan="4">NO REQUEST RIGHT NOW</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
 
             <div class="flex justify-center mt-5 px-4 text-sm">
@@ -141,161 +269,94 @@
                             Done</button>
                             <button  type="submit" name="action" value="skip"
                             class="bg-[#FFCC00] hover:bg-[#FFCC00]/80  text-black px-10 py-1 cursor-pointer" >Skip</button>
+                            <!-- call  -->
+                            <button onclick="speakNumber('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
+                                type="button"
+                                class="bg-blue-600 hover:bg-blue-500 text-white px-10 py-1 cursor-pointer">
+                                Call
+                            </button>
                         {% endif %}
                     </div>
-                
                 </form>
             </div>
-        </div>
-
-        <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px]   text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-            
-            {% if next_in_line %}
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                <div class="flex flex-col items-center ">
-                <p class="{% if next_in_line.skip_count > 0 %} text-[#FFCC00]
-                                                    {% elif next_in_line.is_priority == 'yes' %} text-[#ED7676]
-                                                    {% else %}text-[#10934F]
-                                                    {% endif %}
-                medula-one-regular mb-2 text-shadow-lg/30 text-9xl">
-                    {{ next_in_line.ticket_number }}
-                </p>
-                <p>Next Queue</p>
-
-    
-            {% else %}    
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                    <div class="flex flex-col items-center mt-15">
-                        <p class="text-gray-500 mb-4 text-sm">
-                        No Pending request Numbers
-                        </p>
-                    </div>
-                </div>
-            {% endif %}    
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-    <div class="flex justify-between mt-7 gap-6">
-        <div class="flex flex-1 bg-white  divide-x divide-gray-300 shadow-[0_4px_10px_rgba(0,0,0,0.6)] " >
-
-            <!-- Non Priority Students -->
-            <div class="flex-1 max-w-[350px] min-h-[513px] ">
-
-                <div class="bg-[#10934F] text-white p-2 text-center text-base">
-                    <h2 class="font-semibold tracking-wide">WAITING LIST</h2>
-                </div>
-
-                
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% if non_priority_students %}
-                            {% for non_priority_student in non_priority_students %}
-                                {% if non_priority_student == get_first_non_priority_students %}
-                                    <tr class="bg-[#10934F]/20">  <!-- Highlight first -->
-                                        <td class="px-4 py-2 font-semibold">{{ non_priority_student.firstName }} {{ non_priority_student.middleName }} {{ non_priority_student.lastName }}</td>
-                                        <td class="px-4 py-2 font-semibold">{{ non_priority_student.ticket_number }}</td>
-                                    </tr>
-                                {% else %}
-                                    <tr class="">
-                                        <td class="px-4 py-2">{{ non_priority_student.firstName }} {{ non_priority_student.middleName }} {{ non_priority_student.lastName }}</td>
-                                        <td class="px-4 py-2">{{ non_priority_student.ticket_number }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}    
-                        {% else %}
-
-                            <tr class="">
-                                <td class="px-4 py-2" colspan="2">No Pending Right Now</td>
-                            </tr>
-                        {% endif %}
-                        
-                    </tbody>
-                </table>
-            </div>
-
-            
-            <div class="flex-1">
-                <div class="bg-[#10934F] text-white p-2 text-center">
+        </div>  
+        
+        <!-- skip and priority -->
+        <div class="mt-6 flex gap-4">
+            <!-- Skipped List -->
+            <div class="flex-1 min-h-[418px] bg-white flex flex-col shadow-[0_4px_10px_rgba(0,0,0,0.6)] table-container"> 
+                <div class="bg-[#FFCC00] text-black p-2 text-center">
                     <h2 class="font-semibold tracking-wide">SKIPPED LIST</h2>
                 </div>
 
-                <div class="mr-8">
-                <table class="w-full mt-2 " >
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% for skip_non_priority_student in skip_non_priority_students %}
-                        <tr class="">
-                            <td class="px-4 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
-                            <td class="px-4 py-2">{{ skip_non_priority_student.ticket_number }}</td>
-                            <td class="px-4 py-2">
-                                <form action="{% url 'standby' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="ticket_number" value="{{skip_non_priority_student.id}}">
-                                    <button type="submit" name="action" value="standby"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                        Standby
-                                    </button>
-                                </form>
-                                
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-scroll">
+                    <table class="w-full">
+                        <thead class="text-base">
+                            <tr>
+                                <th class="text-left px-4 py-2">Full Name</th>
+                                <th class="text-left px-4 py-2">Number</th>
+                                <th class="text-left px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm" id="skip-body">
+                            {% if skip_non_priority_students %}
+                                {% for skip_non_priority_student in skip_non_priority_students %}
+                                    <tr>
+                                        <td class="px-4 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
+                                        <td class="px-4 py-2">{{ skip_non_priority_student.ticket_number }}</td>
+                                        <td class="px-4 py-2">
+                                            <form action="{% url 'standby' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="ticket_number" value="{{skip_non_priority_student.id}}">
+                                                <button type="submit" name="action" value="standby"
+                                                    class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
+                                                    Standby
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}     
+                                    <tr>
+                                        <td colspan="3" class="text-center px-4 py-2">No Skipped Right Now</td>
+                                    </tr>
+                            {% endif %}   
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
 
-            
-
-        <div class="w-[403px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
-            <!-- Header -->
-            <div class="bg-[#ED7676] text-white p-2 text-center">
-                <h2 class="font-semibold tracking-wide">PRIORITY LIST</h2>
+                    <div class="pagination-container" id="skip-pagination">
+                        <button class="pagination-btn" id="skip-prev-btn" disabled>Prev</button>
+                        <span class="pagination-info" id="skip-page-info">Page 1</span>
+                        <button class="pagination-btn" id="skip-next-btn">Next</button>
+                    </div>
             </div>
 
-            <!-- Table in the middle -->
-            <div class="flex-1 flex justify-center items-start overflow-y-auto">
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr>
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        {% if priority_students %}
+            <!-- Priority List -->
+            <div class="flex-1 min-h-[418px] bg-white flex flex-col shadow-[0_4px_10px_rgba(0,0,0,0.6)] table-container"> 
+                <div class="bg-[#ED7676] text-white p-2 text-center">
+                    <h2 class="font-semibold tracking-wide">PRIORITY QUEUE'S</h2>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="w-full">
+                        <thead class="text-base">
+                            <tr>
+                                <th class="text-left px-4 py-2">Full Name</th>
+                                <th class="text-left px-4 py-2">Number</th>
+                                <th class="text-left px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm" id="priority-body">
+                            {% if priority_students %}
                                 {% for priority_student in priority_students %}
-                                    <tr class="">
+                                    <tr>
                                         <td class="px-4 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
                                         <td class="px-4 py-2">{{ priority_student.ticket_number }}</td>
                                         <td class="px-4 py-2">
                                             <form action="{% url 'priority_standby' %}" method="post">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="ticket_number" value="{{priority_student.id}}">
-                                                <!-- <input type="hidden" name="ticket_number" value="{{priority_student.ticket_number}}"> -->
                                                 <button type="submit" name="action" value="standby"
                                                     class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
                                                     Standby
@@ -305,239 +366,176 @@
                                     </tr>
                                 {% endfor %}    
                             {% else %}
-                                <tr class="">
-                                    <td class="px-4 py-2" colspan="2">No Pending Right Now</td>
+                                <tr>
+                                    <td class="px-4 py-2 text-center" colspan="3">No Pending Right Now</td>
                                 </tr>
                             {% endif %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Button at bottom -->
-            <!-- <div class="p-4 flex justify-center text-sm">
-                <form action="">
-                    <button class="px-15 bg-[#FFCC00] text-black py-2 "> Standby </button> 
-                </form>
-                
-            </div> -->
-        </div>
-
-
-    </div>
-</section>    
-
-
-
-<section id="guest" class="hidden">
-    <div class="flex justify-between mt-7 gap-6 max-h-[224px]">
-            <!-- Centered content (p + button) -->
-    
-                <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px] min-h-[200px]  text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-                    <h2 class="text-gray-700 text-sm font-semibold ">
-                        Current Serving Number
-                    </h2>
-
-                    <div class="flex flex-col items-center ">
-                        <p class="text-[#10934F] text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                            0-000
-                        </p>
-
-                
-                    </div>
-
+                        </tbody>
+                    </table>
                 </div>
-            
-    
-
-
-
-        <div class="flex-1 bg-white justify-center w-[650px] shadow-[0_4px_10px_rgba(0,0,0,0.6)] ">
-            <div class="bg-[#10934F] text-white text-base p-2 text-center">
-                <h2>Information</h2>
-            </div>
-            <div class="mx-4 ">
-            <table class="w-full border-collapse mt-4">
-                <thead class="text-base">
-                    <tr class="border-b border-[#DEDEDE]">
-                        <th class="text-left px-4 py-2">ID Number</th>
-                        <th class="text-left px-4 py-2">Full Name</th>
-                        <th class="text-left px-4 py-2">Course</th>
-                        <th class="text-left px-4 py-2">Request</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                  
-                    <tr>
-                        <td class="px-4 py-2 ">000-0000d</td>
-                        <td class="px-4 py-2 ">Florence Craid Sasdad</td>
-                        <td class="px-4 py-2 ">BSIT</td>
-                        <td class="px-4 py-2">Request 1</td>
-                    </tr>
-                    
-                </tbody>
-            </table>
-            </div>
-
-            <div class="flex justify-center mt-5 px-4 text-sm">
-                <form action="" method="post">
-                    
-                    <div class="flex gap-8">
-                       
-                            <input type="hidden" name="ticket_number" value="" >
-                            <button type="submit" name="action" value="done"
-                                class="bg-[#10934F] hover:bg-[#10934F]/80  text-white px-10 py-1 cursor-pointer" >
-                            Done</button>
-                            <button  type="submit" name="action" value="skip"
-                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80  text-black px-10 py-1 cursor-pointer" >Skip</button>
-                       
-                    </div>
                 
-                </form>
-            </div>
-        </div>
-
-        <div class="flex flex-col bg-white flex-1 p-3 max-w-[255px]   text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-            
           
-                <h2 class="text-gray-700 text-sm font-semibold ">
-                    Standby Numbers
-                </h2>
-                <div class="flex flex-col items-center ">
-                <p class="text-[#10934F] text-9xl medula-one-regular mb-2 text-shadow-lg/30">
-                    0-000
-                </p>
-                <p>Next Queue</p>
-
-    
-              
-            </div>
-
-        </div>
-    </div>
-
-
-
-
-    <div class="flex justify-between mt-7 gap-6">
-        <div class="flex flex-1 bg-white  divide-x divide-gray-300 shadow-[0_4px_10px_rgba(0,0,0,0.6)] " >
-
-            <!-- Non Priority Students -->
-            <div class="flex-1 max-w-[350px] min-h-[513px] ">
-
-                <div class="bg-[#10934F] text-white p-2 text-center text-base">
-                    <h2 class="font-semibold tracking-wide">WAITING LIST</h2>
-                </div>
-
-                
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        
-                            <tr class="bg-[#10934F]/20">  <!-- Highlight first -->
-                                <td class="px-4 py-2 font-semibold">Florence Casdas Aafsdf</td>
-                                <td class="px-4 py-2 font-semibold">0-500</td>
-                            </tr>
-                                
-                        
-                    </tbody>
-                </table>
-            </div>
-
-            
-            <div class="flex-1">
-                <div class="bg-[#10934F] text-white p-2 text-center">
-                    <h2 class="font-semibold tracking-wide">SKIPPED LIST</h2>
-                </div>
-
-                <div class="mr-8">
-                <table class="w-full mt-2 " >
-                    <thead class="text-base">
-                        <tr >
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                       
-                        <tr class="">
-                            <td class="px-4 py-2">Florence Casdn SDFDSF</td>
-                            <td class="px-4 py-2">0-000</td>
-                            <td class="px-4 py-2">
-                                <form action="" method="post">
-                                    <input type="hidden" name="ticket_number" value="">
-                                    <button type="submit" name="action" value="standby"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                        Standby
-                                    </button>
-                                </form>
-                                
-                            </td>
-                        </tr>
-                      
-                    </tbody>
-                </table>
-                </div>
+                    <div class="pagination-container" id="priority-pagination">
+                        <button class="pagination-btn" id="priority-prev-btn" disabled>Prev</button>
+                        <span class="pagination-info" id="priority-page-info">Page 1</span>
+                        <button class="pagination-btn" id="priority-next-btn">Next</button>
+                    </div>
+        
             </div>
         </div>
-
-            
-
-        <div class="w-[403px] bg-white flex flex-col justify-between shadow-[0_4px_10px_rgba(0,0,0,0.6)]"> 
-            <!-- Header -->
-            <div class="bg-[#ED7676] text-white p-2 text-center">
-                <h2 class="font-semibold tracking-wide">PRIORITY LIST</h2>
-            </div>
-
-            <!-- Table in the middle -->
-            <div class="flex-1 flex justify-center items-start overflow-y-auto">
-                <table class="w-full mt-2">
-                    <thead class="text-base">
-                        <tr>
-                            <th class="text-left px-4 py-2">Full Name</th>
-                            <th class="text-left px-4 py-2">Number</th>
-                            <th class="text-left px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                      
-                                    <tr class="">
-                                        <td class="px-4 py-2">floasdfdfn Fsdfdsf Bcvb</td>
-                                        <td class="px-4 py-2">0-000</td>
-                                        <td class="px-4 py-2">
-                                            <form action="" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="ticket_number" value="">
-                                                <!-- <input type="hidden" name="ticket_number" value="{{priority_student.ticket_number}}"> -->
-                                                <button type="submit" name="action" value="standby"
-                                                    class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer  w-full ">
-                                                    Standby
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Button at bottom -->
-            <!-- <div class="p-4 flex justify-center text-sm">
-                <form action="">
-                    <button class="px-15 bg-[#FFCC00] text-black py-2 "> Standby </button> 
-                </form>
-                
-            </div> -->
-        </div>
-
-
     </div>
 </section>    
 
+<script>
+// Pagination function for all three tables
+function setupPagination(tableId, prevBtnId, nextBtnId, pageInfoId, rowsPerPage = 5) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const rows = Array.from(table.getElementsByTagName('tr'));
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+    const pageInfo = document.getElementById(pageInfoId);
+    
+    
+    
+    let currentPage = 1;
+    const totalPages = Math.max(Math.ceil(rows.length / rowsPerPage), 1);
+    
+    function showPage(page) {
+        // Hide all rows
+        rows.forEach(row => row.style.display = 'none');
+        
+        // Show rows for current page
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        for (let i = start; i < end && i < rows.length; i++) {
+            rows[i].style.display = '';
+        }
+        
+        // Update buttons
+        if (prevBtn) prevBtn.disabled = (page === 1);
+        if (nextBtn) nextBtn.disabled = (page === totalPages);
+        
+        // Update page info
+        if (pageInfo) pageInfo.textContent = ` ${page} : ${totalPages}`;
+    }
+    
+    // Event listeners
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+    }
+    
+    // Initialize
+    showPage(1);
+}
+
+// Initialize pagination for all three tables when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupPagination('wait-body', 'wait-prev-btn', 'wait-next-btn', 'wait-page-info');
+    setupPagination('skip-body', 'skip-prev-btn', 'skip-next-btn', 'skip-page-info');
+    setupPagination('priority-body', 'priority-prev-btn', 'priority-next-btn', 'priority-page-info');
+});
+    
+function speakNumber(ticketNumber, fullname) {
+    // Stop ongoing speech
+    window.speechSynthesis.cancel();
+
+    const text = `Number ${ticketNumber}, ${fullname}. Please come to the window.`;
+    const message = new SpeechSynthesisUtterance(text);
+
+    message.lang = "en-US";
+    message.rate = 0.8;   // normal speaking speed
+    message.pitch = 1.5; // slightly higher pitch → more feminine
+    message.volume = 1;
+
+    let voices = speechSynthesis.getVoices();
+
+    if (voices.length === 0) {
+        speechSynthesis.onvoiceschanged = () => {
+            voices = speechSynthesis.getVoices();
+            setFemaleVoice(message, voices);
+            speechSynthesis.speak(message);
+        };
+    } else {
+        setFemaleVoice(message, voices);
+        speechSynthesis.speak(message);
+    }
+}
+
+function setFemaleVoice(message, voices) {
+    // Pick Microsoft Zira if available
+    const preferred = voices.find(v => v.name.includes("Zira"))
+        || voices.find(v => v.name.includes("Female")) // fallback (if other browsers use "Female" in name)
+        || voices[0]; // last fallback: first available
+
+    if (preferred) {
+        message.voice = preferred;
+        console.log("Selected voice:", preferred.name);
+    }
+}
+
+const socket = new WebSocket("ws://" + window.location.host + "/ws/queue/");
+const notificationCountEl = document.getElementById("notification-count");
+
+let pendingCount = 0;
+ let lastPendingCount = 0;
+socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    if (data.stats) {
+        const totalPending = data.stats.non_priority_count + data.stats.priority_count;
+        const bellIcon = document.getElementById("bell-icon");
+        const badge = document.getElementById("notification-badge");
+        const bellSound = document.getElementById("bell-sound");
+
+       
+
+        if (totalPending > 0) {
+            badge.textContent = totalPending;
+            badge.classList.add("active");
+
+            // Bell swings
+            bellIcon.classList.add("ringing");
+            // Play bell sound
+            bellSound.currentTime = 0; // reset to start
+            bellSound.play().catch(e => console.log("Autoplay blocked:", e));
+
+            // Remove ringing class after animation so it can retrigger next time
+            setTimeout(() => {
+                bellIcon.classList.remove("ringing");
+            }, 1200);
+        } else if (totalPending === 0) {
+            badge.classList.remove("active");
+            badge.style.display = "none";
+        }
+
+        lastPendingCount = totalPending; // ✅ update tracker
+    }
+};
+
+function updateNotification() {
+    if (pendingCount > 0) {
+        notificationCountEl.textContent = pendingCount;
+        notificationCountEl.classList.remove("hidden");
+    } else {
+        notificationCountEl.classList.add("hidden");
+    }
+}
+</script>
 
 {% endblock  %}

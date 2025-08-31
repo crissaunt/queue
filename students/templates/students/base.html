@@ -67,7 +67,7 @@
     
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900 h-screen  custom-bg">
+<body class="bg-gray-100 text-gray-900 min-h-screen  custom-bg flex flex-col">
 
     <!-- Header -->
 
@@ -77,13 +77,18 @@
         </div>
     </div>
 
+    <main class="flex-1">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
 
-    {% block content %}
-    {% endblock %}
 
-
-    <footer class="bg-green-600">
-        <h1>FOOTER</h1>
+    <footer class="bg-[#10934F] border-t-10 border-t-white mt-15 py-5">
+        <div class="flex ml-10 gap-10 max-w-7xl mt-5">
+            <img src="{% static 'images/site-logo.svg' %}" alt="Logo" class="pl-9 h-15 md:h-30">
+            <p class=" text-white text-sm w-[550px]">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+        </div>
     </footer>
     
 </body>
