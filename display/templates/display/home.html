@@ -8,25 +8,47 @@ Home Students
 {% load static %}
 <!-- Content -->
 
+<style>
+  .priority-glow {
+    color: #ED7676 !important;
+    text-shadow: 0 0 5px rgba(237, 118, 118, 0.2), 0 0 40px rgba(237, 118, 118, 0.2);
+  }
+
+
+  .skip-glow {
+    color: #FFCC00 !important;
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.2), 0 0 40px rgba(255, 204, 0, 0.2);
+  }
+
+  /* Shake animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .shake {
+    animation: shake 0.3s ease-in-out;
+  }
+</style>
 
 <section class="text-white">
-  <div class="flex flex-col items-center justify-center mt-6">
-    <h1 class="text-9xl font-semibold text-shadow-md/50">CALLING NUMBER</h1>
+  <div class="flex flex-col items-center justify-center mt-8">
+    <h1 id="mainTitle" class="text-9xl font-semibold text-shadow-md/50"></h1>
 
     <div
-      class="flex flex-col bg-white min-w-[441.6px]  text-black py-10 px-15 rounded-4xl mt-6 shadow-[0_7px_7px_10px_rgba(0,0,0,0.3)]"
+      class="flex flex-col bg-white min-w-[441.6px] text-black py-10 px-15 rounded-4xl mt-6 shadow-[0_7px_7px_10px_rgba(0,0,0,0.3)]"
     >
       <h1
         id="ticketNumber"
-        class="text-[240px] leading-none font-medula text-center text-[#10934F]"
+        class="text-[240px] leading-none font-medula text-center"
       >
         -
       </h1>
-      <p id="studentName" class="text-3xl text-[#10934F]">...</p>
+      <p id="user_type" class="text-3xl">...</p>
     </div>
 
     <div class="flex flex-col items-center mt-10">
-      <!-- <p class="text-2xl">Time</p> -->
       <p id="studentTime" class="text-4xl font-poppins">-- : --</p>
     </div>
   </div>
@@ -34,14 +56,13 @@ Home Students
 
 <script>
   const ticketEl = document.getElementById("ticketNumber");
-  const nameEl = document.getElementById("studentName");
+  const userType = document.getElementById("user_type");
   const timeEl = document.getElementById("studentTime");
+  const mainTitle = document.getElementById("mainTitle");
 
   function updateTime() {
-    const timeEl = document.getElementById("studentTime");
     const now = new Date();
-
-    const month = now.toLocaleString("default", { month: "short" }); // Aug
+    const month = now.toLocaleString("default", { month: "short" });
     const day = now.getDate();
     const year = now.getFullYear();
     const hours = String(now.getHours()).padStart(2, "0");
@@ -51,30 +72,71 @@ Home Students
     timeEl.textContent = `${month} ${day}, ${year} - ${hours}:${minutes}:${seconds}`;
   }
 
-
   // Connect to Django Channels WebSocket
-  const socket = new WebSocket("ws://" + window.location.host + "/ws/display/");
+const socket = new WebSocket("ws://" + window.location.host + "/ws/display/");
 
-  socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    const current = data.current;
+function updateDisplay(current) {
+  if (current) {
+    ticketEl.textContent = current.ticket_number || "R-000";
+    userType.textContent = current.user_type || "";
 
-    if (current) {
-      ticketEl.textContent = current.ticket_number || "R-000";
-      nameEl.textContent =
-        (current.user_type || "");
+    // Reset 
+    mainTitle.classList.remove("priority-glow", "skip-glow", "shake");
+
+    if (current.is_priority === "yes") {
+      // Prio
+      ticketEl.style.color = "#ED7676"; 
+      userType.style.color = "#ED7676"; 
+
+      mainTitle.textContent = "PRIORITY NUMBER";
+      mainTitle.classList.add("priority-glow", "shake");
+
+      setTimeout(() => mainTitle.classList.remove("shake"), 700);
+
+    } else if (current.skip_count && current.skip_count > 0) {
+      // Skipped
+      ticketEl.style.color = "#FFCC00";
+      userType.style.color = "#FFCC00";
+
+      mainTitle.textContent = "SKIPPED NUMBER";
+      mainTitle.classList.add("skip-glow", "shake");
       
+
     } else {
-      ticketEl.textContent = "-";
-      nameEl.textContent = "...";
-     
+      // non prio
+      ticketEl.style.color = "#10934F";
+      userType.style.color = "#10934F";
+
+      mainTitle.textContent = "CURRENT SERVING";
     }
-  };
+  } else {
+    ticketEl.textContent = "-";
+    userType.textContent = "...";
+
+    ticketEl.style.color = "#10934F";
+    userType.style.color = "#10934F";
+    mainTitle.textContent = "CURRENT SERVING";
+    mainTitle.classList.remove("priority-glow", "skip-glow");
+  }
+}
+
+socket.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+  const current = data.current;
+
+  updateDisplay(current);
+
+  //  Retry request if no current on first connect
+  if (!current && data.message === "Connected") {
+    setTimeout(() => {
+      socket.send(JSON.stringify({ message: "update" }));
+    }, 1000);
+  }
+};
+
 
   updateTime();
   setInterval(updateTime, 1000);
 </script>
-
-
 
 {% endblock %}

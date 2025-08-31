@@ -99,3 +99,18 @@ class Personel(models.Model):
     def _str__(self):
         return f'{self.username}'
     
+class Survey(models.Model):
+    STATUS_CHOICES = [
+        ('no', 'No'),
+        ('yes', 'Yes'),
+    ]
+    student_appointment = models.ForeignKey(StudentAppointments, on_delete=models.CASCADE)
+    code = models.CharField(max_length=50, unique=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='no')
+
+    def __str__(self):
+        return f'{self.student_appointment} {self.code}'
+
+
+    
+

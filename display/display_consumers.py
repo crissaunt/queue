@@ -14,7 +14,7 @@ class DisplayConsumer(WebsocketConsumer):
         self.accept()
 
         # Send initial data
-        self.send_updates("Connected")
+        self.send_updates("Connected", initial=True)
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(self.group_name, self.channel_name)
@@ -27,7 +27,7 @@ class DisplayConsumer(WebsocketConsumer):
     def chat_message(self, event):
         self.send_updates(event["message"])
 
-    def send_updates(self, message):
+    def send_updates(self, message, initial=False):
         now_ph = localtime(timezone.now())
         today = now_ph.date()
 
@@ -40,10 +40,15 @@ class DisplayConsumer(WebsocketConsumer):
             appt.save()
 
         # Current student
-        get_current_number = StudentAppointments.objects.filter(
-            status="current",
-            datetime__date=today
-        ).order_by("datetime").first()
+        if initial:
+            get_current_number = StudentAppointments.objects.filter(
+                status="current",
+            ).order_by("-datetime").first()
+        else:
+            get_current_number= StudentAppointments.objects.filter(
+                 status="current",
+                datetime__date=today
+            ).order_by("datetime").first()
 
         # Build payload (only current)
         payload = {
@@ -57,6 +62,7 @@ class DisplayConsumer(WebsocketConsumer):
                 "status": get_current_number.status if get_current_number else None,
                 "is_priority": get_current_number.is_priority if get_current_number else None,
                 "user_type": get_current_number.user_type if get_current_number else None,
+                "skip_count": get_current_number.skip_count or 0,
                 "requestType": str(get_current_number.requestType) if get_current_number and get_current_number.requestType else None,
                 "datetime": localtime(get_current_number.datetime).strftime("%H:%M")
                 if get_current_number else None,
