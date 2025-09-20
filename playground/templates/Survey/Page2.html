@@ -1,0 +1,361 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Satisfaction Survey</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; 
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+
+            /* Background image */
+            background: url("{% static 'pictures/Background.svg' %}") no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Overlay effect */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;   
+            z-index: -1;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+        }
+        
+        .survey-container {
+            background-color: white;
+            border-radius: 5px;
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            margin: 2rem auto;
+        }
+        
+        .survey-instruction {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-left: 4px solid #10934F;
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .question-block {
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            border: none;
+            background-color: #fafafa;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question-code {
+            font-weight: bold;
+            color: #10934F;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+            font-size: 1rem;
+        }
+        
+        .answer-option {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-option:hover {
+            background-color: #f8f9fa;
+            border-color: #10934F;
+        }
+        
+        .answer-option input[type="checkbox"] {
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            accent-color: #164F29;
+        }
+        
+        .answer-option label {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            cursor: pointer;
+            color: #495057;
+            font-weight: 400;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .nav-button {
+            padding: 15px 30px;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .back-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .next-button {
+            background-color: #10934F;
+            color: white;
+        }
+        
+        .next-button:hover {
+            background-color: #1a5a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 79, 41, 0.3);
+        }
+        
+        .page-footer {
+            background-color: #10934F;
+            height: 50px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem 1rem;
+            }
+            
+            .survey-container {
+                padding: 2rem;
+                margin: 1rem auto;
+            }
+            
+            .question-block {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-button {
+                width: 100%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img src="{% static 'pictures/header-logo.svg' %}" alt="Logo" class="h-16 m-4">
+    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="survey-container">
+            <div class="survey-instruction" data-editable="instruction">
+                <strong>INSTRUCTION:</strong> Please Check(✓) your answer to the <strong>Citizen's Charter (CC)</strong> questions. 
+                The Citizen's Charter is an official document that reflects the services of a government agency including 
+                its requirements, fees, and processing time among others.
+            </div>
+
+            <form id="surveyForm2" method="POST" action="{% url 'page2' %}">
+            {% csrf_token %}
+
+        <!-- CC1 -->
+        <div class="question-block">
+            <div class="question-code">CC1</div>
+            <div class="question-text">
+                Which of the following best describes your awareness of a CC?
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc1_1" name="cc1" value="1" {% if '1' in cc1 %}checked{% endif %} onclick="limitCC1(this)">
+                <label for="cc1_1">1. I know what a CC is and I saw this office's CC.</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc1_2" name="cc1" value="2" {% if '2' in cc1 %}checked{% endif %} onclick="limitCC1(this)">
+                <label for="cc1_2">2. I know what CC is but I did NOT see this office's CC.</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc1_3" name="cc1" value="3" {% if '3' in cc1 %}checked{% endif %} onclick="limitCC1(this)">
+                <label for="cc1_3">3. I learned of the CC only when I saw this office's CC.</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc1_4" name="cc1" value="4" {% if '4' in cc1 %}checked{% endif %} onclick="limitCC1(this)">
+                <label for="cc1_4">
+                    4. I do not know what a CC is and I did not see one in the office 
+                    (Answer 'N/A' on CC2 and CC3)
+                </label>
+            </div>
+            <p id="cc1Error" class="text-danger"></p>
+        </div>
+
+        <!-- CC2 -->
+        <div class="question-block">
+            <div class="question-code">CC2</div>
+            <div class="question-text">
+                If aware of the CC (answered 1-3 in CC1), would you say that the CC of this office was ...?
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc2_1" name="cc2" value="1" {% if cc2 == '1' %}checked{% endif %} onclick="limitSingle('cc2', this)">
+                <label for="cc2_1">1. Easy to see</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc2_2" name="cc2" value="2" {% if cc2 == '2' %}checked{% endif %} onclick="limitSingle('cc2', this)">
+                <label for="cc2_2">2. Somewhat easy to see</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc2_3" name="cc2" value="3" {% if cc2 == '3' %}checked{% endif %} onclick="limitSingle('cc2', this)">
+                <label for="cc2_3">3. Difficult to see</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc2_4" name="cc2" value="4" {% if cc2 == '4' %}checked{% endif %} onclick="limitSingle('cc2', this)">
+                <label for="cc2_4">4. Not visible at all</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc2_5" name="cc2" value="5" {% if cc2 == '5' %}checked{% endif %} onclick="limitSingle('cc2', this)">
+                <label for="cc2_5">5. N/A</label>
+            </div>
+
+            <p id="cc2Error" class="text-danger"></p>
+        </div>
+
+        <!-- CC3 -->
+        <div class="question-block">
+            <div class="question-code">CC3</div>
+            <div class="question-text">
+                If aware of the CC (answered 1-3 in CC1), how much did the CC help you in your transaction?
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc3_1" name="cc3" value="1" {% if cc3 == '1' %}checked{% endif %} onclick="limitSingle('cc3', this)">
+                <label for="cc3_1">1. Helped very much</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc3_2" name="cc3" value="2" {% if cc3 == '2' %}checked{% endif %} onclick="limitSingle('cc3', this)">
+                <label for="cc3_2">2. Somewhat helped</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc3_3" name="cc3" value="3" {% if cc3 == '3' %}checked{% endif %} onclick="limitSingle('cc3', this)">
+                <label for="cc3_3">3. Did not help</label>
+            </div>
+            <div class="answer-option">
+                <input type="checkbox" id="cc3_4" name="cc3" value="4" {% if cc3 == '4' %}checked{% endif %} onclick="limitSingle('cc3', this)">
+                <label for="cc3_4">4. N/A</label>
+            </div>
+            <p id="cc3Error" class="text-danger"></p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation-buttons">
+            <button type="submit" name="back" class="nav-button back-button">BACK</button>
+            <button type="submit" class="nav-button next-button">NEXT</button>
+        </div>
+
+        <!-- JS Rules -->
+        <script>
+        document.getElementById("surveyForm2").addEventListener("submit", function(event) {
+            let valid = true;
+
+            // --- CC1 ---
+            const cc1Checked = document.querySelectorAll('input[name="cc1"]:checked');
+            const cc1Error = document.getElementById("cc1Error");
+            cc1Error.textContent = "";
+            cc1Error.classList.remove("text-danger"); // reset
+
+            if (cc1Checked.length < 1) {
+                cc1Error.textContent = "You must select at least 1 option in CC1.";
+                cc1Error.classList.add("text-danger");
+                cc1Error.classList.add("text-danger");
+                valid = false;
+            } else if (cc1Checked.length > 3) {
+                cc1Error.textContent = "You can only select up to 3 options in CC1.";
+                cc1Error.classList.add("text-danger");
+                valid = false;
+            }
+
+            // --- CC2 ---
+            const cc2Checked = document.querySelectorAll('input[name="cc2"]:checked');
+            const cc2Error = document.getElementById("cc2Error");
+            cc2Error.textContent = "";
+            cc2Error.classList.remove("text-danger"); // reset
+
+            if (cc2Checked.length < 1) {
+                cc2Error.textContent = "Please select more than 1 option in CC2.";
+                cc2Error.classList.add("text-danger");
+                
+                valid = false;
+            }
+
+            // --- CC3 ---
+            const cc3Checked = document.querySelectorAll('input[name="cc3"]:checked');
+            const cc3Error = document.getElementById("cc3Error");
+            cc3Error.textContent = "";
+            cc3Error.classList.remove("text-danger"); // reset
+
+            if (cc3Checked.length < 1) {
+                cc3Error.textContent = "Please select more than 1 option in CC3.";
+                cc3Error.classList.add("text-danger");
+                valid = false;
+            }
+
+            if (!valid) {
+                event.preventDefault(); // stop form submit
+            }
+        });
+
+        </script>
+        </form>
+
+        </div>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="page-footer"></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

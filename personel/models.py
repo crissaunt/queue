@@ -1,8 +1,19 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Q
+from django.contrib.auth.models import User
 
-# Create your models here.
+
+
+
+class Personel(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.user.username
+    
 
 
 # request ug id, pahimog id 
@@ -16,20 +27,17 @@ class RequestType(models.Model):
 # ex . ceit, cba 
 class Courses(models.Model):
     courses = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=100, null=True)
     
     def __str__(self):
         return self.courses
 
 
-# student, faculty, walk-in
-class UserType(models.Model):
-    name = models.CharField(max_length=50, unique=True, null=True)
-    def __str__(self):
-        return self.name
 
 
 
-class StudentAppointments(models.Model):
+
+class Appointments(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('current', 'Current'),
@@ -43,7 +51,7 @@ class StudentAppointments(models.Model):
         ('guest', 'Guest'),
     ]
 
-    idNumber= models.CharField(max_length=50, null=True)
+
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=1, blank=True)
     lastName = models.CharField(max_length=50)
@@ -57,7 +65,17 @@ class StudentAppointments(models.Model):
     is_priority = models.CharField(max_length=50, choices=[('yes','Yes'),('no','No')], default='no')
     # relationship 
     requestType = models.ForeignKey(RequestType, on_delete=models.CASCADE, null=True, blank=True)
+    custom_request = models.CharField(max_length=200, null=True, blank=True) 
     courses = models.ForeignKey(Courses, on_delete=models.CASCADE, null=True, blank=True)
+
+
+    served_by = models.ForeignKey(
+        'Personel',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="appointments_served"
+    )
 
     # NEW FIELDS
     skip_count = models.IntegerField(default=0)
@@ -86,30 +104,27 @@ class StudentAppointments(models.Model):
         if self.skip_until and timezone.now() > self.skip_until:
             self.status = 'cancel'
             self.save()    
+            
+    @classmethod
+    def cancel_expired(cls):
+        """
+        Cancel only appointments whose datetime is in the past
+        and whose status is pending or skip.
+        """
+        now = timezone.localdate()
+        expired_appointments = cls.objects.filter(
+            Q(status='pending') | Q(status='skip'),
+            datetime__date__lt=now 
+        )
+        print(expired_appointments)
+        expired_appointments.update(status='cancel')   
 
     def __str__(self):
-        return f'{self.firstName} {self.middleName} {self.lastName}'
+        return f'{self.firstName} {self.lastName}'
 
 
-class Personel(models.Model):
-    username = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
 
-    def _str__(self):
-        return f'{self.username}'
-    
-class Survey(models.Model):
-    STATUS_CHOICES = [
-        ('no', 'No'),
-        ('yes', 'Yes'),
-    ]
-    student_appointment = models.ForeignKey(StudentAppointments, on_delete=models.CASCADE)
-    code = models.CharField(max_length=50, unique=True)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='no')
 
-    def __str__(self):
-        return f'{self.student_appointment} {self.code}'
 
 
     

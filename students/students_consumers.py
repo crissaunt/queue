@@ -2,7 +2,7 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from personel.models import StudentAppointments
+from personel.models import Appointments
 from django.utils import timezone
 from django.utils.timezone import localtime
 from personel.views import get_display_queue
@@ -33,7 +33,7 @@ class StudentsConsumer(WebsocketConsumer):
         today = now_ph.date()
 
         # Auto-cancel expired skips
-        expired = StudentAppointments.objects.filter(
+        expired = Appointments.objects.filter(
             status="skip", skip_until__lt=now_ph
         )
         for appt in expired:
@@ -41,13 +41,13 @@ class StudentsConsumer(WebsocketConsumer):
             appt.save()
 
         # Current student
-        get_current_number = StudentAppointments.objects.filter(
+        get_current_number = Appointments.objects.filter(
             status="current",
             datetime__date=today
         ).order_by("datetime").first()
 
         # Served count (done + current)
-        served_today = StudentAppointments.objects.filter(
+        served_today = Appointments.objects.filter(
             status__in=["done", "current"],
             datetime__date=today
         ).count()
@@ -59,19 +59,19 @@ class StudentsConsumer(WebsocketConsumer):
         next_in_line_students = get_display_queue(today, limit=5)
 
         # Stats
-        non_priority_students = StudentAppointments.objects.filter(
+        non_priority_students = Appointments.objects.filter(
             is_priority="no",
             status="pending",
             datetime__date=today
         )
 
-        priority_students = StudentAppointments.objects.filter(
+        priority_students = Appointments.objects.filter(
             is_priority="yes",
             status__in=["pending", "skip"],
             datetime__date=today
         )
 
-        skip_non_priority_students = StudentAppointments.objects.filter(
+        skip_non_priority_students = Appointments.objects.filter(
             is_priority="no",
             status="skip",
             datetime__date=today
@@ -82,7 +82,6 @@ class StudentsConsumer(WebsocketConsumer):
             "message": message,
             "current": {
                 "id": get_current_number.id if get_current_number else None,
-                "idNumber": get_current_number.idNumber if get_current_number else None,
                 "ticket_number": get_current_number.ticket_number if get_current_number else None,
                 "firstName": get_current_number.firstName if get_current_number else None,
                 "lastName": get_current_number.lastName if get_current_number else None,
@@ -95,7 +94,6 @@ class StudentsConsumer(WebsocketConsumer):
             "next_in_line": [
                 {
                     "id": s.id,
-                    "idNumber": s.idNumber,
                     "ticket_number": s.ticket_number,
                     "firstName": s.firstName,
                     "lastName": s.lastName,

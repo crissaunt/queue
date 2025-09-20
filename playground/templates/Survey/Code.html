@@ -1,0 +1,160 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Satisfaction Survey</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet">
+</head>
+
+<style>
+  .custom-bg {
+    background-image: url("{% static 'pictures/Background.svg' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+  }
+  body {
+    font-family: 'Sora', sans-serif;
+  }
+</style>
+
+<body class="relative min-h-screen bg-cover bg-center custom-bg">
+
+  <!-- Navbar -->
+  <nav class="relative z-10 flex items-center justify-between px-6 md:px-8 py-4">
+    <div class="flex items-center">
+      <img src="{% static 'pictures/header-logo.svg' %}" alt="Logo" class="h-12 sm:h-14 w-auto">
+    </div>
+    <div class="hidden md:flex space-x-6 lg:space-x-8 text-gray-800 font-medium">
+      <a href="#" class="hover:text-green-700 text-sm sm:text-base">About Us</a>
+      <a href="#" class="hover:text-green-700 text-sm sm:text-base">Developers</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="flex flex-col lg:flex-row justify-between items-center mx-auto px-6 md:px-12 lg:px-28 py-10 min-h-[calc(100vh-160px)]">
+    <!-- Left: Logo -->
+    <div class="flex-1 lg:w-1/2 mb-8 lg:mb-0 flex justify-center">
+      <img src="{% static 'pictures/LOGS1.png' %}" alt="Feedback" class="w-48 sm:w-64 md:w-72 lg:w-96 max-w-full">
+    </div>
+
+    <!-- Right: Text -->
+    <div class="flex-1 lg:w-1/2 text-center lg:text-left flex flex-col justify-center px-2 sm:px-6">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[45+px] font-bold text-gray-800 leading-tight tracking-[0.06em]">
+        Client Satisfaction <br>
+        Measurement <span class="text-yellow-500">Survey</span>
+      </h1>
+      <p class="mt-4 italic text-base sm:text-lg text-gray-700 text-center">
+        Help us to serve you better!
+      </p>
+      <div class="mt-6 flex justify-center">
+        <button id="openModal"
+          class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 sm:px-8 py-3 shadow-md transition text-sm sm:text-base rounded-md">
+          Get Started
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="codeModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 px-4">
+    <div class="bg-white rounded-md shadow-lg p-8 w-full max-w-sm relative text-center">
+      
+      <!-- Logos -->
+      <div class="flex flex-col items-center mb-4">
+        <img src="{% static 'pictures/csulogo.png' %}" alt="CSU Logo" class="h-16 mb-2">
+      </div>
+
+      <!-- Instruction -->
+      <p class="text-gray-700 mb-6 text-sm sm:text-base">
+        Please enter your 4-digit code to continue.
+      </p>
+
+      <!-- Form -->
+      <form method="POST" action="">
+        {% csrf_token %}
+        <label for="code" class="block text-left text-gray-700 font-medium mb-2 text-sm sm:text-base">
+          Enter Code
+        </label>
+        <input type="text" id="code" name="code"  required
+          class="w-full border border-gray-300 rounded-md px-4 py-3 mb-6 focus:ring-2 focus:ring-green-500 text-center tracking-widest text-xl">
+        <button type="submit" 
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-md transition">
+          Submit
+        </button>
+      </form>
+
+      <!-- Error messages -->
+      {% if messages %}
+        <div class="mt-4">
+          {% for message in messages %}
+            <div class="bg-red-100 text-red-700 text-center px-4 py-2 rounded-md text-sm">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+        <script>
+          // Keep modal open if there are error messages
+          document.addEventListener("DOMContentLoaded", () => {
+            const modal = document.getElementById('codeModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          });
+
+          // Auto-hide error messages after 3s
+          setTimeout(() => {
+            document.querySelectorAll('.bg-red-100').forEach(el => el.remove());
+          }, 3000);
+        </script>
+      {% endif %}
+
+      <!-- Close button -->
+      <button id="closeModal" 
+        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    </div>
+  </div>
+
+
+  <!-- Footer -->
+  <footer class="relative z-10 text-gray-100 py-6 mt-10 bg-[#10934F]">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm sm:text-base">
+      <p>&copy; 2025 Client Satisfaction Survey</p>
+      <p>All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    const modal = document.getElementById('codeModal');
+    const openModal = document.getElementById('openModal');
+    const closeModal = document.getElementById('closeModal');
+
+    if (openModal) {
+      openModal.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+    }
+    if (closeModal) {
+      closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+    }
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
+  </script>
+
+</body>
+</html>

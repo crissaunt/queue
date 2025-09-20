@@ -6,10 +6,10 @@ class PersonelAuthMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Exclude login/register routes
+        # Paths that don’t require login
         allowed_paths = [reverse("auth_login"), reverse("auth_register")]
-        
-        if not request.session.get("user_id") and request.path not in allowed_paths:
+
+        if not request.user.is_authenticated and request.path not in allowed_paths:
             return redirect("auth_login")
 
         return self.get_response(request)

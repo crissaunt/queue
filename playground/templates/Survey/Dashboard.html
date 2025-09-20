@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSU Survey Analytics Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #10934F;
+            --secondary-color: #2D5A27;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --dark-color: #1f2937;
+            --gray-color: #6b7280;
+            --light-color: whitesmoke;
+            --border-color: #e5e7eb;
+            --sidebar-color: #2D5A27;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            min-height: calc(100vh - 98px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-color);
+            color: white;
+            padding: 0;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #d1d5db;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(16, 147, 79, 0.3);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar-menu i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Statistics Cards */
+        .stats-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .surveys-icon { background: var(--primary-color); }
+        .responses-icon { background: var(--success-color); }
+        .satisfaction-icon { background: var(--warning-color); }
+
+        .stat-content h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-content p {
+            font-size: 1rem;
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-bottom: 3rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-card.small {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .chart-header {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .chart-container {
+            height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Satisfaction Ratings Grid */
+        .ratings-section {
+            margin-bottom: 3rem;
+        }
+
+        .ratings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .rating-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .rating-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .rating-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-label {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        /* CC Analysis Section */
+        .cc-analysis-section {
+            margin-bottom: 3rem;
+        }
+
+        .cc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .cc-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .cc-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .cc-content {
+            padding: 0;
+        }
+
+        .cc-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cc-table th {
+            background: #f8fafc;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .cc-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .cc-table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .option-number {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 30px;
+        }
+
+        /* Data Table Section */
+        .table-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .entries-info {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            padding: 0.8rem 0.6rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        .data-table td {
+            padding: 0.7rem 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--gray-color);
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        /* Pagination Styles */
+        .pagination-section {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination-info {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .pagination-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .page-number {
+            background: transparent;
+            color: var(--gray-color);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-number:hover:not(.active) {
+            background: var(--light-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-number.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card.small {
+                max-width: none;
+            }
+
+            .cc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: sticky;
+                top: 98px;
+                z-index: 99;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .sidebar-menu li {
+                border-bottom: none;
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid,
+            .ratings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .sidebar-menu {
+                flex-direction: column;
+            }
+
+            .sidebar-menu li {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                min-width: auto;
+            }
+
+            .pagination-section {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .pagination-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="header-title">
+                <h1>Survey Analytics Dashboard</h1>
+                <p>Caraga State University - Cabadbaran City</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-header">Navigation</div>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="#" class="active">
+                            <i class="fas fa-chart-line"></i>
+                            Dashboard Overview
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-poll"></i>
+                            Survey Analytics
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            Demographics
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-star"></i>
+                            Satisfaction Reports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-header">Management</div>
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-clipboard-list"></i>
+                            Survey Management
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-download"></i>
+                            Data Export
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cogs"></i>
+                            Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Overview Statistics -->
+            <div class="stats-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Survey Overview
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-content">
+                                <h3>{{ total_surveys }}</h3>
+                                <p>Total Survey Responses</p>
+                            </div>
+                            <div class="stat-icon surveys-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-content">
+                                <h3>{{ total_responses }}</h3>
+                                <p>Completed Surveys</p>
+                            </div>
+                            <div class="stat-icon responses-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-content">
+                                <h3>{{ satisfaction_rate }}%</h3>
+                                <p>Average Satisfaction Rate</p>
+                            </div>
+                            <div class="stat-icon satisfaction-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Demographics Analysis
+                </h2>
+                <div class="charts-grid">
+                    <!-- Gender Distribution -->
+                    <div class="chart-card small">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Gender Distribution</h3>
+                            <p class="chart-subtitle">Survey respondents by gender</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="genderChart" width="200" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Satisfaction Ratings Breakdown -->
+                    <div class="ratings-section" style="margin: 0;">
+                        <h2 class="section-title" style="margin-bottom: 1rem;">
+                            <i class="fas fa-poll"></i>
+                            Satisfaction Ratings Distribution
+                        </h2>
+                        <div class="ratings-grid">
+                            <div class="rating-card">
+                                <div class="rating-value">{{ strongly_agree }}</div>
+                                <div class="rating-label">Strongly Agree (5)</div>
+                            </div>
+                            <div class="rating-card">
+                                <div class="rating-value">{{ agree }}</div>
+                                <div class="rating-label">Agree (4)</div>
+                            </div>
+                            <div class="rating-card">
+                                <div class="rating-value">{{ neutral }}</div>
+                                <div class="rating-label">Neither Agree nor Disagree (3)</div>
+                            </div>
+                            <div class="rating-card">
+                                <div class="rating-value">{{ disagree }}</div>
+                                <div class="rating-label">Disagree (2)</div>
+                            </div>
+                            <div class="rating-card">
+                                <div class="rating-value">{{ strongly_disagree }}</div>
+                                <div class="rating-label">Strongly Disagree (1)</div>
+                            </div>
+                            <div class="rating-card">
+                                <div class="rating-value">{{ not_applicable }}</div>
+                                <div class="rating-label">Not Applicable (0)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CC Analysis Section -->
+            <div class="cc-analysis-section">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    CC Analysis Distribution
+                </h2>
+                <div class="cc-grid">
+                    <!-- CC1 -->
+                    <div class="cc-card">
+                        <div class="cc-header">CC1</div>
+                        <div class="cc-content">
+                            <table class="cc-table">
+                                <thead>
+                                    <tr>
+                                        <th>#1</th>
+                                        <th>#2</th>
+                                        <th>#3</th>
+                                        <th>#4</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ cc1_option1 }}</td>
+                                        <td>{{ cc1_option2 }}</td>
+                                        <td>{{ cc1_option3 }}</td>
+                                        <td>{{ cc1_option4 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CC2 -->
+                    <div class="cc-card">
+                        <div class="cc-header">CC2</div>
+                        <div class="cc-content">
+                            <table class="cc-table">
+                                <thead>
+                                    <tr>
+                                        <th>#1</th>
+                                        <th>#2</th>
+                                        <th>#3</th>
+                                        <th>#4</th>
+                                        <th>#5</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ cc2_option1 }}</td>
+                                        <td>{{ cc2_option2 }}</td>
+                                        <td>{{ cc2_option3 }}</td>
+                                        <td>{{ cc2_option4 }}</td>
+                                        <td>{{ cc2_option5 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CC3 -->
+                    <div class="cc-card">
+                        <div class="cc-header">CC3</div>
+                        <div class="cc-content">
+                            <table class="cc-table">
+                                <thead>
+                                    <tr>
+                                        <th>#1</th>
+                                        <th>#2</th>
+                                        <th>#3</th>
+                                        <th>#4</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ cc3_option1 }}</td>
+                                        <td>{{ cc3_option2 }}</td>
+                                        <td>{{ cc3_option3 }}</td>
+                                        <td>{{ cc3_option4 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+
+            <!-- Survey Data Table -->
+            <div class="table-section"> 
+            <div class="table-header"> 
+                <h3 class="table-title">Survey Responses Data</h3> 
+                <div class="entries-info"> 
+                    {% if page_obj %}
+                        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} entries 
+                    {% else %}
+                        No entries found 
+                    {% endif %} 
+                </div> 
+            </div> 
+
+            <div class="table-container"> 
+                <table class="data-table"> 
+                    <thead> 
+                        <tr> 
+                            <th>Survey ID</th> 
+                            <th>Client Type</th> 
+                            <th>Government/Private</th> 
+                            <th>Visit Date</th> 
+                            <th>Gender</th> 
+                            <th>Age</th> 
+                            <th>Region</th> 
+                            <th>Office Person</th> 
+                            <th>Service Availed</th> 
+                            <th>Feedback</th> 
+                            <th>Email</th> 
+                            <th>Submitted Date</th> 
+                        </tr> 
+                    </thead> 
+                    <tbody> 
+                        {% for survey in page_obj|dictsort:"id" %}
+                        <tr> 
+                            <td>#{{ survey.id }}</td> 
+                            <td>{{ survey.clientType|default:"-" }}</td> 
+                            <td>{{ survey.government|default:"-" }}</td> 
+                            <td>{{ survey.visitDate|date:"M d, Y"|default:"-" }}</td> 
+                            <td>{{ survey.sex|default:"-" }}</td> 
+                            <td>{% if survey.age %}{{ survey.age }} years{% else %}-{% endif %}</td> 
+                            <td>{{ survey.region|default:"-" }}</td> 
+                            <td>{{ survey.officePerson|truncatechars:20|default:"-" }}</td> 
+                            <td>{{ survey.serviceAvailed|truncatechars:30|default:"-" }}</td> 
+                            <td>{{ survey.feedback|truncatechars:30|default:"-" }}</td> 
+                            <td>{{ survey.email|truncatechars:30|default:"-" }}</td> 
+                            <td>{{ survey.submitted_at|date:"M d, Y g:i A"|default:"-" }}</td> 
+                        </tr> 
+                        {% empty %} 
+                        <tr> 
+                            <td colspan="10" style="text-align: center; padding: 2rem; color: var(--gray-color);"> 
+                                No survey data available 
+                            </td> 
+                        </tr> 
+                        {% endfor %} 
+                    </tbody> 
+                </table> 
+            </div> 
+
+            <!-- Pagination Section --> 
+            {% if page_obj.paginator.num_pages > 1 %} 
+            <div class="pagination-section"> 
+                <div class="pagination-info"> 
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} 
+                </div> 
+                <div class="pagination-controls"> 
+                    {% if page_obj.has_previous %} 
+                    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn"> 
+                        <i class="fas fa-chevron-left"></i> Previous 
+                    </a> 
+                    {% else %} 
+                    <button class="pagination-btn" disabled> 
+                        <i class="fas fa-chevron-left"></i> Previous 
+                    </button> 
+                    {% endif %} 
+
+                    <div class="page-numbers"> 
+                        {% for num in page_obj.paginator.page_range %} 
+                            {% if page_obj.number == num %} 
+                                <button class="page-number active">{{ num }}</button> 
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} 
+                                <a href="?page={{ num }}" class="page-number">{{ num }}</a> 
+                            {% endif %} 
+                        {% endfor %} 
+                    </div> 
+
+                    {% if page_obj.has_next %} 
+                    <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn"> 
+                        Next <i class="fas fa-chevron-right"></i> 
+                    </a> 
+                    {% else %} 
+                    <button class="pagination-btn" disabled> 
+                        Next <i class="fas fa-chevron-right"></i> 
+                    </button> 
+                    {% endif %} 
+                </div> 
+            </div> 
+            {% endif %} 
+        </div> 
+
+        <script> 
+        // Chart initialization with Django template data 
+        function initializeCharts() { 
+            // Gender Distribution Chart - Blue and Pink colors 
+            const genderCtx = document.getElementById('genderChart').getContext('2d'); 
+            const maleCount = {{ male_count|default:0 }}; 
+            const femaleCount = {{ female_count|default:0 }}; 
+
+            new Chart(genderCtx, { 
+                type: 'doughnut', 
+                data: { 
+                    labels: ['Male', 'Female'], 
+                    datasets: [{ 
+                        data: [maleCount, femaleCount], 
+                        backgroundColor: ['#3b82f6', '#ec4899'], // Blue and Pink 
+                        borderWidth: 2, 
+                        borderColor: '#ffffff' 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: true, 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                padding: 15, 
+                                usePointStyle: true, 
+                                font: { size: 11 } 
+                            } 
+                        }, 
+                        tooltip: { 
+                            callbacks: { 
+                                label: function(context) { 
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0); 
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0; 
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`; 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }); 
+        } 
+
+        // Initialize page when DOM is loaded 
+        document.addEventListener('DOMContentLoaded', function() { 
+            initializeCharts(); 
+        }); 
+        </script>
+
+</body>
+</html>

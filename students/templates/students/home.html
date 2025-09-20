@@ -104,12 +104,6 @@ Home Students
             <form id="studentForm" action="{% url 'student_submit' %}" method="post">
             {% csrf_token %}
             
-            <!-- ID Number -->
-            <div class="mb-2">
-                <label class="block mb-2" for="idNumber">ID Number</label>
-                <input type="text" id="idNumber" name="idNumber" required
-                    class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
-            </div>
 
             <div class="flex flex-row gap-2">
                 <!-- First Name -->
@@ -147,16 +141,24 @@ Home Students
             </div>
 
             <!-- Request Type -->
-            <div class="mb-3">
+            <div class="mb-3" id="request-container">
                 <label class="block mb-2" for="request">Request Type</label>
                 <select id="request" name="request" required
                         class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
                     <option value="">Select Request</option>
                     {% for r in requests %}
-                    <option value="{{ r.id }}">{{ r.request }}</option>
+                        <option value="{{ r.id }}">{{ r.request }}</option>
                     {% endfor %}
+                    <option value="other">Other</option>
                 </select>
+
+                <div class="mb-3" id="custom-request-container" style="display: none;">
+                    <label class="block mb-2" for="custom_request">Custom Request</label>
+                    <input type="text" id="custom_request" name="custom_request" placeholder="Enter your request"
+                        class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                </div>
             </div>
+
 
             <!-- Priority -->
             <div class="mb-6 flex items-center">
@@ -217,8 +219,8 @@ Home Students
                     </div>
                 </div>
 
-                <!-- Request Type -->
-                <div class="mb-3">
+                <!-- Guest Request Type -->
+                <div class="mb-3" id="guest-request-container">
                     <label class="block mb-2" for="guestRequest">Request Type</label>
                     <select id="guestRequest" name="request" required
                             class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
@@ -226,8 +228,16 @@ Home Students
                         {% for r in requests %}
                         <option value="{{ r.id }}">{{ r.request }}</option>
                         {% endfor %}
+                        <option value="other">Other</option>
                     </select>
+
+                    <div class="mb-3" id="guest-custom-request-container" style="display: none;">
+                        <label class="block mb-2" for="guest_custom_request">Custom Request</label>
+                        <input type="text" id="guest_custom_request" name="custom_request" placeholder="Enter your request"
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
                 </div>
+
 
                 <!-- Priority -->
                 <div class="mb-6 flex items-center">
@@ -248,6 +258,43 @@ Home Students
     </div>
 
 </div>
+
+
+<script>
+    // Student modal
+    const studentSelect = document.getElementById('request');
+    const studentCustom = document.getElementById('custom-request-container');
+
+    studentSelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            studentSelect.style.display = 'none';
+            studentCustom.style.display = 'block';
+            document.getElementById('custom_request').required = true;
+        } else {
+            studentSelect.style.display = 'block';
+            studentCustom.style.display = 'none';
+            document.getElementById('custom_request').required = false;
+        }
+    });
+
+    // Guest modal
+    const guestSelect = document.getElementById('guestRequest');
+    const guestCustom = document.getElementById('guest-custom-request-container');
+
+    guestSelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            guestSelect.style.display = 'none';
+            guestCustom.style.display = 'block';
+            document.getElementById('guest_custom_request').required = true;
+        } else {
+            guestSelect.style.display = 'block';
+            guestCustom.style.display = 'none';
+            document.getElementById('guest_custom_request').required = false;
+        }
+    });
+</script>
+
+
 
 
 <!-- Success Modal -->

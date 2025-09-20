@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
-from personel.models import StudentAppointments, RequestType, Courses, Survey
+from personel.models import Appointments, RequestType, Courses
+from playground.models import Pin 
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
@@ -23,26 +24,29 @@ def broadcast_queue_update():
     now_ph = localtime(timezone.now())
     today = now_ph.date()
 
-    non_priority_count = StudentAppointments.objects.filter(
+    non_priority_count = Appointments.objects.filter(
         Q(status="pending") | Q(status="skip"),
         is_priority="no",
         datetime__date=today
     ).count()
 
-    priority_count = StudentAppointments.objects.filter(
+    priority_count = Appointments.objects.filter(
         Q(status="pending") | Q(status="skip"),
         is_priority="yes",
         datetime__date=today
     ).count()
 
-    # 🔹 Get total display queue (NO LIMIT applied)
-    display_queue_total = (
-        StudentAppointments.objects.filter(
-            Q(status="standby") | Q(status="pending"),
+    # ✅ Get waiting list
+    waiting_list = list(
+        Appointments.objects.filter(
+            status="pending",
             is_priority="no",
             datetime__date=today
-        ).count()
+        )
+        .order_by("datetime")
+        .values("ticket_number", "user_type", "status", "is_priority")[:5]  # 👈 limit 5
     )
+
 
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -54,21 +58,23 @@ def broadcast_queue_update():
                 "stats": {
                     "non_priority_count": non_priority_count,
                     "priority_count": priority_count,
-                    "display_queues": display_queue_total,  # ✅ send total
+                    "display_queues": len(waiting_list),
                 },
+                "waiting_list": waiting_list,  # ✅ send queue data
             },
         },
     )
 
 
 
+
 def generate_unique_survey_code():
-    """ ABC-00000.generate until no duplicate """
+ 
     while True:
-        letters = ''.join(random.choices(string.ascii_uppercase, k=3))
-        number = random.randint(10000, 99999)  
+        letters = ''.join(random.choices(string.ascii_uppercase, k=2))
+        number = random.randint(100, 9999)  
         code = f"{letters}-{number}"
-        if not Survey.objects.filter(code=code).exists():
+        if not Pin.objects.filter(code=code).exists():
             return code    
 
 
@@ -81,13 +87,13 @@ def generate_sequential_ticket(is_priority: str) -> str:
 
     if is_priority == "yes":
         prefix = "P"
-        last_ticket = StudentAppointments.objects.filter(
+        last_ticket = Appointments.objects.filter(
             is_priority="yes",
             datetime__date=today
         ).order_by("-id").first()
     else:
         prefix = "R"
-        last_ticket = StudentAppointments.objects.filter(
+        last_ticket = Appointments.objects.filter(
             is_priority="no",
             datetime__date=today
         ).order_by("-id").first()
@@ -122,27 +128,32 @@ def home(request):
 
 def student_submit(request):
     if request.method == "POST":
-        id_number = request.POST.get("idNumber")
+    
         first_name = request.POST.get("firstName")
-        middle_name = request.POST.get("middleName")
+        # middle_name = request.POST.get("middleName")
         last_name = request.POST.get("lastName")
         course_id = request.POST.get("course")
         request_id = request.POST.get("request")
+        custom_request = request.POST.get("custom_request")
         is_priority = "yes" if request.POST.get("is_priority") else "no"
 
         course = Courses.objects.filter(id=course_id).first()
-        request_type = RequestType.objects.filter(id=request_id).first()
+         # Handle "Other" request type
+        if request_id == "other":
+            request_type = None
+        else:
+            request_type = RequestType.objects.filter(id=request_id).first()
 
         # Generate ticket
         new_ticket_number = generate_sequential_ticket(is_priority)
 
-        student = StudentAppointments.objects.create(
-            idNumber=id_number,
+        student = Appointments.objects.create(
             firstName=first_name,
-            middleName=middle_name,
+            # middleName=middle_name,
             lastName=last_name,
             courses=course,
             requestType=request_type,
+            custom_request=custom_request,
             ticket_number=new_ticket_number,
             status="pending",
             is_priority=is_priority,
@@ -150,10 +161,10 @@ def student_submit(request):
         )
         survey_code = generate_unique_survey_code()
 
-        survey = Survey.objects.create(
-                                student_appointment=student,
+        survey = Pin.objects.create(
+                                appointments = student,
                                 code=survey_code,
-                                status="no"
+                                status="unused"
                             )
         broadcast_queue_update()
 
@@ -165,7 +176,7 @@ def student_submit(request):
 def guest_submit(request):
     if request.method == "POST":
         firstName = request.POST.get("firstName")
-        middleName = request.POST.get("middleName", "")
+        # middleName = request.POST.get("middleName", "")
         lastName = request.POST.get("lastName")
         requestType_id = request.POST.get("request")
         is_priority = "yes" if request.POST.get("is_priority") else "no"
@@ -178,9 +189,9 @@ def guest_submit(request):
         # Generate ticket
         new_ticket_number = generate_sequential_ticket(is_priority)
 
-        guest = StudentAppointments.objects.create(
+        guest = Appointments.objects.create(
             firstName=firstName,
-            middleName=middleName,
+            # middleName=middleName,
             lastName=lastName,
             user_type="guest",
             is_priority=is_priority,
@@ -191,8 +202,8 @@ def guest_submit(request):
         )
         survey_code = generate_unique_survey_code()
 
-        survey = Survey.objects.create(
-                                student_appointment=guest,
+        survey = Pin.objects.create(
+                                appointments = guest,         
                                 code=survey_code,
                                 status="no"
                             )
@@ -210,3 +221,13 @@ def guest_submit(request):
 
 
 
+def form(request):
+    courses = Courses.objects.all()
+    requests = RequestType.objects.all()
+    template = loader.get_template('students/form.html')
+    context = {
+        'courses' : courses,
+        'requests' : requests,
+    }
+
+    return HttpResponse(template.render(context, request))

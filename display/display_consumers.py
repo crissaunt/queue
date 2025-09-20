@@ -2,7 +2,7 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from personel.models import StudentAppointments
+from personel.models import Appointments
 from django.utils import timezone
 from django.utils.timezone import localtime
 
@@ -32,7 +32,7 @@ class DisplayConsumer(WebsocketConsumer):
         today = now_ph.date()
 
         # Auto-cancel expired skips
-        expired = StudentAppointments.objects.filter(
+        expired = Appointments.objects.filter(
             status="skip", skip_until__lt=now_ph
         )
         for appt in expired:
@@ -41,11 +41,11 @@ class DisplayConsumer(WebsocketConsumer):
 
         # Current student
         if initial:
-            get_current_number = StudentAppointments.objects.filter(
+            get_current_number = Appointments.objects.filter(
                 status="current",
             ).order_by("-datetime").first()
         else:
-            get_current_number= StudentAppointments.objects.filter(
+            get_current_number= Appointments.objects.filter(
                  status="current",
                 datetime__date=today
             ).order_by("datetime").first()
@@ -55,7 +55,6 @@ class DisplayConsumer(WebsocketConsumer):
             "message": message,
             "current": {
                 "id": get_current_number.id if get_current_number else None,
-                "idNumber": get_current_number.idNumber if get_current_number else None,
                 "ticket_number": get_current_number.ticket_number if get_current_number else None,
                 "firstName": get_current_number.firstName if get_current_number else None,
                 "lastName": get_current_number.lastName if get_current_number else None,

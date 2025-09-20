@@ -1,0 +1,512 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Caraga State University Cabadbaran Campus(CSUCC)</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        .odor-mean-chey-regular {
+                                font-family: "Odor Mean Chey", serif;
+                                font-weight: 400;
+                                font-style: normal;
+                                }
+
+        .medula-one-regular {
+                            font-family: "Medula One", system-ui;
+                            font-weight: 400;
+                            font-style: normal;
+                            }
+
+        .inria-sans-regular {
+                            font-family: "Inria Sans", sans-serif;
+                            font-weight: 400;
+                            font-style: normal;
+                            }
+        .font-poppins {
+                    font-family: 'Poppins', sans-serif;
+                    }                    
+
+         .custom-bg {
+                background-image: url("{% static 'images/bg-image.svg' %}");
+                background-size: cover;        /* fill the screen */
+                /* background-position: center;   center the image */
+                background-repeat: no-repeat;  /* don’t repeat */
+                background-attachment: scroll; /* make background scroll with content */
+                }
+    </style>
+</head>
+<body class="custom-bg flex flex-col min-h-screen  space-y-7 ">
+    <header class="flex w-full  mx-auto bg-transparent p-4 md:p-2 border-t-[40px] border-[#10420C]">
+        <div class="gap-4 mt-5 max-w-screen-2xl w-full mx-auto">
+            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+        </div>
+    </header>
+
+    <main class="flex flex-1  max-w-screen-2xl w-full mx-auto px-4 gap-[123px]">
+        <!-- left -->
+        <div class="flex flex-col w-[889px] " >
+          
+        
+            <!-- Carousel -->
+            <div class="flex flex-col text-center relative">
+                <!-- Slides -->
+                <div class="relative w-full min-h-[300px] overflow-hidden ">
+                    <img class="mySlides absolute w-full h-full object-cover" src="{% static 'images/carousel1.svg' %}" alt="">
+                    <img class="mySlides absolute w-full h-full object-cover" src="{% static 'images/carousel2.svg' %}" alt="">
+                    <img class="mySlides absolute w-full h-full object-cover" src="{% static 'images/carousel3.svg' %}" alt="">
+                    {% comment %} <img class="mySlides absolute w-full h-full object-cover" src="{% static 'images/carousel1.svg' %}" alt=""> {% endcomment %}
+                </div>
+
+                <!-- Dots -->
+                <div class="flex items-center justify-center gap-2 mt-4">
+                    <span class="dot w-3 h-3 rounded-full bg-black"></span>
+                    <span class="dot w-3 h-3 rounded-full bg-gray-400"></span>
+                    <span class="dot w-3 h-3 rounded-full bg-gray-400"></span>
+                    <span class="dot w-3 h-3 rounded-full bg-gray-400"></span>
+                </div>
+            </div>
+
+
+            <div class="flex flex-col space-y-[67px] mt-3">
+                <div class="flex flex-row gap-[83px] ">
+                    <div class="flex-1 text-center space-y-4">
+                        <h1 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Vision</h1>
+                        <p class="inria-sans-regular text-[15px] leading-none">A socially-engaged digital, innovation, and entrepreneurial university excelling globally in science,engineering, and the arts by 2028.</p>
+                    </div>
+                    <div class="flex-1 text-center space-y-4">
+                        <h1 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">General Mandate</h1>
+                        <p class="inria-sans-regular text-[15px] leading-none">Caraga State University shall primarily provide advanced education, higher technological, professional instruction and training in the fields of agriculture and environmental studies, fishery, engineering, forestry, industrial technology, education, law, medicine and other health related programs, information technology, arts and sciences and other related courses. It shall undertake research and extension services, and provide progressive leadership in its areas of specialization.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-row gap-[83px] ">
+                    <div class="flex-1 text-center space-y-4">
+                        <h1 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Mission</h1>
+                        <p class="inria-sans-regular text-[15px] leading-none">As a transformative university, CSU is a responsible steward of problem-solvers and value creators who are driven to create a sustainable future for the region, the nation,and beyond.</p>
+                    </div>
+                    <div class="flex-1 text-center space-y-4">
+                        <h1 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Core Values</h1>
+                        <div class="flex flex-col">
+                            <p class="inria-sans-regular text-[15px] leading-none">Competence</p>
+                            <p class="inria-sans-regular text-[15px] leading-none">Service</p>
+                            <p class="inria-sans-regular text-[15px] leading-none">Uprightness</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+        <!-- right  -->
+         
+        <div class="flex-start flex-col flex-1  space-y-[93px] ">
+            <div class="flex-1 flex flex-col text-center space-y-[41px] items-center pt-5  ">
+                <h1 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Notice</h1>
+                <div class="flex w-[317px] ">
+                    <p class="inria-sans-regular text-[15px] leading-none">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center space-y-[50px] ">
+                <button type="button"  onclick="openModal()" 
+                 class="bg-[#10420C] hover:bg-[#10420C]/80  w-[270px] h-[71px] text-[32px] medula-one-regular text-white cursor-pointer">Student</button>
+                <button type="button" onclick="openGuestModal()"
+                class="bg-[#10420C] hover:bg-[#10420C]/80  w-[270px] h-[71px] text-[32px] medula-one-regular text-white cursor-pointer">Guess</button>
+            </div>
+
+        </div>
+
+
+        <!-- Student Modal -->
+        <div id="studentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden  flex items-center justify-center z-50 ">
+            <div class="bg-white shadow-xl w-[450px] h-auto max-w-md  py-10 px-12 text-black relative">
+                <!-- Modal Header -->
+            
+                <p class="inria-sans-regular text-sm text-black text-center">Please enter your  information to login</p>
+                <button onclick="closeModal()" class="absolute top-2 right-4 text-3xl font-bold text-[#10420C] cursor-pointer">&times;</button>
+            
+                
+                <!-- Modal Form -->
+                <form id="studentForm" action="{% url 'student_submit' %}" method="post">
+                {% csrf_token %}
+
+                <!-- First Name -->
+                    <div class="mb-2">
+                        <label class="block mb-2" for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                     <!-- Last Name -->
+                    <div class="mb-2">
+                        <label class="block mb-2" for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                {% comment %} <div class="flex flex-row gap-1">
+                    <!-- First Name -->
+                    <!-- Middle Name -->
+                    <div class="mb-2">
+                        <label class="block mb-2" for="middleName">M.I.</label>
+                        <input type="text" id="middleName" name="middleName" maxlength="1"
+                            class="w-15 p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="mb-2">
+                        <label class="block mb-2" for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                </div> {% endcomment %}
+
+                <!-- Course -->
+                <div class="mb-2">
+                    <label class="block mb-2" for="course">Course</label>
+                    <select id="course" name="course" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        <option value="">Select Course</option>
+                        {% for c in courses %}
+                        <option value="{{ c.id }}">{{ c.courses }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Request Type -->
+                <div class="mb-3" id="request-container">
+                    <label class="block mb-2" for="request">Request Type</label>
+                    <select id="request" name="request" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        <option value="">Select Request</option>
+                        {% for r in requests %}
+                            <option value="{{ r.id }}">{{ r.request }}</option>
+                        {% endfor %}
+                        <option value="other">Other</option>
+                    </select>
+
+                    <div class="mb-3" id="custom-request-container" style="display: none;">
+                        <label class="block mb-2" for="custom_request">Custom Request</label>
+                        <input type="text" id="custom_request" name="custom_request" placeholder="Enter your request"
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+                </div>
+
+
+                <!-- Priority -->
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="is_priority" name="is_priority"
+                        class="mr-2 text-[#10934F] border-gray-300 rounded">
+                    <label for="is_priority">Priority (PWD/Senior)</label>
+                </div>
+
+                <!-- Submit -->
+                <div>
+                    <button type="submit"
+                            class="px-4 py-2 bg-[#10420C] w-full text-white hover:bg-[#10420C]/80 cursor-pointer transition">
+                        Submit
+                    </button>
+                </div>
+            </form>
+
+            </div>
+        </div>
+
+            <!-- Guest Modal -->
+        <div id="guestModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+            <div class="bg-white shadow-xl w-[450px] h-auto max-w-md py-10 px-12 text-black relative">
+                
+                <!-- Close Button -->
+                <button onclick="closeGuestModal()" 
+                    class="absolute top-2 right-4 text-3xl font-bold text-[#10420C] cursor-pointer">&times;</button>
+
+                <p class="inria-sans-regular text-sm text-black text-center mb-5">
+                    Please enter your information to make a request
+                </p>
+                
+                <!-- Modal Form -->
+                <form id="guestForm" action="{% url 'guest_submit' %}" method="post">
+                    {% csrf_token %}
+
+                    <!-- First Name -->
+                    <div class="mb-2 flex-1">
+                        <label class="block mb-2" for="guestFirstName">First Name</label>
+                        <input type="text" id="guestFirstName" name="firstName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+                     <!-- Last Name -->
+                    <div class="mb-2 flex-1">
+                        <label class="block mb-2" for="guestLastName">Last Name</label>
+                        <input type="text" id="guestLastName" name="lastName" required
+                            class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                    </div>
+
+
+                    {% comment %} <div class="flex flex-row gap-2">
+                        <!-- First Name -->
+                        <div class="mb-2 flex-1">
+                            <label class="block mb-2" for="guestFirstName">First Name</label>
+                            <input type="text" id="guestFirstName" name="firstName" required
+                                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        </div>
+
+                        <!-- Middle Name -->
+                        <div class="mb-2 w-16">
+                            <label class="block mb-2" for="guestMiddleName">M.I.</label>
+                            <input type="text" id="guestMiddleName" name="middleName" maxlength="1"
+                                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="mb-2 flex-1">
+                            <label class="block mb-2" for="guestLastName">Last Name</label>
+                            <input type="text" id="guestLastName" name="lastName" required
+                                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        </div>
+                    </div> {% endcomment %}
+
+                    <!-- Guest Request Type -->
+                    <div class="mb-3" id="guest-request-container">
+                        <label class="block mb-2" for="guestRequest">Request Type</label>
+                        <select id="guestRequest" name="request" required
+                                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                            <option value="">Select Request</option>
+                            {% for r in requests %}
+                            <option value="{{ r.id }}">{{ r.request }}</option>
+                            {% endfor %}
+                            <option value="other">Other</option>
+                        </select>
+
+                        <div class="mb-3" id="guest-custom-request-container" style="display: none;">
+                            <label class="block mb-2" for="guest_custom_request">Custom Request</label>
+                            <input type="text" id="guest_custom_request" name="custom_request" placeholder="Enter your request"
+                                class="w-full p-2 border border-black focus:outline-none focus:ring-2 focus:ring-black">
+                        </div>
+                    </div>
+
+
+                    <!-- Priority -->
+                    <div class="mb-6 flex items-center">
+                        <input type="checkbox" id="guestPriority" name="is_priority"
+                            class="mr-2 text-[#10934F] border-gray-300 rounded">
+                        <label for="guestPriority">Priority (PWD/Senior)</label>
+                    </div>
+
+                    <!-- Submit -->
+                    <div>
+                        <button type="submit"
+                                class="px-4 py-2 bg-[#10420C] w-full text-white hover:bg-[#10420C]/80 cursor-pointer transition">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+        
+        <!-- Success Modal -->
+        <div id="successModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden  z-50 flex items-center justify-center">
+            <div class="shadow-[0_0_0_2px_rgba(0,0,0,0.4)] rounded-[15px] relative  bg-white flex flex-col w-[850px] max-w-[1200px] my-4 h-[850px]"
+              >
+
+                <!-- Close Button -->
+                <button onclick="closeSuccessModal()" 
+                    class="absolute top-[2vh] right-[2vh] font-bold text-gray-500 hover:text-gray-800 cursor-pointer"
+                   >Close &times;</button>
+
+                <div class=" flex-1">
+                    <!-- Queue Number Section -->
+                    <div class="text-center my-[3vh] leading-none">
+                        <h2 class="font-bold text-[#1E1E1E]  mb-5 font-poppins text-4xl " >Queue Number</h2>
+                        <p class=" mb-[2vh]  text-[20px] inria-sans-regular">
+                            Please take a picture of your number so that you won’t forget
+                        </p>
+                        <div class="bg-white border-2 border-gray-200  shadow-[0_2px_10px_5px_rgba(0,0,0,0.2)] inline-block px-10 ">
+                            <p id="successTicket" class="font-bold text-[220px] medula-one-regular leading-none text-[#10420C] " ></p>
+                        </div>
+                        <p class=" mt-[2vh] inria-sans-regula text-[16px] leading-none" >
+                            After you take a picture of your Queue Number, your name will be called shortly.
+                        </p>
+                    </div>
+
+                    <hr class="my-[4vh] mx-10 border-gray-400">
+
+                    <!-- Survey Code Section -->
+                    <div class="text-center">
+                        <h2 class="font-bold  mb-[1vh] font-poppins text-3xl text-[#F0B100]">
+                            Code for the Client Survey Satisfaction
+                        </h2>
+                        <p class="text-gray-600 mb-[2vh] inria-sans-regular font-semibold text-[18px]">
+                            Please take a picture of your code, you may use this after you are done serving                        
+                        </p>
+                        <div class="bg-white max-w-full  break-words px-[4vh] py-[3vh] flex justify-center">
+                            <p id="successSurvey" class="font-bold text-[#FFCC00] w-md  shadow-[0_2px_10px_5px_rgba(0,0,0,0.2)] medula-one-regular text-[128px] leading-none"></p>
+                        </div>
+                        <p class="text-gray-700 mt-[2vh] mb-10 text-[14px] inria-sans-regular" >
+                            This code is for the Client Satisfaction Survey form for students and guests, designed to improve the quality of service we provide.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+    // Student modal
+    const studentSelect = document.getElementById('request');
+    const studentCustom = document.getElementById('custom-request-container');
+
+    studentSelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            studentSelect.style.display = 'none';
+            studentCustom.style.display = 'block';
+            document.getElementById('custom_request').required = true;
+        } else {
+            studentSelect.style.display = 'block';
+            studentCustom.style.display = 'none';
+            document.getElementById('custom_request').required = false;
+        }
+    });
+
+    // Guest modal
+    const guestSelect = document.getElementById('guestRequest');
+    const guestCustom = document.getElementById('guest-custom-request-container');
+
+    guestSelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+            guestSelect.style.display = 'none';
+            guestCustom.style.display = 'block';
+            document.getElementById('guest_custom_request').required = true;
+        } else {
+            guestSelect.style.display = 'block';
+            guestCustom.style.display = 'none';
+            document.getElementById('guest_custom_request').required = false;
+        }
+    });
+
+
+    function openModal() {
+        document.getElementById('studentModal').classList.remove('hidden');
+        document.body.style.overflow = "hidden";
+    }
+    
+    function closeModal() {
+        document.getElementById('studentModal').classList.add('hidden');
+
+        document.body.style.overflow = "";
+    }
+
+    // document.getElementById('studentModal').addEventListener('click', function(e) {
+    //     if (e.target === this) closeModal();
+    // });
+
+    document.getElementById('studentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, { method: "POST", body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccessModal(data.ticket, data.survey_code);
+            form.reset();
+            closeModal();
+        } else {
+            alert("Failed to submit form!");
+        }
+    });
+
+    // ===== Guest Modal =====
+    function openGuestModal() {
+        document.getElementById('guestModal').classList.remove('hidden');
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeGuestModal() {
+        document.getElementById('guestModal').classList.add('hidden');
+        document.body.style.overflow = "";
+    }
+
+    // document.getElementById('guestModal').addEventListener('click', function(e) {
+    //     if (e.target === this) closeGuestModal();
+    // });
+
+    document.getElementById('guestForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, { method: "POST", body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccessModal(data.ticket, data.survey_code);
+            form.reset();
+            closeGuestModal();
+        } else {
+            alert("Failed to submit guest form!");
+        }
+    });
+
+        // ===== Shared Success Modal =====
+    function showSuccessModal(ticket, surveyCode) {
+        document.getElementById("successTicket").textContent = ticket;
+        document.getElementById("successSurvey").textContent = surveyCode ?? "N/A"; // guest might not have survey_code
+        document.getElementById("successModal").classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeSuccessModal() {
+        document.getElementById("successModal").classList.add("hidden");
+        document.body.style.overflow = "";
+        location.reload(); // optional, can remove if you don’t want reload
+    }
+
+    // Automatic Carousel
+let slideIndex = 0;
+const slides = document.getElementsByClassName("mySlides");
+const dots = document.getElementsByClassName("dot");
+
+function showSlides() {
+    // Hide all slides
+    for (let i = 0; i < slides.length; i++) {
+        slides[i].style.opacity = 0;
+        slides[i].style.transition = "opacity 1.5s ease-in-out";
+    }
+
+    // Reset all dots
+    for (let i = 0; i < dots.length; i++) {
+        dots[i].classList.remove("bg-black");
+        dots[i].classList.add("bg-gray-400");
+    }
+
+    // Show current slide
+    slides[slideIndex].style.opacity = 1;
+    dots[slideIndex].classList.remove("bg-gray-400");
+    dots[slideIndex].classList.add("bg-black");
+
+    // Move to next slide
+    slideIndex = (slideIndex + 1) % slides.length;
+}
+
+// Start carousel
+showSlides(); // Show first slide immediately
+setInterval(showSlides, 2000); // Change every 1 second
+
+    </script>
+
+    <footer class="bg-[#10420C] max-h-[86px] h-[85px] w-full">
+
+    </footer>
+</body>
+
+</html>

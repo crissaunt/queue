@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -14,35 +15,33 @@
 <style>
     .custom-bg {
                 background-image: url("{% static 'images/background.png' %}");
-                background-size: cover;        /* fill the screen */
-                /* background-position: center;   center the image */
-                background-repeat: no-repeat;  /* don’t repeat */
-                background-attachment: scroll; /* make background scroll with content */
-                }
+                background-size: cover;        
+                /* background-position: center;  
+                background-repeat: no-repeat;  
+                background-attachment: scroll; 
+            }
 
 </style>
-<body class="inria-sans-regular h-screen custom-bg" >
+<body class="inria-sans-regular h-screen custom-bg flex flex-col" >
 
-    <header class="py-2 bg-white border-b-12 border-b-[#10934F] shadow-[0_4px_10px_rgba(0,0,0,0.4)] ">
-        <div class="max-w-7xl mx-auto py-1 px-4 sm:px-6 lg:px-8">
-            <a href="#" >
-                <img class=" h-12 md:h-12" src="{% static 'images/header-logo.svg' %}" alt="">
-            </a>
+    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-t-[40px] border-[#10420C]">
+        <div class="gap-4 mt-5 max-w-screen-2xl w-full mx-auto ">
+            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
         </div>
-
     </header>
 
-    <main class="max-w-7xl mx-auto mb-10 ">
+    <main class="max-w-[1500px] mx-auto flex-1 px-4 ">
         {% block content %}
         {% endblock %}
     </main>
-
-    <footer class="bg-[#10934F] border-t-10 border-t-white mt-15 py-5">
-        <div class="flex ml-10 gap-10 max-w-7xl mt-5">
-            <img src="{% static 'images/site-logo.svg' %}" alt="Logo" class="pl-9 h-15 md:h-30">
-            <p class=" text-white text-sm w-[550px]">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+    
+{% comment %} 
+    <footer class="bg-[#10420C]  w-full border-t-10 border-t-white mt-15 py-5">
+        <div class="flex ml-10 gap-10 max-w-screen-2x  mx-auto mt-5 items-center">
+            <img src="{% static 'images/site-logo.svg' %}" alt="Logo" class="pl-9 h-13 md:h-20">
+            <p class=" text-white text-xs w-[700px]">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
         </div>
-    </footer>
+    </footer> {% endcomment %}
    
 </body>
 </html>

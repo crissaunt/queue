@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'students',
     'personel',
     'display',
+    'playground',
 ]
 
 # Daphne
@@ -64,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'personel.middleware.PersonelAuthMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'my_queue.urls'
@@ -92,8 +93,12 @@ WSGI_APPLICATION = 'my_queue.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'my_queue',
+        'USER': 'postgres',        
+        'PASSWORD': 'postgres',     
+        'HOST': 'localhost',      
+        'PORT': '5432',        
     }
 }
 
@@ -147,3 +152,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+LOGIN_URL = 'auth_login'
+LOGIN_REDIRECT_URL = 'personel' 
+LOGOUT_REDIRECT_URL = 'auth_login'

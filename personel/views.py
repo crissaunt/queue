@@ -1,17 +1,21 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
-from .models import StudentAppointments, Personel
+from .models import Appointments, Personel
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
-from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q, Case, When, Value, IntegerField
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
-
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.contrib.auth.decorators import login_required
+
+
+
 
 def broadcast_update():
     channel_layer = get_channel_layer()
@@ -24,7 +28,7 @@ def get_next_in_line(today, next_should_be_priority):
     """Get the next student in line - EXCLUDE priority pending students"""
     
     # First check for any standby students (they take highest priority and cut in line)
-    standby_student = StudentAppointments.objects.filter(
+    standby_student = Appointments.objects.filter(
         status="standby",
         datetime__date=today
     ).order_by("datetime").first()
@@ -35,7 +39,7 @@ def get_next_in_line(today, next_should_be_priority):
     # If no standby, ONLY consider non-priority students (exclude priority pending)
     # Regardless of the pattern, we only pick from non-priority students
     
-    non_priority_pending = StudentAppointments.objects.filter(
+    non_priority_pending = Appointments.objects.filter(
         status="pending",
         is_priority="no",  # Only non-priority
         datetime__date=today
@@ -59,7 +63,7 @@ def get_display_queue(today, limit=8):
     
     # 1) Add all standby students first (they cut in line)
     standby_students = list(
-        StudentAppointments.objects.filter(
+        Appointments.objects.filter(
             status="standby",
             datetime__date=today
         ).order_by("datetime")
@@ -72,7 +76,7 @@ def get_display_queue(today, limit=8):
     
     # 2) Add non-priority pending students only (exclude priority pending)
     non_priority_students = list(
-        StudentAppointments.objects.filter(
+        Appointments.objects.filter(
             status="pending",
             is_priority="no",  # Only non-priority
             datetime__date=today
@@ -89,11 +93,14 @@ def get_display_queue(today, limit=8):
 
 
 def home(request):
+    # Appointments.cancel_expired()
+
+    print("Current user:", request.user)  # Debug
     today = timezone.now().date()
     now_ph = localtime(timezone.now())
     
     # Auto-cancel expired skips
-    expired = StudentAppointments.objects.filter(
+    expired = Appointments.objects.filter(
         status="skip", skip_until__lt=now_ph
     )
     for appt in expired:
@@ -102,34 +109,35 @@ def home(request):
 
     today = now_ph.date() 
 
+    
     # pending non priority students
-    non_priority_students = StudentAppointments.objects.filter(
+    non_priority_students = Appointments.objects.filter(
         is_priority="no",
         status="pending",
         datetime__date=today 
     ).order_by("datetime") 
 
-    get_non_priority_students = StudentAppointments.objects.filter(
+    get_non_priority_students = Appointments.objects.filter(
         is_priority="no",
         status="pending",
         datetime__date=today 
     ).order_by("datetime").first() 
 
     # skip non priority students
-    skip_non_priority_students = StudentAppointments.objects.filter(
+    skip_non_priority_students = Appointments.objects.filter(
         is_priority="no",
         status="skip",
         datetime__date=today 
     ).order_by("datetime") 
 
     # get stand by students
-    get_standby_students = StudentAppointments.objects.filter(
+    get_standby_students = Appointments.objects.filter(
         status="standby",
         datetime__date=today 
     ).order_by("datetime").first()
 
     # pending priority students
-    priority_students = StudentAppointments.objects.filter(
+    priority_students = Appointments.objects.filter(
         is_priority="yes",
         status__in=["pending", "skip"],
         datetime__date=today 
@@ -143,19 +151,19 @@ def home(request):
     ).order_by("status_order", "datetime")  
 
     # get the first pending non-priority student
-    get_first_pending_non_priority = StudentAppointments.objects.filter(
+    get_first_pending_non_priority = Appointments.objects.filter(
         is_priority="no",
         status="pending",
         datetime__date=today 
     ).order_by("datetime").first() 
 
     # get the current student
-    get_current_number = StudentAppointments.objects.filter(
+    get_current_number = Appointments.objects.filter(
         status="current",
         datetime__date=today 
     ).order_by("datetime").first()
 
-    served_today = StudentAppointments.objects.filter(
+    served_today = Appointments.objects.filter(
         status__in=["done", "current"],
         datetime__date=today
     ).count()
@@ -167,7 +175,7 @@ def home(request):
 
     if request.method == "POST":
         if 'start' in request.POST:
-            served_count = StudentAppointments.objects.filter(
+            served_count = Appointments.objects.filter(
                 status__in=["done", "current"],
                 datetime__date=today
             ).count()
@@ -210,7 +218,7 @@ def done_current_number(request):
         action = request.POST.get('action')
         ticket_id = request.POST.get('ticket_number')
 
-        current_number = get_object_or_404(StudentAppointments, id=ticket_id)
+        current_number = get_object_or_404(Appointments, id=ticket_id)
         
         today = timezone.now().date()
         now_ph = localtime(timezone.now())
@@ -220,28 +228,24 @@ def done_current_number(request):
                 current_number.status = 'done'
                 current_number.skip_until = None
                 current_number.skip_count = 0
+                current_number.served_by = request.user.personel
                 current_number.save()
                 broadcast_update()
             elif action == 'skip':
                 if current_number.is_priority == 'yes':
                     current_number.status = 'skip'
+                    current_number.served_by = request.user.personel
                     current_number.save()
                     broadcast_update()
                 else:
-                   current_number.skip_count += 1
-                   if current_number.skip_count >= 3:
-                        current_number.status = 'cancel'
-                        current_number.skip_until = None
-                   elif current_number.skip_count == 1:
-                        current_number.status = 'skip'
-                        current_number.skip_until = timezone.now() + timedelta(hours=1)
-                   else:
-                        current_number.status = 'skip'
-                   current_number.save()  
-                   broadcast_update()  
+                    current_number.served_by = request.user.personel
+                    current_number.handle_skip() 
+                    broadcast_update()  
+
+            today = timezone.now().date()
 
             # Get count of served students today to determine pattern
-            served_today = StudentAppointments.objects.filter(
+            served_today = Appointments.objects.filter(
                 status__in=["done", "current"],
                 datetime__date=today
             ).count()
@@ -266,9 +270,9 @@ def done_current_number(request):
 def standby(request):
     if request.method == 'POST':
         action = request.POST.get('action')
-        ticket_id = request.POST.get('ticket_number')  # get ID from form
+        ticket_id = request.POST.get('ticket_number') 
 
-        current_number = get_object_or_404(StudentAppointments, id=ticket_id)
+        current_number = get_object_or_404(Appointments, id=ticket_id)
 
         if current_number:
             if action == 'standby':
@@ -285,7 +289,7 @@ def priority_standby(request):
         ticket_id = request.POST.get("ticket_number")  
         action = request.POST.get("action")  
 
-        student = get_object_or_404(StudentAppointments, id=ticket_id)
+        student = get_object_or_404(Appointments, id=ticket_id)
 
         if action == "standby":
             student.status = "standby"
@@ -303,10 +307,10 @@ def end_all_appointments(request):
         now_ph = localtime(timezone.now())
         
         # Cancel only today's pending and skip appointments
-        StudentAppointments.objects.filter(
-            datetime__date=now_ph,
-            status__in=["pending", "skip", "current",'done', 'cancel']
-        ).update(status="pending")
+        Appointments.objects.filter(
+            
+            status__in=["pending", "skip", "current", ]
+        ).update(status="cancel")
         
         broadcast_update()
         return redirect("personel")  
@@ -314,6 +318,19 @@ def end_all_appointments(request):
 
 
 def login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user) 
+            messages.success(request, "Login successful.")
+            return redirect("personel")  
+        else:
+            messages.error(request, "Invalid username or password.")
+            return redirect("auth_login")
 
         
     template = loader.get_template('personel/auth/login.html')
@@ -322,16 +339,32 @@ def login(request):
     return HttpResponse(template.render(context, request))
 
 
-def register(request):
-   
 
-    template = loader.get_template('personel/auth/register.html')
-    context = {
-    }
-    return HttpResponse(template.render(context, request))
+
+def register(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            messages.error(request, "Username and password are required.")
+            return redirect("auth_register")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("auth_register")
+
+        user = User.objects.create_user(username=username, password=password)
+        user.save()
+
+        messages.success(request, "Account created! You can now log in.")
+        return redirect("auth_login")
+
+    return render(request, "personel/auth/register.html")
+
 
 
 def logout(request):
-    request.session.flush()  # clears all session data
+    auth_logout(request)
     messages.success(request, "Logged out successfully.")
     return redirect("auth_login")

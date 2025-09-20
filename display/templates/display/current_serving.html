@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Caraga State University Cabadbaran Campus(CSUCC)</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        .odor-mean-chey-regular {
+                                font-family: "Odor Mean Chey", serif;
+                                font-weight: 400;
+                                font-style: normal;
+                                }
+
+        .medula-one-regular {
+                            font-family: "Medula One", system-ui;
+                            font-weight: 400;
+                            font-style: normal;
+                            }
+
+        .inria-sans-regular {
+                            font-family: "Inria Sans", sans-serif;
+                            font-weight: 400;
+                            font-style: normal;
+                            }
+
+         .custom-bg {
+                background-image: url("{% static 'images/bg-image.svg' %}");
+                background-size: cover;        /* fill the screen */
+                /* background-position: center;   center the image */
+                background-repeat: no-repeat;  /* don’t repeat */
+                background-attachment: scroll; /* make background scroll with content */
+                }
+
+
+
+
+    .priority-glow {
+        color: #ED7676 !important;
+        text-shadow: 0 0 5px rgba(237, 118, 118, 0.2), 0 0 40px rgba(237, 118, 118, 0.2);
+    }
+
+
+    .skip-glow {
+        color: #FFCC00 !important;
+        text-shadow: 0 0 5px rgba(255, 204, 0, 0.2), 0 0 40px rgba(255, 204, 0, 0.2);
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+    }
+
+    .shake {
+        animation: shake 0.3s ease-in-out;
+    }
+
+    </style>
+</head>
+<body class="custom-bg flex flex-col  min-h-screen  ">
+
+    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-t-[40px] border-[#10420C]">
+        <div class="gap-4 mt-5 max-w-screen-2xl w-full mx-auto ">
+            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+        </div>
+    </header>
+
+    <main class="flex flex-col space-y-20 max-w-screen-2xl w-full mx-auto px-4 flex-1">
+        <div class="flex flex-col items-center justify-center space-y-0 leading-none">
+            <h2 class="text-[96px] odor-mean-chey-regular text-[#10420C]" id="mainTitle" style="text-shadow:
+                    0 0 2px #000" >Current Serving</h2>
+            <h1 class="medula-one-regular text-[300px] text-[#10420C]" id="ticketNumber" 
+                 style="text-shadow:
+                    0 0 2px #000">-</h1>
+            <div class="border-2 w-2/3 bg-[#10420C]"></div>
+        </div>
+
+        <div class="flex  gap-16  items-center  ">
+            <!-- Image -->
+            <div class="flex-1 min-w-185 ">
+                <img src="{% static 'images/carousel1.svg' %}" alt="" class="w-full h-auto">
+            </div>
+
+            <!-- Vision Mission -->
+            <div class="flex-1 text-center space-y-5 px-2  ">
+                <h2 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Vision Mission</h2>
+                <p class="text-sm inria-sans-regular text-center w-md">
+                    Vision A socially-engaged digital, innovation, and entrepreneurial university excelling globally in science, engineering, and the arts by 2028. 
+                    Mission As a transformative university, CSU is a responsible steward of problem-solvers and value creators who are driven to create a sustainable future for the region, the nation, and beyond. 
+                    General Mandate Caraga State University shall primarily provide advanced …
+                </p>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="flex-1 flex flex-col max-w-50 leading-none mt-12">
+                <div class="flex flex-col leading-none">
+                    <h3 id="dayName" class="odor-mean-chey-regular text-[32px] text-[#10420C]" >---</h3>
+                    <p id="dateText" class="text-sm text-[#10420C]">---</p>
+                </div>
+                <div class="flex mt-2"> 
+                    <p class="odor-mean-chey-regular text-[32px] text-[#10420C]">
+                    <strong id="timeText" class="text-[64px] text-[#1E1E1E] medula-one-regular" >--:--</strong>
+                    <span id="ampm">--</span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-[#10420C] h-[86px] w-full">
+
+    </footer>
+
+
+    <script>
+window.onload = function() {
+  const ticketEl = document.getElementById("ticketNumber");
+
+  const mainTitle = document.getElementById("mainTitle");
+
+    function updateTime() {
+    const now = new Date();
+
+    const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+    const months = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ];
+
+    const dayName = days[now.getDay()];
+    const month = months[now.getMonth()];
+    const day = now.getDate();
+    const year = now.getFullYear();
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12; 
+
+    // update DOM
+    document.getElementById("dayName").textContent = dayName;
+    document.getElementById("dateText").textContent = `${month} ${day} ${year}`;
+    document.getElementById("timeText").textContent = `${hours}:${minutes}`;
+    document.getElementById("ampm").textContent = ampm;
+    }
+
+  // WebSocket
+  const socket = new WebSocket("ws://" + window.location.host + "/ws/display/");
+
+  socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    console.log("WebSocket payload:", data);
+    updateDisplay(data.current);
+  };
+
+  function updateDisplay(current) {
+    if (current) {
+      ticketEl.textContent = current.ticket_number || "R-000";
+
+      mainTitle.classList.remove("priority-glow", "skip-glow", "shake");
+
+      if (current.is_priority === "yes") {
+        ticketEl.style.color = "#ED7676";
+
+        mainTitle.textContent = "Priority Number";
+        mainTitle.classList.add("priority-glow", "shake");
+        setTimeout(() => mainTitle.classList.remove("shake"), 700);
+      } else if (current.skip_count && current.skip_count > 0) {
+        ticketEl.style.color = "#FFCC00";
+
+        mainTitle.textContent = "Recalling Number";
+        mainTitle.classList.add("skip-glow", "shake");
+      } else {
+        ticketEl.style.color = "#10420C";
+
+        mainTitle.textContent = "CURRENT SERVING";
+      }
+    } else {
+      ticketEl.textContent = "-";
+
+      ticketEl.style.color = "#10934F";
+      
+      mainTitle.textContent = "CURRENT SERVING";
+      mainTitle.classList.remove("priority-glow", "skip-glow");
+    }
+  }
+
+    updateTime();
+    setInterval(updateTime, 1000); 
+
+  
+};
+
+    </script>
+</body>
+
+</html>
