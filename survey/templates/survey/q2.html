@@ -1,0 +1,198 @@
+{% extends 'survey/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<div class="w-full flex bg-white p-20 justify-center  border mt-20  flex-col shadow-lg/30 relative ">
+  <h1 class="la-belle-aurore-regular text-center absolute -top-17 left-[460px] text-[32px] mb-6">
+    Help us to serve you better!</h1>
+
+    <div class="flex flex-col space-y-5">
+        <div class="flex flex-col space-y-10">
+          <p class="text-2xl font-bold">INSTRUCTION: </p>
+          <p class="text-2xl">For SQD 0-8, please click the star (  &#x2606;  ) on the column that best corresponds to your answer. </p>
+        </div>
+        
+
+        <p class="text-2xl font-bold italic mt-10">INSTRUCTION: </p>
+        <div class=" flex  space-y-5 justify-between">
+        
+          <div class="flex flex-col space-y-5 mx-10 ">
+            <div class="flex text-xl space-x-3">
+              <p>Strongly Agree  =</p>
+              <div class="flex gap-3">
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+              </div>
+            </div>
+            <div class="flex text-xl space-x-3">
+              <p>Neither Agree nor Disagree   =</p>
+              <div class="flex gap-3">
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+              </div>
+            </div>
+            <div class="flex text-xl space-x-3">
+              <p>Strongly Disgree  =</p>
+              <div class="flex gap-3">
+                <p>&#11088;</p>
+
+              </div>
+            </div>
+
+          </div>
+
+
+          <div class="flex flex-col space-y-5 mx-10 ">
+            <div class="flex text-xl space-x-3">
+              <p> Agree  =</p>
+              <div class="flex gap-3">
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+
+              </div>
+            </div>
+            <div class="flex text-xl space-x-3">
+              <p>Disagree   =</p>
+              <div class="flex gap-3">
+                <p>&#11088;</p>
+                <p>&#11088;</p>
+
+              </div>
+            </div>
+            <div class="flex text-xl space-x-3">
+              <p>N/A Not Applicable   =</p>
+              <div class="flex gap-3">
+                <p>Leave it blank</p>
+
+              </div>
+            </div>
+
+          </div>
+          
+          
+
+        </div>
+    </div>
+
+    
+
+    <p id="output" class="text-center mt-3 font-semibold"></p>
+    <div class="flex-1  mt-15" >
+      <div class="bg-[#10934F] flex justify-around text-xl text-white py-5">
+        <p>Service Quality Dimension</p>
+        <p>Ratings</p>
+      </div>
+
+      
+      <form  action="{% url 'validate_question2' %}" method="POST">
+         {% csrf_token %}
+        <div class="space-y-10 mt-5">
+
+          {% for sqd in sqds %}
+          <div class="flex justify-center items-center border-b border-gray-200">
+            <label class="flex-1 text-15">
+              <strong class="mr-3">SQD{{ forloop.counter }}.</strong> {{ sqd.name }}
+            </label>
+            <div class="rating text-4xl w-[450px] flex justify-center gap-5 cursor-pointer" data-sqd-id="{{ sqd.id }}">
+              <span data-value="1" class="star">&#x2606;</span>
+              <span data-value="2" class="star">&#x2606;</span>
+              <span data-value="3" class="star">&#x2606;</span>
+              <span data-value="4" class="star">&#x2606;</span>
+              <span data-value="5" class="star">&#x2606;</span>
+            </div>
+          </div>
+          {% endfor %}
+
+
+          
+          <div class="flex-1 flex flex-col mt-20 space-y-5">
+            <label for="" class="font-semibold">Suggestion on how we can further improve our services (optional):</label>
+            <textarea name="feedback" id="" class="border h-40">
+
+            </textarea>
+
+          </div>
+
+
+          <div class="flex-1 flex flex-col mt-10 space-y-5">
+            <label for="" class="font-semibold">Email address (Optional): :</label>
+            <textarea name="email" id="" class="border ">
+
+            </textarea>
+
+          </div>
+
+
+        </div>  
+
+         <div class="flex flex-1 mt-15 text-white justify-between">
+            <button class="px-20 py-2  bg-[#1E5F3D] cursor-pointer hover:bg-[#1E5F3D]/80">Back</button>
+            <button class="px-20 py-2 bg-[#10934F] cursor-pointer hover:bg-[#10934F]/80">Next</button>
+        </div>
+  </form>
+
+   
+        
+
+    </div>
+</div>
+
+<script>
+document.querySelectorAll(".rating").forEach(ratingDiv => {
+  const stars = ratingDiv.querySelectorAll(".star");
+  let rating = 0;
+
+  stars.forEach((star, index) => {
+    // Hover effect
+    star.addEventListener("mouseover", () => {
+      resetStars();
+      highlightStars(index);
+    });
+
+    // Reset on mouseout if no rating chosen
+    star.addEventListener("mouseout", () => {
+      resetStars();
+      if (rating > 0) highlightStars(rating - 1);
+    });
+
+    // Click to set rating
+    star.addEventListener("click", () => {
+      rating = index + 1;
+      console.log(`You rated SQD ${ratingDiv.dataset.sqdId} with ${rating} star(s)`);
+      let input = ratingDiv.querySelector("input");
+      if (!input) {
+        input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "rating_" + ratingDiv.dataset.sqdId;  // ✅ unique per SQD
+        ratingDiv.appendChild(input);
+      }
+      input.value = rating;
+    });
+
+  });
+
+  function highlightStars(index) {
+    for (let i = 0; i <= index; i++) {
+      stars[i].textContent = "★"; // filled
+      stars[i].style.color = "gold";
+    }
+  }
+
+  function resetStars() {
+    stars.forEach(star => {
+      star.textContent = "☆"; // empty
+      star.style.color = "black";
+    });
+  }
+});
+
+</script>
+
+{% endblock  %}

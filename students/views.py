@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
-from personel.models import Appointments, RequestType, Courses
-from playground.models import Pin 
+from personel.models import Appointments, RequestType, Courses, Code
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
@@ -74,7 +73,7 @@ def generate_unique_survey_code():
         letters = ''.join(random.choices(string.ascii_uppercase, k=2))
         number = random.randint(100, 9999)  
         code = f"{letters}-{number}"
-        if not Pin.objects.filter(code=code).exists():
+        if not Code.objects.filter(code=code).exists():
             return code    
 
 
@@ -161,10 +160,10 @@ def student_submit(request):
         )
         survey_code = generate_unique_survey_code()
 
-        survey = Pin.objects.create(
+        survey = Code.objects.create(
                                 appointments = student,
                                 code=survey_code,
-                                status="unused"
+                                
                             )
         broadcast_queue_update()
 
@@ -202,10 +201,10 @@ def guest_submit(request):
         )
         survey_code = generate_unique_survey_code()
 
-        survey = Pin.objects.create(
+        survey = Code.objects.create(
                                 appointments = guest,         
                                 code=survey_code,
-                                status="no"
+                            
                             )
         broadcast_queue_update()
 

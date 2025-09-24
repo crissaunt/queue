@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'students',
     'personel',
     'display',
-    'playground',
+    'survey',
 ]
 
 # Daphne

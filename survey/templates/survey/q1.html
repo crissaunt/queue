@@ -1,0 +1,41 @@
+{% extends 'survey/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<div class="w-full flex bg-white py-40 px-20  justify-center  border mt-20  flex-col shadow-lg/30 relative ">
+  <h1 class="la-belle-aurore-regular text-center absolute -top-17 left-[460px] text-[32px] mb-6">
+    Help us to serve you better!</h1>
+
+    <p class="text-2xl"><strong>INSTRUCTION:</strong>  Please Check( &#10004; ) your answer to the  <strong>Citizen’s Charter (CC)</strong> questions. The Citizen’s Charter is an official document that reflects the services of a government agency  /office including its requirements, fees, and processing time among others.</p>
+    
+
+    <div class="mt-15 ml-15 " >
+        <form action="{% url 'validate_question1' %}" method="POST">
+            {% csrf_token %}
+           {% for question in questions %}
+                <div class="flex flex-col mb-10">
+                    <label class="flex gap-5 font-semibold text-lg">
+                        <p class="mr-10">CC{{ forloop.counter }}</p> {{ question.name }}
+                        <input type="hidden" name="question{{forloop.counter}}" value="{{ question.id }}">
+                    </label>
+
+
+                    {% for choice in question.choices.all %}
+                        <div class="flex ml-13 space-x-10 mt-7">
+                            <input type="checkbox" name="choice_{{ question.id }}" value="{{ choice.id }}">
+                            <label>{{ forloop.counter }}.  {{ choice.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div class="flex flex-1 text-white justify-between">
+                <button type="button" class="px-20 py-2  bg-[#1E5F3D] hover:bg-[#1E5F3D]/80 cursor-pointer">Back</button>
+                <button type="submit" class="px-20 py-2 bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer">Next</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock  %}

@@ -1,0 +1,91 @@
+{% extends 'survey/base.html' %}
+
+{% block content %}
+{% load static %}
+
+<div class="w-full flex bg-white p-10 px-20 justify-center border mt-10  flex-col shadow-lg/30 relative">
+  <h1 class="la-belle-aurore-regular text-center absolute -top-9 left-[470px] text-[32px] mb-6">
+    Help us to serve you better!</h1>
+
+    <div class="w-full mx-10  flex justify-center">
+        <p class="text-center  text-[16px] max-w-[865px]">The Client Satisfaction Measurement (CSM) tracks the customer experience of government offices. Your feedback on your <strong>recently concluded transaction </strong>  will help this office provide a better service. Personal information  shared will be kept confidential  and you always have the option to not answer this form.</p>
+    </div>
+
+    <div class="mt-13 ">
+        <form action="{% url 'validate_form' %}" method="POST">
+            {% csrf_token %}
+            <div class="flex justify-center gap-5">
+                <div class="flex flex-col flex-1 gap-2">
+                    <label for="" class="font-bold">Client type:</label>
+                    <select name="client_type" id="client_type" class="border h-[39px]">
+                        <option hidden class="text-gray-400">What are you?</option>
+                        {% for client in client_type %}
+                            <option value="{{client.id}}">{{client.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- <input type="text" class="border h-[39px]"> -->
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                    <label for="" class="font-bold">Date:</label>
+                    <input type="date" class="border h-[39px]" name="date">
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                    <label for="" class="font-bold">Sex:</label>
+                    <select name="sex" id="sex" class="border h-[39px]">
+                        <option hidden>Choose sex</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <!-- <input type="text" class="border h-[39px]"> -->
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                    <label for="" class="font-bold">Age :</label>
+                    <input type="text" class="border h-[39px]" name="age">
+                </div>
+            </div>
+             <div class="flex  gap-5 mt-15">
+                <div class="flex flex-col  flex-1 gap-2">
+                    <label for="" class="font-bold">Goverment: </label>
+                    <select name="government" id="" class="border h-[39px]">
+                        <option value="government"  class="">Government</option>
+                        <option value="other_agency"  class="">Other Agency</option>
+                    </select>
+                    <!-- <input type="text" class="border  h-[39px]"> -->
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                    <label for="" class="font-bold">Region of Residence: </label>
+                    <input type="text" class="border h-[39px]" name="region">
+                </div>
+                <div class="flex flex-col flex-1  gap-2">
+                    <label for="" class="font-bold">Office Person Visited: </label>
+                    <input type="text" class="border  h-[39px]" name="person_visited">
+                </div>
+            </div>
+
+            <div class="flex  gap-5 mt-10">
+                <div class="flex flex-col gap-2 w-full ">
+                    <label for="" class="font-bold">Service Availed: </label>
+                    <textarea name="service_availed" id="" class="border w-full h-[150px] p-5" name="service_availed">
+
+                    </textarea>
+                </div>
+               
+            </div>
+
+            <div class="flex  gap-5 mt-5  justify-end">
+                <div class="flex flex-col gap-2 ">
+                    <button class="px-10 w-[231px] text-white py-1.5 bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer"> Next</button>
+                </div>
+               
+            </div>
+
+
+        </form>
+    </div>
+
+
+</div>
+
+
+{% endblock  %}

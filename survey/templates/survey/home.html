@@ -1,0 +1,79 @@
+{% extends 'survey/base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="w-full flex  justify-center ">
+    <div class="flex mt-10  items-center space-x-7" >
+        <div class="">
+            <img src="{% static 'pictures/feedback.svg' %}" alt="" class="">
+        </div>
+
+
+        <div class="flex flex-col gap-3 items-center ">
+            <div class="flex flex-col items-center">
+                <h1 class=" sora-regular gap-1 font-bold text-[50px]">Client Satisfaction</h1>
+                <h1 class=" sora-regular gap-1 font-bold text-[50px]">Measurement <span class="text-[#FFCC00]"> Survey</span> </h1>
+            </div>
+            <p class="la-belle-aurore-regular text-center text-[32px]">Help us to serve you better!</p>
+            <button id="openModal" 
+             class="max-w-[168px] px-8 py-2 border-4 border-double border-white bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer text-white">Get Started</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="codeModal" 
+     class="hidden fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white shadow-lg w-[400px]  px-10 pt-5 pb-10 relative">
+    
+    <!-- Close button -->
+    <button id="closeModal" class="absolute top-2 right-3 text-gray-500 hover:text-black text-2xl">
+      &times;
+    </button>
+
+    <div class="flex items-center justify-center flex-1 mx-auto flex-col gap-4 mb-7">
+        <img src="{% static 'pictures/csulogo.png' %}" alt="CSUCC Logo" class="h-20 md:h-18 pl-2 md:pl-8">
+        <p class="text-sm text-gray-400">Please enter your 4-digit code to continue.</p>
+    </div>
+    
+    <!-- <h2 class="text-3xl font-bold mb-6 text-center">Enter Your Code</h2> -->
+    
+    <form method="post" action="{% url 'validate_code' %}" class="flex flex-col gap-2">
+      {% csrf_token %}
+      <label for="">Enter Code:</label>
+      <input type="text" name="code" placeholder="Enter Code" 
+             class="border  text-base  px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black" required />
+      
+      <button type="submit" 
+              class="bg-[#10934F] hover:bg-[#10934F]/80 text-white text-base cursor-pointer mt-5 px-4 py-2">
+        Submit
+      </button>
+    </form>
+  </div>
+</div>
+
+
+<!-- JS for modal -->
+<script>
+  const openModal = document.getElementById("openModal");
+  const closeModal = document.getElementById("closeModal");
+  const modal = document.getElementById("codeModal");
+
+  openModal.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+  });
+
+  closeModal.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+
+  // Optional: close when clicking outside modal content
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+    }
+  });
+</script>
+
+{% endblock  %}
