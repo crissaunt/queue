@@ -140,12 +140,11 @@ th, td {
 }
 </style>
 {% load static %}
-<div class="flex mt-7 justify-between">
-    <div class="flex gap-4 md:gap-10">
+<div class="flex mt-4 justify-between">
+    <div class="flex gap-2 md:gap-10">
        <div class="relative">
             <a href="#" class="text-sm border-b-3 border-[#10420C]">Dashboard</a>
-           
-
+        
             <!-- Bell container -->
             <div class="absolute left-18 top-0">  
                 <div class="relative">
@@ -442,44 +441,32 @@ th, td {
 
   <div class="flex gap-6 justify-between ">
     <!-- First table -->
-    <div class="bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+    <div class="bg-white">
       <table class="min-w-full border border-gray-300 rounded-lg">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="px-4 py-2 border">Question</th>
-            <th class="px-4 py-2 border">Answer</th>
-            <th class="px-4 py-2 border">Answer</th>
+        <thead class="bg-[#10420C]">
+          <tr class="text-white">
+            <th class="px-4 py-2 border">Code </th>
+            <th class="px-4 py-2 border">Name</th>
+            <th class="px-4 py-2 border">Status</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="px-4 py-2 border">Service Quality</td>
-            <td class="px-4 py-2 border">Excellent</td>
-            <td class="px-4 py-2 border">Excellent</td>
-          </tr>
+        <tbody id="survey-body">
+            {% for survey in display_survey %}
+            <tr>
+                <td class="px-4 py-2 border">{{ survey.code }}</td>
+                <td class="px-4 py-2 border">{{ survey.appointments }}</td>
+                <td class="px-4 py-2 border">{% if survey.status == 'used' %} done {% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center py-2 text-gray-500">No survey records found</td>
+            </tr>
+            {% endfor %}
         </tbody>
+
       </table>
     </div>
 
-    <!-- Second table -->
-    <div class="bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-      <table class="min-w-full border border-gray-300 rounded-lg">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="px-4 py-2 border">Aspect</th>
-            <th class="px-4 py-2 border">Rating</th>
-            <th class="px-4 py-2 border">Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="px-4 py-2 border">Staff</td>
-            <td class="px-4 py-2 border">Good</td>
-            <td class="px-4 py-2 border">Good</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
     
   </div>
@@ -653,6 +640,33 @@ socket.onmessage = function (event) {
                 `;
                 tbody.insertAdjacentHTML("beforeend", row);
             });
+        }
+    }
+    // ✅ Handle survey updates
+    if (data.surveys) {
+        const tbody = document.getElementById("survey-body");
+        tbody.innerHTML = ""; // clear old rows
+
+        if (data.surveys.length > 0) {
+            data.surveys.forEach(survey => {
+                console.log("Survey update received:", data.surveys);
+                const row = `
+                    <tr>
+                        <td class="px-4 py-2 border">${survey.code}</td>
+                        <td class="px-4 py-2 border">${survey.appointment}</td>
+                        <td class="px-4 py-2 border">${survey.status}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML("beforeend", row);
+            });
+        } else {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center py-2 text-gray-500">
+                        No survey records found
+                    </td>
+                </tr>
+            `;
         }
     }
 };

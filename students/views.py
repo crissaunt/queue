@@ -204,7 +204,7 @@ def guest_submit(request):
         survey = Code.objects.create(
                                 appointments = guest,         
                                 code=survey_code,
-                            
+                                
                             )
         broadcast_queue_update()
 

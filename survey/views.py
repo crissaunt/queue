@@ -8,6 +8,34 @@ from .models import (
     SatisfactionSurvey, CCResponse
 )
 
+from django.db.models import Q
+
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def mark_survey_used(request, code_id):
+    survey = Code.objects.get(id=code_id)
+    survey.status = "used"
+    survey.save()
+
+    # ✅ Send websocket update to refresh frontend
+    channel_layer = get_channel_layer()
+    surveys = Code.objects.filter(status="used").order_by("-created_at")[:20]
+    survey_list = [
+        {"code": s.code, "appointment": str(s.appointments), "status": s.status}
+        for s in surveys
+    ]
+
+    async_to_sync(channel_layer.group_send)(
+        "queue",  # same group
+        {
+            "type": "send_update",
+            "data": {"surveys": survey_list}
+        }
+    )
+
+    return redirect("personel")
 
 # ---------------- HOME ----------------
 def home(request):
@@ -23,15 +51,10 @@ def validate_code(request):
         code_obj = Code.objects.filter(code=get_code).first()
         if code_obj:
             print("Found code:", code_obj.code, "Status:", code_obj.status)
-            if code_obj.status == 'unused':
-                code_obj.status = 'used'
-                code_obj.save()
-                request.session['code_obj'] = get_code
-                print("✅ Code stored in session")
-                print("SESSION STATE:", dict(request.session))
-                return redirect('form')
-            else:
-                print("⚠️ Code already used.")
+            request.session['code_obj'] = get_code
+            print("✅ Code stored in session")
+            print("SESSION STATE:", dict(request.session))
+            return redirect('form')
         else:
             print("❌ Code not found.")
 
@@ -153,6 +176,13 @@ def validate_question2(request):
             survey.email = email
             survey.save()
 
+        code_obj = Code.objects.get(code=request.session.get('code_obj'))
+
+        if code_obj.status == 'unused':
+            code_obj.status = 'used'
+            mark_survey_used(request, code_obj.id)
+            code_obj.save()    
+
         print("✅ SQD Responses + Feedback/Email saved")
         print("SESSION STATE BEFORE CLEAR:", dict(request.session))
 
@@ -160,6 +190,7 @@ def validate_question2(request):
         request.session.flush()
 
         print("SESSION STATE AFTER CLEAR:", dict(request.session))
+        
         return redirect('survey')   # ⬅ back to home
 
     return redirect('question2')

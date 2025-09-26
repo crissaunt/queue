@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
-from .models import Appointments, Personel
+from .models import Appointments, Personel, Code
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
@@ -13,6 +13,8 @@ from django.contrib.auth.models import User
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now, timedelta
+
 
 
 
@@ -197,7 +199,17 @@ def home(request):
         broadcast_update()
         return redirect("personel")
 
+
+    survey_today = now().date()
+    since = survey_today - timedelta(days=1)
     display_queues  = get_display_queue(today, limit=8)
+    display_survey = Code.objects.filter(
+                                            status="used",
+                                            created_at__date__gte=since
+                                        ).order_by("-created_at")
+    # display_survey = Code.objects.filter(status="used").order_by("-created_at")
+    print("Survey count:", display_survey.count())
+    print("Survey rows:", list(display_survey.values("code", "created_at")))
 
     template = loader.get_template('personel/home.html')
     context = {
@@ -210,6 +222,7 @@ def home(request):
         'display_queues' : display_queues ,
         'next_should_be_priority': next_should_be_priority,
         'get_first_non_priority_students': get_non_priority_students,
+        'display_survey': display_survey,
     }
     return HttpResponse(template.render(context, request))
 
