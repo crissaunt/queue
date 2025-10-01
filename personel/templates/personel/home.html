@@ -6,7 +6,7 @@ Caraga State University Cabadbaran Campus(CSUCC)
 
 {% block content %}
 
-<!-- #10420C -->
+<!-- #10934F -->
 <!-- #FFCC00 -->
 <!-- #bb2124 -->
 
@@ -61,7 +61,7 @@ Caraga State University Cabadbaran Campus(CSUCC)
 }
 
 .pagination-btn {
-  background-color: #10420C;
+  background-color: #10934F;
   color: white;
   border: none;
   padding: 5px 12px;
@@ -71,7 +71,7 @@ Caraga State University Cabadbaran Campus(CSUCC)
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #10420C;
+  background-color: #10934F;
 }
 
 .pagination-btn:disabled {
@@ -143,7 +143,7 @@ th, td {
 <div class="flex mt-4 justify-between">
     <div class="flex gap-2 md:gap-10">
        <div class="relative">
-            <a href="#" class="text-sm border-b-3 border-[#10420C]">Dashboard</a>
+            <a href="#" class="text-sm border-b-3 border-[#10934F]">Dashboard</a>
         
             <!-- Bell container -->
             <div class="absolute left-18 top-0">  
@@ -215,7 +215,7 @@ th, td {
             <div class="min-h-[200px] flex justify-center items-center py-4">
 
                 <div class="flex items-center "> 
-                    <p class="text-[#10420C] text-7xl md:text-8xl medula-one-regular">
+                    <p class="text-[#10934F] text-7xl md:text-8xl medula-one-regular">
                     {{ get_current_number.ticket_number }}
                     </p>
                 </div>
@@ -228,7 +228,7 @@ th, td {
                     </p>
                     <form action="{% url 'personel' %}" method="POST">
                         {% csrf_token %}
-                        <button class="bg-[#10420C] hover:bg-[#10420C]/80 text-sm text-white px-8 py-2 cursor-pointer"
+                        <button class="bg-[#10934F] hover:bg-[#10934F]/80 text-sm text-white px-8 py-2 cursor-pointer"
                             type="submit" name="start" value="start">
                             Start
                         </button>
@@ -240,7 +240,7 @@ th, td {
         <div class="border-1 border-gray-400 my-4"></div>
 
         <div class="flex-col table-container">
-            <h1 class="text-center px-4 py-2 text-base font-bold text-white bg-[#10420C]">Waiting List</h1>
+            <h1 class="text-center px-4 py-2 text-base font-bold text-white bg-[#10934F]">Waiting List</h1>
 
             <div class="table-scroll">
                 <table class="w-full">
@@ -254,7 +254,7 @@ th, td {
                         {% for display_queue in display_queues  %}
                         <tr class="{% if display_queue.status == 'standby' and display_queue.is_priority == 'no'  %} bg-[#FFCC00]/20 
                                                     {% elif display_queue.status == 'standby' and display_queue.is_priority == 'yes'  %} bg-[#ED7676]/20
-                                                    {% else %}bg-[#10420C]/20
+                                                    {% else %}bg-[#10934F]/20
                                                     {% endif %} ">
                             <td class="text-left px-4 py-2 text-sm ">{{ display_queue.ticket_number }}</td>
                             <td class="px-4 py-2 text-sm text-center">{{ display_queue.user_type }}</td>
@@ -275,24 +275,24 @@ th, td {
     <!-- right  -->
     <div class="flex-1 flex flex-col min-h-0">
         <div class="bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)] min-h-[250px]">
-            <div class="bg-[#10420C] text-white text-base p-2 text-center">
+            <div class="bg-[#10934F] text-white text-base p-2 text-center">
                 <h2 class="text-base font-bold" >INFORMATION</h2>
             </div>
             <div class="mx-4 overflow-x-auto flex ">
                 <table class="w-full border-collapse mt-8 min-w-full">
                     <thead class="text-base">
-                        <tr class="border-b border-[#DEDEDE]">
-                            <th class="text-center px-4 py-2 w-1/5">Full Name</th>
-                            <th class="text-center px-4 py-2 w-1/5">Course</th>
-                            <th class="text-center px-4 py-2 w-1/5">Request</th>
+                        <tr class="border-b border-[#DEDEDE] ">
+                            <th class="text-center px-4 py-2 w-full">Full Name</th>
+                            <th class="text-center px-4 py-2 w-full ">Course</th>
+                            <th class="text-center px-4 py-2 w-full">Request</th>
                         </tr>
-                    </thead>
+                    </thead> 
                     <tbody class="text-sm">
                         {% if get_current_number %}
                         <tr>
-                            <td class="px-4 py-2  text-center">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
-                            <td class="px-4 py-2  text-center">{{ get_current_number.courses }}</td>
-                            <td class="px-4 py-2 text-center">
+                            <td class="px-4 py-2  w-full text-center">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
+                            <td class="px-4 py-2  w-full text-center">{{ get_current_number.courses }}</td>
+                            <td class="px-4 py-2 w-full text-center">
                                 {% if get_current_number.requestType == None %}
                                     {{ get_current_number.custom_request }}
                                 {% else %}
@@ -316,7 +316,7 @@ th, td {
                         {% if get_current_number %}
                             <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}" >
                             <button type="submit" name="action" value="done"
-                                class="bg-[#10420C] hover:bg-[#10420C]/80 text-white px-6 py-2 cursor-pointer w-full sm:w-auto" >
+                                class="bg-[#10934F] hover:bg-[#10934F]/80 text-white px-6 py-2 cursor-pointer w-full sm:w-auto" >
                             Done</button>
                             <button type="submit" name="action" value="skip"
                             class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-black px-6 py-2 cursor-pointer w-full sm:w-auto" >Skip</button>
@@ -437,13 +437,13 @@ th, td {
 </section>    
 
 <section class="p-6 bg-white mt-8 shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-  <h1 class="text-2xl font-bold mb-6">Client Satisfaction Survey</h1>
+  <h1 class="text-xl font-bold mb-6">Client Satisfaction Survey</h1>
 
   <div class="flex gap-6 justify-between ">
     <!-- First table -->
     <div class="bg-white">
       <table class="min-w-full border border-gray-300 rounded-lg">
-        <thead class="bg-[#10420C]">
+        <thead class="bg-[#10934F]">
           <tr class="text-white">
             <th class="px-4 py-2 border">Code </th>
             <th class="px-4 py-2 border">Name</th>
@@ -629,7 +629,7 @@ socket.onmessage = function (event) {
                 } else if (item.status === "standby" && item.is_priority === "yes") {
                     rowClass = "bg-[#ED7676]/20";
                 } else {
-                    rowClass = "bg-[#10420C]/20";
+                    rowClass = "bg-[#10934F]/20";
                 }
 
                 const row = `

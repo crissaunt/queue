@@ -936,6 +936,9 @@
   .border-\[\#10420C\] {
     border-color: #10420C;
   }
+  .border-\[\#10934F\] {
+    border-color: #10934F;
+  }
   .border-\[\#DEDEDE\] {
     border-color: #DEDEDE;
   }
@@ -969,11 +972,11 @@
   .bg-\[\#10420C\] {
     background-color: #10420C;
   }
-  .bg-\[\#10420C\]\/20 {
-    background-color: color-mix(in oklab, #10420C 20%, transparent);
-  }
   .bg-\[\#10934F\] {
     background-color: #10934F;
+  }
+  .bg-\[\#10934F\]\/20 {
+    background-color: color-mix(in oklab, #10934F 20%, transparent);
   }
   .bg-\[\#ED7676\] {
     background-color: #ED7676;
@@ -1028,9 +1031,6 @@
   }
   .bg-gray-100 {
     background-color: var(--color-gray-100);
-  }
-  .bg-gray-200 {
-    background-color: var(--color-gray-200);
   }
   .bg-gray-300 {
     background-color: var(--color-gray-300);
