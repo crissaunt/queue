@@ -1,0 +1,212 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+Satisfaction Surveys
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="min-h-screen bg-gray-50/50 px-4 py-6 sm:px-6 lg:px-8">
+    <!-- HEADER -->
+    <div class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div class="mb-4 sm:mb-0">
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Satisfaction Surveys</h1>
+                <p class="text-[11px] text-gray-600 mt-2">View and manage all satisfaction survey responses</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SURVEYS TABLE -->
+    <div class="overflow-hidden mt-3">
+        <div class="px-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-gray-900">Survey Responses</h2>
+                <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-[11px] font-medium px-3 py-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    {{ surveys|length }} responses
+                </span>
+            </div>
+        </div>
+
+        <div class="p-6">
+            {% if surveys %}
+            <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Survey ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Survey Year</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service Availed</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Submitted</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for survey in surveys %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                #{{ survey.id }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ survey.survey_year.year }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ survey.client_type.name|default:"Not specified" }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                                {{ survey.service_availed|default:"Not specified"|truncatewords:8 }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ survey.submitted_at|date:"M d, Y H:i" }}  <!-- Fixed: changed created_at to submitted_at -->
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if survey.cc_responses.all or survey.sqd_responses.all %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Completed
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Incomplete
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{% url 'view_satisfaction_survey' survey.id %}" class="text-[#10420C] hover:text-[#10420C]/80 cursor-pointer transition-colors mr-3">
+                                    View
+                                </a>
+                                <button onclick="openDeleteModal({{ survey.id }}, 'Survey #{{ survey.id }}')" 
+                                        class="text-red-600 hover:text-red-800 cursor-pointer transition-colors">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 flex items-center justify-center">
+                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-sm font-semibold text-gray-900 mb-2">No survey responses yet</h3>
+                <p class="text-[11px] text-gray-500 mb-6 max-w-sm mx-auto">Survey responses will appear here once users start submitting satisfaction surveys.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 hidden z-50 p-4">
+    <div class="flex items-center justify-center min-h-full">
+        <div class="bg-white shadow-xl w-full max-w-md transform transition-all">
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-gray-200 bg-red-600">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-white">Delete Survey</h2>
+                    <button id="closeDeleteModalBtn" class="text-white/80 hover:text-white text-2xl leading-none cursor-pointer transition-colors">&times;</button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-8 space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Confirm Deletion</h3>
+                        <p class="text-sm text-gray-600 mt-1">Are you sure you want to delete this survey? This action cannot be undone.</p>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-red-800 mb-2">Survey to be deleted:</h4>
+                    <p class="text-sm text-red-700 font-medium" id="deleteSurveyText"></p>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-yellow-800 font-medium">Warning</p>
+                            <p class="text-xs text-yellow-700 mt-1">This will permanently delete all associated responses (CC responses and SQD ratings).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 pt-4">
+                    <button type="button" id="cancelDeleteModalBtn"
+                        class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 cursor-pointer transition-colors">
+                        Cancel
+                    </button>
+                    <form id="deleteForm" method="POST" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="px-6 py-3 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors">
+                            Delete Survey
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Delete Modal Functionality
+    const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+    const cancelDeleteModalBtn = document.getElementById("cancelDeleteModalBtn");
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteForm = document.getElementById("deleteForm");
+    const deleteSurveyText = document.getElementById("deleteSurveyText");
+
+    function openDeleteModal(surveyId, surveyText) {
+        // Set the survey text in the modal
+        deleteSurveyText.textContent = surveyText;
+        
+        // Set the form action
+        deleteForm.action = `/dashboard/surveys/satisfaction/${surveyId}/delete/`;
+        
+        deleteModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeDeleteModal() {
+        deleteModal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+    }
+
+    // Event Listeners
+    closeDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+    cancelDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+
+    // Close modal when clicking outside
+    deleteModal.addEventListener("click", (e) => {
+        if (e.target === deleteModal) {
+            closeDeleteModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !deleteModal.classList.contains("hidden")) {
+            closeDeleteModal();
+        }
+    });
+</script>
+{% endblock %}

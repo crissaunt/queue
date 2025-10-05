@@ -354,6 +354,8 @@ def login(request):
 
 
 
+from .models import Personel
+
 def register(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -368,12 +370,15 @@ def register(request):
             return redirect("auth_register")
 
         user = User.objects.create_user(username=username, password=password)
-        user.save()
+        
+        # ✅ create the Personel record
+        Personel.objects.create(user=user)
 
         messages.success(request, "Account created! You can now log in.")
         return redirect("auth_login")
 
     return render(request, "personel/auth/register.html")
+
 
 
 

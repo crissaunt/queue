@@ -1,0 +1,398 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}
+SQD Management
+{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="min-h-screen bg-gray-50/50 px-4 py-6 sm:px-6 lg:px-8">
+  <!-- HEADER -->
+  <div class="mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div class="mb-4 sm:mb-0">
+        <h1 class="text-xl font-bold text-gray-900 tracking-tight">Service Quality Dimensions (SQD) Management</h1>
+        <p class="text-[11px] text-gray-600 mt-2">Create and organize service quality dimensions for different years</p>
+      </div>
+      <button id="openCreateModalBtn"
+        class="inline-flex items-center gap-2 bg-[#10420C] text-white text-[11px] font-semibold px-5 py-3 hover:bg-[#10420C]/80 transition-all duration-200 cursor-pointer group">
+        <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Create SQD
+      </button>
+    </div>
+  </div>
+
+  <!-- SQD GRID -->
+  <div class="overflow-hidden mt-3">
+    <div class="px-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-gray-900">Service Quality Dimensions</h2>
+        <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-[11px] font-medium px-3 py-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          {{ sqds|length }} items
+        </span>
+      </div>
+    </div>
+
+    <div class="p-6">
+      {% if sqds %}
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {% for sqd in sqds %}
+        <div class="group bg-white border border-gray-200 p-6 hover:border-[#10420C]/40 hover:shadow-md transition-all duration-300">
+          <!-- SQD Header -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex flex-col gap-2">
+                <h3 class="text-sm font-semibold text-gray-900 leading-tight pr-2">{{ sqd.name }}</h3>
+                <div class="flex gap-2">
+                    {% for year_link in sqd.year_links.all %}
+                        <span class="inline-flex items-center text-[11px] font-medium text-green-700">
+                        {{ year_link.year.year }}
+                        </span>
+                        {% empty %}
+                        <span class="text-[11px] text-gray-400 italic">Not assigned to any year</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button onclick="openEditModal({{ sqd.id }}, '{{ sqd.name|escapejs }}')"
+                 class="p-1.5 text-black hover:text-[#10420C] hover:bg-[#10420C]/5 transition-colors"
+                 title="Edit SQD">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+              <button onclick="openDeleteModal({{ sqd.id }}, '{{ sqd.name|escapejs }}')"
+                 class="p-1.5 text-black hover:text-red-600 hover:bg-red-50 transition-colors"
+                 title="Delete SQD">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Created Info -->
+          <div class="mb-4">
+            <p class="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">Details</p>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 text-[11px] text-gray-600">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Created: {{ sqd.created_at|date:"M d, Y" }}
+              </div>
+              <div class="flex items-center gap-2 text-[11px] text-gray-600">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Updated: {{ sqd.updated_at|date:"M d, Y" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Assign to Year Form -->
+          <div class="pt-4 border-t border-gray-200">
+            <form method="POST" action="{% url 'assign_sqd_to_year' %}" class="flex gap-2">
+              {% csrf_token %}
+              <input type="hidden" name="sqd_id" value="{{ sqd.id }}">
+              <select name="year_id" 
+                      class="flex-1 text-sm border border-gray-300 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#10420C] focus:border-[#10420C]">
+                <option value="" disabled selected>Select year...</option>
+                {% for year in available_years %}
+                <option value="{{ year.id }}">{{ year.year }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" 
+                      class="bg-[#10420C] text-white text-sm px-4 py-2 hover:bg-[#10420C]/80 cursor-pointer transition-colors">
+                Assign
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <div class="w-24 h-24 mx-auto mb-4 bg-gray-100 flex items-center justify-center">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <h3 class="text-sm font-semibold text-gray-900 mb-2">No SQD yet</h3>
+        <p class="text-[11px] text-gray-500 mb-6 max-w-sm mx-auto">Get started by creating your first service quality dimension to organize your survey framework.</p>
+        <button id="openCreateModalBtnEmpty"
+          class="inline-flex items-center gap-2 bg-[#10420C] text-white text-[11px] font-semibold px-6 py-3 hover:bg-[#0a2f0a] transition-colors cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Create First SQD
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- CREATE MODAL -->
+<div id="createModal" class="fixed inset-0 bg-black/50 hidden z-50 p-4">
+  <div class="flex items-center justify-center min-h-full">
+    <div class="bg-white shadow-xl w-full max-w-2xl transform transition-all">
+      <!-- Modal Header -->
+      <div class="px-8 py-6 border-b border-gray-200 bg-[#10420C]">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white">Create New SQD</h2>
+          <button id="closeCreateModalBtn" class="text-white/80 hover:text-white text-2xl leading-none cursor-pointer transition-colors">&times;</button>
+        </div>
+      </div>
+
+      <!-- Modal Form -->
+      <form method="POST" action="{% url 'create_sqd' %}" class="p-8 space-y-8">
+        {% csrf_token %}
+        <div>
+          <label class="block text-lg font-medium text-gray-900 mb-4">
+            SQD Name
+            <span class="text-red-500 ml-1">*</span>
+          </label>
+          <input type="text" name="name"
+            class="w-full border border-gray-300 px-6 py-4 text-base focus:outline-none focus:ring-2 focus:ring-[#10420C] focus:border-[#10420C] transition-all"
+            placeholder="e.g., Reliability, Responsiveness, Assurance..."
+            required>
+          <p class="text-base text-gray-600 mt-3">Enter the name of the service quality dimension</p>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-6">
+          <button type="button" id="cancelCreateModalBtn"
+            class="px-8 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 cursor-pointer transition-colors">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-8 py-3 text-base font-semibold text-white bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer transition-all">
+            Create SQD
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="fixed inset-0 bg-black/50 hidden z-50 p-4">
+  <div class="flex items-center justify-center min-h-full">
+    <div class="bg-white shadow-xl w-full max-w-2xl transform transition-all">
+      <!-- Modal Header -->
+      <div class="px-8 py-6 border-b border-gray-200 bg-[#10420C]">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white">Edit SQD</h2>
+          <button id="closeEditModalBtn" class="text-white/80 hover:text-white text-2xl leading-none cursor-pointer transition-colors">&times;</button>
+        </div>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="editForm" method="POST" class="p-8 space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="sqd_id" id="editSqdId">
+        
+        <div>
+          <label class="block text-lg font-medium text-gray-900 mb-4">
+            SQD Name
+            <span class="text-red-500 ml-1">*</span>
+          </label>
+          <input type="text" name="name" id="editSqdName"
+            class="w-full border border-gray-300 px-6 py-4 text-base focus:outline-none focus:ring-2 focus:ring-[#10420C] focus:border-[#10420C] transition-all"
+            placeholder="e.g., Reliability, Responsiveness, Assurance..."
+            required>
+          <p class="text-base text-gray-600 mt-3">Update the name of the service quality dimension</p>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-6">
+          <button type="button" id="cancelEditModalBtn"
+            class="px-8 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 cursor-pointer transition-colors">
+            Cancel
+          </button>
+          <button type="submit"
+            class="px-8 py-3 text-base font-semibold text-white bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer transition-all">
+            Update SQD
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" class="fixed inset-0 bg-black/50 hidden z-50 p-4">
+  <div class="flex items-center justify-center min-h-full">
+    <div class="bg-white shadow-xl w-full max-w-md transform transition-all">
+      <!-- Modal Header -->
+      <div class="px-8 py-6 border-b border-gray-200 bg-red-600">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white">Delete SQD</h2>
+          <button id="closeDeleteModalBtn" class="text-white/80 hover:text-white text-2xl leading-none cursor-pointer transition-colors">&times;</button>
+        </div>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-8 space-y-6">
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Confirm Deletion</h3>
+            <p class="text-sm text-gray-600 mt-1">Are you sure you want to delete this SQD? This action cannot be undone.</p>
+          </div>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h4 class="text-sm font-semibold text-red-800 mb-2">SQD to be deleted:</h4>
+          <p class="text-sm text-red-700 font-medium" id="deleteSqdText"></p>
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div>
+              <p class="text-sm text-yellow-800 font-medium">Warning</p>
+              <p class="text-xs text-yellow-700 mt-1">This will remove this SQD from any assigned years and may affect survey configurations.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-4">
+          <button type="button" id="cancelDeleteModalBtn"
+            class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 cursor-pointer transition-colors">
+            Cancel
+          </button>
+          <form id="deleteForm" method="POST" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+              class="px-6 py-3 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 cursor-pointer transition-colors">
+              Delete SQD
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+  // Create Modal Functionality
+  const openCreateModalBtn = document.getElementById("openCreateModalBtn");
+  const openCreateModalBtnEmpty = document.getElementById("openCreateModalBtnEmpty");
+  const closeCreateModalBtn = document.getElementById("closeCreateModalBtn");
+  const cancelCreateModalBtn = document.getElementById("cancelCreateModalBtn");
+  const createModal = document.getElementById("createModal");
+
+  function openCreateModal() {
+    createModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCreateModal() {
+    createModal.classList.add("hidden");
+    document.body.style.overflow = "auto";
+  }
+
+  openCreateModalBtn?.addEventListener("click", openCreateModal);
+  openCreateModalBtnEmpty?.addEventListener("click", openCreateModal);
+  closeCreateModalBtn?.addEventListener("click", closeCreateModal);
+  cancelCreateModalBtn?.addEventListener("click", closeCreateModal);
+
+  // Edit Modal Functionality
+  const closeEditModalBtn = document.getElementById("closeEditModalBtn");
+  const cancelEditModalBtn = document.getElementById("cancelEditModalBtn");
+  const editModal = document.getElementById("editModal");
+  const editForm = document.getElementById("editForm");
+
+  function openEditModal(sqdId, sqdName) {
+    document.getElementById('editSqdId').value = sqdId;
+    document.getElementById('editSqdName').value = sqdName;
+    
+    // Set form action - you'll need to create this URL pattern
+    editForm.action = `/dashboard/sqd/${sqdId}/edit/`;
+    
+    editModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeEditModal() {
+    editModal.classList.add("hidden");
+    document.body.style.overflow = "auto";
+  }
+
+  // Delete Modal Functionality
+  const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+  const cancelDeleteModalBtn = document.getElementById("cancelDeleteModalBtn");
+  const deleteModal = document.getElementById("deleteModal");
+  const deleteForm = document.getElementById("deleteForm");
+  const deleteSqdText = document.getElementById("deleteSqdText");
+
+  function openDeleteModal(sqdId, sqdName) {
+    // Set the SQD text in the modal
+    deleteSqdText.textContent = sqdName;
+    
+    // Set the form action
+    deleteForm.action = `/dashboard/sqd/${sqdId}/delete/`;
+    
+    deleteModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDeleteModal() {
+    deleteModal.classList.add("hidden");
+    document.body.style.overflow = "auto";
+  }
+
+  // Event Listeners
+  closeEditModalBtn?.addEventListener("click", closeEditModal);
+  cancelEditModalBtn?.addEventListener("click", closeEditModal);
+  
+  closeDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+  cancelDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+
+  // Close modals when clicking outside
+  [createModal, editModal, deleteModal].forEach(modal => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        if (modal === createModal) closeCreateModal();
+        if (modal === editModal) closeEditModal();
+        if (modal === deleteModal) closeDeleteModal();
+      }
+    });
+  });
+
+  // Close modals with Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (!createModal.classList.contains("hidden")) closeCreateModal();
+      if (!editModal.classList.contains("hidden")) closeEditModal();
+      if (!deleteModal.classList.contains("hidden")) closeDeleteModal();
+    }
+  });
+</script>
+
+<style>
+  .group:hover .opacity-0 {
+    opacity: 1 !important;
+  }
+  
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+</style>
+
+{% endblock %}

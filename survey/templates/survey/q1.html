@@ -23,7 +23,7 @@
 
                     {% for choice in question.choices.all %}
                         <div class="flex ml-13 space-x-10 mt-7">
-                            <input type="checkbox" name="choice_{{ question.id }}" value="{{ choice.id }}">
+                            <input type="radio" name="choice_{{ question.id }}" value="{{ choice.id }}">
                             <label>{{ forloop.counter }}.  {{ choice.name }}</label>
                         </div>
                     {% endfor %}

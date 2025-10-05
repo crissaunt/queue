@@ -2,6 +2,26 @@
 
 {% block content %}
 {% load static %}
+<!-- Flash messages -->
+{% if messages %}
+<div id="flashMessage" class="fixed top-25 left-1/2 transform -translate-x-1/2 z-50">
+    {% for message in messages %}
+    <div class="px-6 py-3 rounded-xs text-white font-semibold
+                {% if message.tags == 'error' %}bg-red-400{% else %}bg-green-500{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+  // Hide flash message after 2 seconds
+  setTimeout(() => {
+    const flash = document.getElementById("flashMessage");
+    if(flash) flash.remove();
+  }, 2000);
+</script>
+{% endif %}
+
 <div class="w-full flex  justify-center ">
     <div class="flex mt-10  items-center space-x-7" >
         <div class="">

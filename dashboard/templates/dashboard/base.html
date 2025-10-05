@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+
+    <title>{% block title %} {% endblock %}</title>
+  <style>
+    .font-medula {
+        font-family: 'Medula One', cursive;
+        }
+
+        .font-poppins {
+    font-family: 'Poppins', sans-serif;
+    }
+    .inria-sans-light {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    }
+
+    .inria-sans-regular {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    }
+
+    .inria-sans-bold {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    }
+
+    .inria-sans-light-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    }
+
+    .inria-sans-regular-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    }
+
+    .inria-sans-bold-italic {
+    font-family: "Inria Sans", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    }
+
+.dropdown-menu {
+    transition: all 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.dropdown-menu.open {
+    max-height: 200px;
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease-in-out;
+}
+
+.dropdown-arrow.rotate-180 {
+    transform: rotate(180deg);
+}
+    
+    
+  </style>
+</head>
+<body class=" text-gray-900 min-h-screen   flex flex-col  ">
+    <div class="min-h-screen flex flex-row bg-gray-50">
+  <div class="flex flex-col w-56 bg-green-950 text-white  overflow-hidden">
+    <div class="flex items-center justify-center h-20 shadow-md">
+      <h1 class="text-3xl uppercase font-bold">Logo</h1>
+    </div>
+    <ul class="flex flex-col py-4">
+      <li>
+        <a href="{% url 'dashboard' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200">
+          <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class="bx bx-home"></i></span>
+          <span class="text-xs font-medium">Dashboard</span>
+        </a>
+      </li>
+      <li class="relative">
+      <!-- Main Menu Item -->
+      <button type="button" class="flex flex-row items-center justify-between w-full h-12 transform hover:translate-x-2 cursor-pointer transition-transform ease-in duration-200 text-white hover:text-gray-200 dropdown-toggle">
+          <div class="flex items-center">
+              <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white">
+                  <i class="bx bx-poll"></i>
+              </span>
+              <span class="text-xs font-medium">Survey Management</span>
+          </div>
+          <span class="inline-flex items-center justify-center h-12 w-8 text-white transition-transform duration-200 dropdown-arrow">
+              <i class="bx bx-chevron-down text-sm"></i>
+          </span>
+      </button>
+      
+          <!-- Dropdown Menu -->
+          <div class="dropdown-menu hidden pl-4 mt-1 space-y-1">
+              <a href="{% url 'survey_year_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                  <span class="inline-flex items-center justify-center w-8 text-lg">
+                      <i class="bx bx-calendar text-xs"></i>
+                  </span>
+                  <span class="text-xs font-medium">Survey Years</span>
+              </a>
+              
+              <a href="{% url 'question_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                  <span class="inline-flex items-center justify-center w-8 text-lg">
+                      <i class="bx bx-cognition text-xs"></i>
+                  </span>
+                  <span class="text-xs font-medium">Citizen’s Charter (CC)</span>
+              </a>
+              
+              <a href="{% url 'sqd_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                  <span class="inline-flex items-center justify-center w-8 text-lg">
+                      <i class="bx bx-strategy text-xs"></i>
+                  </span>
+                  <span class="text-xs font-medium">SQDs</span>
+              </a>
+
+              <a href="{% url 'satisfaction_survey_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                    <span class="inline-flex items-center justify-center w-8 text-lg">
+                        <i class="bx bx-clipboard text-xs"></i>
+                    </span>
+                    <span class="text-xs font-medium">Satisfaction Surveys</span>
+                </a>
+          </div>
+      </li>
+      
+      <li>
+        <a href="#" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200">
+          <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class='bx  bx-horizontal-left' ></i> </span>
+          <span class="text-xs font-medium">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+    <main class="flex-1 flex flex-col w-full max-w-[1500px] mx-auto mb-15  ">
+        {% block content %}
+        {% endblock %}
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const dropdownArrow = document.querySelector('.dropdown-arrow');
+    
+    dropdownToggle.addEventListener('click', function() {
+        dropdownMenu.classList.toggle('open');
+        dropdownMenu.classList.toggle('hidden');
+        dropdownArrow.classList.toggle('rotate-180');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.relative')) {
+            dropdownMenu.classList.remove('open');
+            dropdownMenu.classList.add('hidden');
+            dropdownArrow.classList.remove('rotate-180');
+        }
+    });
+});
+</script>
+</body>
+</html>

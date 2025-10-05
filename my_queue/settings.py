@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'personel',
     'display',
     'survey',
+    'dashboard',
 ]
 
 # Daphne

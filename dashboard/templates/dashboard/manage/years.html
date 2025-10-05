@@ -1,0 +1,40 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-end ">
+        <h2 class="text-2xl font-bold text-gray-900 ">Survey Management</h2>
+
+    </div>
+    
+    <div class="">
+        
+
+        <div class="p-6">
+            <div class="space-y-4">
+                {% for year in years %}
+                <div class="flex items-center justify-between py-6 px-10  bg-white border border-gray-300">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ year.year }} Survey</h3>
+                        <p class="text-gray-600 text-xs">
+                            Questions: {{ year.question_links.count }} | 
+                            SQDs: {{ year.sqd_links.count }}
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="{% url 'configure_survey_year' year.id %}" 
+                           class="bg-[#10420C] hover:bg-[#10420C]/80 text-white px-4 py-2  text-xs font-medium transition duration-200 flex items-center gap-2">
+                            Configure  <i class='bx  bxs-right-arrow-alt text-lg'  ></i> 
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8">
+                    <p class="text-gray-500">No survey years created yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
