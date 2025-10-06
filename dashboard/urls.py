@@ -3,6 +3,12 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
+    # Authentication URLs
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+
+
     path('', views.home ,name='dashboard'),
     # Survey Year Management
     path('years/', views.survey_year_list, name='survey_year_list'),

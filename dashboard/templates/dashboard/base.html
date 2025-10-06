@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <title>{% block title %} {% endblock %}</title>
   <style>
@@ -56,123 +57,350 @@
     font-style: italic;
     }
 
-.dropdown-menu {
-    transition: all 0.3s ease-in-out;
-    max-height: 0;
-    overflow: hidden;
-}
+    .dropdown-menu {
+        transition: all 0.3s ease-in-out;
+        max-height: 0;
+        overflow: hidden;
+    }
 
-.dropdown-menu.open {
-    max-height: 200px;
-}
+    .dropdown-menu.open {
+        max-height: 200px;
+    }
 
-.dropdown-arrow {
-    transition: transform 0.3s ease-in-out;
-}
+    .dropdown-arrow {
+        transition: transform 0.3s ease-in-out;
+    }
 
-.dropdown-arrow.rotate-180 {
-    transform: rotate(180deg);
-}
+    .dropdown-arrow.rotate-180 {
+        transform: rotate(180deg);
+    }
     
+    /* Sidebar Styles */
+    .sidebar {
+        transition: all 0.3s ease-in-out;
+        width: 224px; /* w-56 = 14rem = 224px */
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
     
+    .sidebar.collapsed {
+        width: 64px; /* w-16 = 4rem = 64px */
+    }
+    
+    .main-content {
+        transition: all 0.3s ease-in-out;
+        margin-left: 20px;
+        flex: 1;
+        overflow-y: auto;
+        max-height: 100vh;
+    }
+    
+    .main-content.expanded {
+        margin-left: 20px;
+    }
+    
+    .sidebar-text {
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    
+    .sidebar.collapsed .sidebar-text {
+        opacity: 0;
+        width: 0;
+    }
+    
+    .sidebar.collapsed .dropdown-arrow {
+        display: none;
+    }
+    
+    .sidebar.collapsed .dropdown-menu {
+        display: none !important;
+    }
+    
+    .burger-menu {
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .burger-menu:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Ensure the main content area scrolls independently */
+    .content-wrapper {
+        display: flex;
+        min-height: 100vh;
+        overflow: hidden;
+    }
   </style>
 </head>
-<body class=" text-gray-900 min-h-screen   flex flex-col  ">
-    <div class="min-h-screen flex flex-row bg-gray-50">
-  <div class="flex flex-col w-56 bg-green-950 text-white  overflow-hidden">
-    <div class="flex items-center justify-center h-20 shadow-md">
-      <h1 class="text-3xl uppercase font-bold">Logo</h1>
+<body class="text-gray-900 min-h-screen flex flex-col">
+    {% if messages %}
+        <div class="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} px-4 py-3 rounded-lg shadow-lg border-l-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        {% if message.tags == 'success' %}
+                            <i class="bx bx-check-circle text-xl mr-2"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="bx bx-error-circle text-xl mr-2"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bx bx-error text-xl mr-2"></i>
+                        {% else %}
+                            <i class="bx bx-info-circle text-xl mr-2"></i>
+                        {% endif %}
+                        <span class="text-sm font-medium">{{ message }}</span>
+                    </div>
+                    <button type="button" class="text-lg hover:text-gray-700" onclick="this.parentElement.remove()">
+                        <i class="bx bx-x"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar bg-green-950 text-white overflow-hidden relative" id="sidebar">
+            <!-- Burger Menu Button -->
+            <div class="absolute -right-2 top-6 z-20">
+                <button class="burger-menu w-6 h-6 bg-green-950 rounded-full border-2 border-white flex items-center justify-center text-white hover:bg-green-800 transition-colors"
+                        onclick="toggleSidebar()">
+                    <i class="bx bx-chevron-left text-sm" id="sidebar-arrow"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center justify-center h-20 shadow-md relative">
+                <h1 class="text-3xl uppercase font-bold font-medula sidebar-text">Queue's</h1>
+                <h1 class="text-3xl uppercase font-bold font-medula absolute opacity-0 sidebar-collapsed-logo">Q</h1>
+            </div>
+            
+            <!-- User Info -->
+            {% if user.is_authenticated %}
+            <div class="px-4 py-3 border-b border-green-800">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                        <i class="bx bx-user text-sm"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <p class="text-xs font-medium truncate">{{ user.username }}</p>
+                        <p class="text-xs text-green-300 truncate">{{ user.email|default:"User" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <ul class="flex flex-col py-4">
+                <li>
+                    <a href="{% url 'dashboard' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                        <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
+                            <i class="bx bx-home"></i>
+                        </span>
+                        <span class="text-xs font-medium sidebar-text ml-2">Dashboard</span>
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                <!-- Survey Management Dropdown -->
+                <li class="relative">
+                    <button type="button" class="flex flex-row items-center justify-between w-full h-12 transform hover:translate-x-2 cursor-pointer transition-transform ease-in duration-200 text-white hover:text-gray-200 dropdown-toggle px-4">
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
+                                <i class="bx bx-poll"></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">Survey Management</span>
+                        </div>
+                        <span class="inline-flex items-center justify-center h-12 w-8 text-white transition-transform duration-200 dropdown-arrow flex-shrink-0">
+                            <i class="bx bx-chevron-down text-sm"></i>
+                        </span>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu hidden pl-4 mt-1 space-y-1">
+                        <a href="{% url 'survey_year_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                            <span class="inline-flex items-center justify-center w-8 text-lg flex-shrink-0">
+                                <i class="bx bx-calendar text-xs"></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">Survey Years</span>
+                        </a>
+                        
+                        <a href="{% url 'question_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                            <span class="inline-flex items-center justify-center w-8 text-lg flex-shrink-0">
+                                <i class="bx bx-cognition text-xs"></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">Citizen's Charter</span>
+                        </a>
+                        
+                        <a href="{% url 'sqd_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                            <span class="inline-flex items-center justify-center w-8 text-lg flex-shrink-0">
+                                <i class="bx bx-strategy text-xs"></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">SQDs</span>
+                        </a>
+
+                        <a href="{% url 'satisfaction_survey_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
+                            <span class="inline-flex items-center justify-center w-8 text-lg flex-shrink-0">
+                                <i class="bx bx-clipboard text-xs"></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">Satisfaction Surveys</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- Authentication Links for Logged-in Users -->
+                <li>
+                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="flex flex-row items-center w-full h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                            <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
+                                <i class='bx bx-log-out'></i>
+                            </span>
+                            <span class="text-xs font-medium sidebar-text ml-2">Logout</span>
+                        </button>
+                    </form>
+                </li>
+                {% else %}
+                <!-- Authentication Links for Guests -->
+                <li>
+                    <a href="{% url 'login' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                        <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
+                            <i class='bx bx-log-in'></i>
+                        </span>
+                        <span class="text-xs font-medium sidebar-text ml-2">Login</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'register' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                        <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
+                            <i class='bx bx-user-plus'></i>
+                        </span>
+                        <span class="text-xs font-medium sidebar-text ml-2">Register</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col main-content overflow-hidden" id="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
     </div>
-    <ul class="flex flex-col py-4">
-      <li>
-        <a href="{% url 'dashboard' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200">
-          <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class="bx bx-home"></i></span>
-          <span class="text-xs font-medium">Dashboard</span>
-        </a>
-      </li>
-      <li class="relative">
-      <!-- Main Menu Item -->
-      <button type="button" class="flex flex-row items-center justify-between w-full h-12 transform hover:translate-x-2 cursor-pointer transition-transform ease-in duration-200 text-white hover:text-gray-200 dropdown-toggle">
-          <div class="flex items-center">
-              <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white">
-                  <i class="bx bx-poll"></i>
-              </span>
-              <span class="text-xs font-medium">Survey Management</span>
-          </div>
-          <span class="inline-flex items-center justify-center h-12 w-8 text-white transition-transform duration-200 dropdown-arrow">
-              <i class="bx bx-chevron-down text-sm"></i>
-          </span>
-      </button>
-      
-          <!-- Dropdown Menu -->
-          <div class="dropdown-menu hidden pl-4 mt-1 space-y-1">
-              <a href="{% url 'survey_year_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
-                  <span class="inline-flex items-center justify-center w-8 text-lg">
-                      <i class="bx bx-calendar text-xs"></i>
-                  </span>
-                  <span class="text-xs font-medium">Survey Years</span>
-              </a>
-              
-              <a href="{% url 'question_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
-                  <span class="inline-flex items-center justify-center w-8 text-lg">
-                      <i class="bx bx-cognition text-xs"></i>
-                  </span>
-                  <span class="text-xs font-medium">Citizen’s Charter (CC)</span>
-              </a>
-              
-              <a href="{% url 'sqd_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
-                  <span class="inline-flex items-center justify-center w-8 text-lg">
-                      <i class="bx bx-strategy text-xs"></i>
-                  </span>
-                  <span class="text-xs font-medium">SQDs</span>
-              </a>
 
-              <a href="{% url 'satisfaction_survey_list' %}" class="flex items-center h-10 pl-4 transform hover:translate-x-1 transition-transform ease-in duration-200 text-white hover:text-gray-200 border-l-2 border-transparent hover:border-white">
-                    <span class="inline-flex items-center justify-center w-8 text-lg">
-                        <i class="bx bx-clipboard text-xs"></i>
-                    </span>
-                    <span class="text-xs font-medium">Satisfaction Surveys</span>
-                </a>
-          </div>
-      </li>
-      
-      <li>
-        <a href="#" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200">
-          <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white"><i class='bx  bx-horizontal-left' ></i> </span>
-          <span class="text-xs font-medium">Logout</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+        
+        if (dropdownToggle && dropdownMenu && dropdownArrow) {
+            dropdownToggle.addEventListener('click', function() {
+                dropdownMenu.classList.toggle('open');
+                dropdownMenu.classList.toggle('hidden');
+                dropdownArrow.classList.toggle('rotate-180');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.relative')) {
+                    dropdownMenu.classList.remove('open');
+                    dropdownMenu.classList.add('hidden');
+                    dropdownArrow.classList.remove('rotate-180');
+                }
+            });
+        }
 
-
-    <main class="flex-1 flex flex-col w-full max-w-[1500px] mx-auto mb-15  ">
-        {% block content %}
-        {% endblock %}
-    </main>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
-    const dropdownArrow = document.querySelector('.dropdown-arrow');
-    
-    dropdownToggle.addEventListener('click', function() {
-        dropdownMenu.classList.toggle('open');
-        dropdownMenu.classList.toggle('hidden');
-        dropdownArrow.classList.toggle('rotate-180');
+        // Check if sidebar state is saved in localStorage
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            collapseSidebar();
+        }
     });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.relative')) {
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        const collapsedLogo = document.querySelector('.sidebar-collapsed-logo');
+        const fullLogo = document.querySelector('.sidebar-text:first-child');
+
+        if (sidebar.classList.contains('collapsed')) {
+            // Expand sidebar
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+            sidebarArrow.classList.remove('bx-chevron-right');
+            sidebarArrow.classList.add('bx-chevron-left');
+            collapsedLogo.classList.remove('opacity-0');
+            collapsedLogo.classList.add('opacity-0');
+            fullLogo.classList.remove('opacity-0');
+            localStorage.setItem('sidebarCollapsed', 'false');
+        } else {
+            // Collapse sidebar
+            collapseSidebar();
+        }
+    }
+
+    function collapseSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        const collapsedLogo = document.querySelector('.sidebar-collapsed-logo');
+        const fullLogo = document.querySelector('.sidebar-text:first-child');
+
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('expanded');
+        sidebarArrow.classList.remove('bx-chevron-left');
+        sidebarArrow.classList.add('bx-chevron-right');
+        collapsedLogo.classList.remove('opacity-0');
+        collapsedLogo.classList.add('opacity-100');
+        fullLogo.classList.add('opacity-0');
+        localStorage.setItem('sidebarCollapsed', 'true');
+
+        // Close any open dropdowns when collapsing
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+        if (dropdownMenu && dropdownArrow) {
             dropdownMenu.classList.remove('open');
             dropdownMenu.classList.add('hidden');
             dropdownArrow.classList.remove('rotate-180');
         }
+    }
+
+    // Auto-hide messages after 5 seconds
+    const messages = document.querySelectorAll('.fixed .px-4');
+    messages.forEach(message => {
+        setTimeout(() => {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(() => {
+                if (message.parentElement) {
+                    message.parentElement.remove();
+                }
+            }, 500);
+        }, 5000);
     });
-});
-</script>
+    </script>
 </body>
 </html>
