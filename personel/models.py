@@ -4,38 +4,25 @@ from datetime import timedelta
 from django.db.models import Q
 from django.contrib.auth.models import User
 
-
-
-
 class Personel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.user.username
-    
 
-
-# request ug id, pahimog id 
 class RequestType(models.Model):
     request = models.CharField(max_length=100)
 
     def __str__(self):
         return self.request
-    
 
-# ex . ceit, cba 
 class Courses(models.Model):
     courses = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=100, null=True)
     
     def __str__(self):
         return self.courses
-
-
-
-
-
 
 class Appointments(models.Model):
     STATUS_CHOICES = [
@@ -44,30 +31,26 @@ class Appointments(models.Model):
         ('done', 'Done'),
         ('skip', 'Skip'),
         ('cancel', 'Cancel'),
-        ('standby', 'Standby' )
+        ('standby', 'Standby')
     ]
     USER_TYPE = [
         ('student', 'Student'),
         ('guest', 'Guest'),
     ]
 
-
     firstName = models.CharField(max_length=50)
     middleName = models.CharField(max_length=1, blank=True)
     lastName = models.CharField(max_length=50)
-    # email = models.CharField(max_length=50)
     datetime = models.DateTimeField(default=timezone.now)
     ticket_number = models.CharField(max_length=10, null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
-
     user_type = models.CharField(max_length=50, choices=USER_TYPE, default='student')
-
     is_priority = models.CharField(max_length=50, choices=[('yes','Yes'),('no','No')], default='no')
-    # relationship 
+    
+    # relationships 
     requestType = models.ForeignKey(RequestType, on_delete=models.CASCADE, null=True, blank=True)
     custom_request = models.CharField(max_length=200, null=True, blank=True) 
     courses = models.ForeignKey(Courses, on_delete=models.CASCADE, null=True, blank=True)
-
 
     served_by = models.ForeignKey(
         'Personel',
@@ -108,22 +91,91 @@ class Appointments(models.Model):
     @classmethod
     def cancel_expired(cls):
         """
-        Cancel only appointments whose datetime is in the past
-        and whose status is pending or skip.
+        Cancel all pending, current, skip, and standby appointments after midnight.
+        This should be run daily via cron job.
         """
-        now = timezone.localdate()
+        # Statuses to cancel at end of day
+        statuses_to_cancel = ['pending', 'current', 'skip', 'standby']
+        
+        # Get today's date
+        today = timezone.localdate()
+        
+        # Cancel appointments that are from today or earlier with the specified statuses
         expired_appointments = cls.objects.filter(
-            Q(status='pending') | Q(status='skip'),
-            datetime__date__lt=now 
+            status__in=statuses_to_cancel,
+            datetime__date__lte=today  # Includes today and past dates
         )
-        print(expired_appointments)
-        expired_appointments.update(status='cancel')   
+        
+        count = expired_appointments.count()
+        print(f"🎯 Cancelling {count} appointments with statuses: {statuses_to_cancel}")
+        
+        expired_appointments.update(status='cancel')
+        
+        return count
+
+    @classmethod
+    def cancel_outdated(cls):
+        """
+        Automatically cancel appointments from previous days that are still active.
+        This can be called from anywhere to clean up outdated appointments.
+        """
+        today = timezone.localdate()
+        statuses_to_cancel = ['pending', 'current', 'skip', 'standby']
+        
+        outdated_appointments = cls.objects.filter(
+            datetime__date__lt=today,  # Only previous days
+            status__in=statuses_to_cancel
+        )
+        
+        count = outdated_appointments.count()
+        if count > 0:
+            print(f"🕒 Auto-cancelling {count} outdated appointments from previous days")
+            outdated_appointments.update(status='cancel')
+        
+        return count
+
+    @classmethod
+    def get_today_appointments(cls):
+        """
+        Helper method to get only today's appointments with active statuses.
+        """
+        today = timezone.localdate()
+        return cls.objects.filter(datetime__date=today)
+
+    @classmethod
+    def get_current_student(cls):
+        """
+        Get current student from today only.
+        """
+        today = timezone.localdate()
+        return cls.objects.filter(
+            status="current",
+            datetime__date=today
+        ).first()
 
     def __str__(self):
         return f'{self.firstName} {self.lastName}'
-
-
-
+    # Add this to your Appointments model in models.py
+    @classmethod
+    def cancel_expired_skips(cls):
+        """
+        Cancel skip appointments where skip_until time has passed.
+        """
+        from django.utils import timezone
+        now = timezone.now()
+        
+        expired_skips = cls.objects.filter(
+            status="skip",
+            skip_until__lt=now,
+            skip_until__isnull=False  # Only where skip_until is set
+        )
+        
+        count = expired_skips.count()
+        if count > 0:
+            print(f"⏰ Auto-cancelling {count} expired skip appointments")
+            expired_skips.update(status='cancel')
+        
+        return count
 
 class Code(models.Model):
     STATUS_CHOICES = [
@@ -131,9 +183,12 @@ class Code(models.Model):
         ('used', 'Used'),
     ]
     appointments = models.ForeignKey(Appointments, on_delete=models.PROTECT,  null=True)
-    code = models.CharField(max_length=10, null=True)  # unique so duplicates are prevented
+    code = models.CharField(max_length=10, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unused' , null=True)
 
     def __str__(self):
         return self.code
+    
+
+

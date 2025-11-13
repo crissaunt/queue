@@ -16,6 +16,10 @@ from asgiref.sync import async_to_sync
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now, timedelta
 
+
+
+
+
 def broadcast_update():
     """Broadcast updates to BOTH groups"""
     try:
@@ -471,3 +475,5 @@ def new_home(request):
     template = loader.get_template("personel/new_home.html")
     context = {}
     return HttpResponse(template.render(context, request))
+
+

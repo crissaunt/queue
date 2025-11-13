@@ -11,6 +11,9 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import random, string
 
+
+
+
 def broadcast_queue_update():
     """Broadcast queue updates to all connected clients with CONSISTENT date handling"""
     now_ph = localtime(timezone.now())

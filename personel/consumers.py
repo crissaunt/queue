@@ -68,6 +68,12 @@ class QueueConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def get_complete_queue_data(self):
+        # Auto-cancel outdated appointments (from previous days)
+        outdated_count = Appointments.cancel_outdated()
+        
+        # Auto-cancel expired skips
+        Appointments.cancel_expired_skips()
+
         """Get COMPLETE queue data for ALL sections with CONSISTENT date handling"""
         try:
             # Use the SAME date logic as the views - Django's built-in timezone
