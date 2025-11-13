@@ -186,20 +186,41 @@ def logout_view(request):
 
 @login_required
 def survey_year_list(request):
-    """List all survey years"""
+    """List all survey years with auto-create current year functionality"""
+    # Get current year
+    current_year = datetime.now().year
+    
+    # Check if current year exists, if not create it
+    if not SurveyYear.objects.filter(year=current_year).exists():
+        SurveyYear.objects.create(year=current_year)
+        messages.info(request, f"Automatically created survey year {current_year}")
+    
     years = SurveyYear.objects.all().order_by('-year')
     template = loader.get_template('dashboard/manage/years.html')
     context = {
         'years': years,
+        'current_year': current_year,
     }
     return HttpResponse(template.render(context, request))
 
 @login_required
 def create_survey_year(request):
-    """Create a new survey year"""
+    """Create a new survey year - can be manual or auto-create current year"""
     if request.method == 'POST':
         year = request.POST.get('year')
-        if year:
+        auto_create = request.POST.get('auto_create')  # Check if it's auto-create
+        
+        if auto_create == 'current':
+            # Auto-create current year
+            current_year = datetime.now().year
+            if not SurveyYear.objects.filter(year=current_year).exists():
+                SurveyYear.objects.create(year=current_year)
+                messages.success(request, f"Survey year {current_year} created successfully!")
+            else:
+                messages.info(request, f"Survey year {current_year} already exists!")
+        
+        elif year:
+            # Manual creation
             try:
                 SurveyYear.objects.create(year=year)
                 messages.success(request, f"Survey year {year} created successfully!")

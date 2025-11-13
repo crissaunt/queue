@@ -25,17 +25,23 @@ def mark_survey_used(request, code_id):
 
     # ✅ Send websocket update to refresh frontend
     channel_layer = get_channel_layer()
+    
+    # Get the latest surveys for display
     surveys = Code.objects.filter(status="used").order_by("-created_at")[:20]
     survey_list = [
-        {"code": s.code, "appointment": str(s.appointments), "status": s.status}
+        {
+            "appointments": str(s.appointments), 
+            "code": s.code, 
+            "status": s.status
+        }
         for s in surveys
     ]
 
     async_to_sync(channel_layer.group_send)(
-        "queue",  # same group
+        "survey_updates",  # group name
         {
-            "type": "send_update",
-            "data": {"surveys": survey_list}
+            "type": "survey_update",
+            "surveys": survey_list
         }
     )
 

@@ -1,198 +1,160 @@
 {% extends 'dashboard/base.html' %}
 
 {% block title %}
-Analytics Dashboard
+Dashboard Overview
 {% endblock %}
 
 {% block page_title %}
-Analytics Dashboard
+Dashboard Overview
 {% endblock %}
 
 {% block page_subtitle %}
-Appointments and survey trends over time
+Key metrics and performance indicators
 {% endblock %}
 
 {% block content %}
 {% load static %}
 
-<div class="space-y-8">
-    <!-- Period Selector -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+<div class="space-y-6">
+    <!-- Quick Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Appointments Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Appointments</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_appointments }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Current period</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-calendar text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Surveys Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Survey Responses</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_surveys }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ response_rate }}% response rate</p>
+                </div>
+                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-clipboard text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Satisfaction Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Satisfaction</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ avg_satisfaction_score }}/5</p>
+                    <div class="flex items-center mt-1">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_satisfaction_score %}
+                                <i class="bx bxs-star text-yellow-400 text-xs mr-0.5"></i>
+                            {% else %}
+                                <i class="bx bx-star text-gray-300 text-xs mr-0.5"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-happy text-amber-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Rate Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Response Rate</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ response_rate }}%</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ total_surveys }}/{{ total_appointments }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-trending-up text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Period Filter -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">Time Period</h3>
-                <p class="text-sm text-gray-500">Select timeframe for analytics</p>
+                <h3 class="text-base font-semibold text-gray-900">Time Period</h3>
+                <p class="text-sm text-gray-500">Filter data by timeframe</p>
             </div>
             <div class="flex space-x-2">
                 <a href="?period=7days" 
-                   class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
-                          {% if period == '7days' %}bg-blue-600 text-white shadow-md
+                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 
+                          {% if period == '7days' %}bg-blue-600 text-white
                           {% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                    Last 7 Days
+                    7 Days
                 </a>
                 <a href="?period=30days" 
-                   class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
-                          {% if period == '30days' %}bg-blue-600 text-white shadow-md
+                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 
+                          {% if period == '30days' %}bg-blue-600 text-white
                           {% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                    Last 30 Days
+                    30 Days
                 </a>
                 <a href="?period=90days" 
-                   class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 
-                          {% if period == '90days' %}bg-blue-600 text-white shadow-md
+                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 
+                          {% if period == '90days' %}bg-blue-600 text-white
                           {% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
-                    Last 3 Months
+                    3 Months
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Appointments -->
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Total Appointments</p>
-                        <p class="text-3xl font-bold mt-2">{{ total_appointments }}</p>
-                        <p class="text-blue-100 text-xs mt-1">
-                            {{ start_date|date:"M d" }} - {{ end_date|date:"M d" }}
-                        </p>
-                    </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <i class="bx bx-calendar text-xl"></i>
-                    </div>
+    <!-- Main Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Combined Activity Chart -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Activity Overview</h3>
+                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-bar-chart-alt-2 text-blue-600"></i>
                 </div>
             </div>
-            <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full"></div>
-        </div>
-
-        <!-- Survey Responses -->
-        <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-green-100 text-sm font-medium">Survey Responses</p>
-                        <p class="text-3xl font-bold mt-2">{{ total_surveys }}</p>
-                        <p class="text-green-100 text-xs mt-1">{{ response_rate }}% response rate</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <i class="bx bx-clipboard text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full"></div>
-        </div>
-
-        <!-- Satisfaction Score -->
-        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-amber-100 text-sm font-medium">Avg. Satisfaction</p>
-                        <p class="text-3xl font-bold mt-2">{{ avg_satisfaction_score }}/5</p>
-                        <div class="flex items-center mt-1">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= avg_satisfaction_score %}
-                                    <i class="bx bxs-star text-xs mr-1"></i>
-                                {% else %}
-                                    <i class="bx bx-star text-xs mr-1 text-amber-200"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <i class="bx bx-happy text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full"></div>
-        </div>
-
-        <!-- Response Rate -->
-        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-purple-100 text-sm font-medium">Response Rate</p>
-                        <p class="text-3xl font-bold mt-2">{{ response_rate }}%</p>
-                        <p class="text-purple-100 text-xs mt-1">
-                            {{ total_surveys }}/{{ total_appointments }} completed
-                        </p>
-                    </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                        <i class="bx bx-trending-up text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full"></div>
-        </div>
-    </div>
-
-    <!-- Main Charts Grid -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <!-- Appointments Trend Chart -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Appointments Trend</h3>
-                    <p class="text-sm text-gray-500">Daily appointment volume over time</p>
-                </div>
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-calendar text-blue-600"></i>
-                </div>
-            </div>
-            <div class="h-80">
-                <canvas id="appointmentsChart"></canvas>
+            <div class="h-72">
+                <canvas id="activityChart"></canvas>
             </div>
         </div>
 
-        <!-- Survey Responses Trend Chart -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Survey Responses Trend</h3>
-                    <p class="text-sm text-gray-500">Daily survey completion rate</p>
-                </div>
-                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-clipboard text-green-600"></i>
+        <!-- Satisfaction Trend -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Satisfaction Trend</h3>
+                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-trending-up text-amber-600"></i>
                 </div>
             </div>
-            <div class="h-80">
-                <canvas id="surveysChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Satisfaction Trend Chart -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Satisfaction Trend</h3>
-                    <p class="text-sm text-gray-500">Daily average satisfaction ratings</p>
-                </div>
-                <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-happy text-amber-600"></i>
-                </div>
-            </div>
-            <div class="h-80">
+            <div class="h-72">
                 <canvas id="satisfactionChart"></canvas>
             </div>
         </div>
+    </div>
 
-        <!-- Comparison Chart -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Appointments vs Surveys</h3>
-                    <p class="text-sm text-gray-500">Comparison of daily volumes</p>
-                </div>
-                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-bar-chart-alt-2 text-purple-600"></i>
-                </div>
-            </div>
-            <div class="h-80">
-                <canvas id="comparisonChart"></canvas>
-            </div>
+    <!-- Response Rate Progress -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Survey Response Progress</h3>
+            <span class="text-2xl font-bold text-gray-900">{{ response_rate }}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-green-600 h-3 rounded-full transition-all duration-500" 
+                 style="width: {{ response_rate }}%"></div>
+        </div>
+        <div class="flex justify-between text-sm text-gray-500 mt-2">
+            <span>{{ total_surveys }} surveys completed</span>
+            <span>{{ total_appointments }} total appointments</span>
         </div>
     </div>
 </div>
@@ -202,32 +164,17 @@ Appointments and survey trends over time
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Chart colors
     const colors = {
-        blue: {
-            bg: 'rgba(59, 130, 246, 0.1)',
-            border: 'rgba(59, 130, 246, 1)',
-            point: 'rgba(59, 130, 246, 1)'
-        },
-        green: {
-            bg: 'rgba(16, 185, 129, 0.1)',
-            border: 'rgba(16, 185, 129, 1)',
-            point: 'rgba(16, 185, 129, 1)'
-        },
-        amber: {
-            bg: 'rgba(245, 158, 11, 0.1)',
-            border: 'rgba(245, 158, 11, 1)',
-            point: 'rgba(245, 158, 11, 1)'
-        },
-        purple: {
-            bg: 'rgba(139, 92, 246, 0.1)',
-            border: 'rgba(139, 92, 246, 1)',
-            point: 'rgba(139, 92, 246, 1)'
-        }
+        blue: 'rgb(59, 130, 246)',
+        green: 'rgb(16, 185, 129)',
+        amber: 'rgb(245, 158, 11)',
+        purple: 'rgb(139, 92, 246)',
+        lightBlue: 'rgba(59, 130, 246, 0.1)',
+        lightGreen: 'rgba(16, 185, 129, 0.1)',
+        lightAmber: 'rgba(245, 158, 11, 0.1)'
     };
 
-    // Common chart configuration
-    const chartConfig = {
+    const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
@@ -239,98 +186,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 beginAtZero: true,
                 grid: {
                     color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                    color: '#6B7280'
                 }
             },
             x: {
                 grid: {
                     display: false
+                },
+                ticks: {
+                    color: '#6B7280'
                 }
             }
         },
         plugins: {
             legend: {
-                display: true,
-                position: 'top'
+                position: 'top',
+                labels: {
+                    color: '#374151',
+                    usePointStyle: true,
+                    padding: 15
+                }
             },
             tooltip: {
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 titleColor: 'white',
-                bodyColor: 'white',
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                borderWidth: 1
+                bodyColor: 'white'
             }
         }
     };
 
-    // Appointments Chart
-    const appointmentsCtx = document.getElementById('appointmentsChart').getContext('2d');
-    new Chart(appointmentsCtx, {
-        type: 'line',
-        data: {
-            labels: {{ date_labels|safe }},
-            datasets: [{
-                label: 'Appointments',
-                data: {{ appointments_data }},
-                backgroundColor: colors.blue.bg,
-                borderColor: colors.blue.border,
-                borderWidth: 3,
-                pointBackgroundColor: colors.blue.point,
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            ...chartConfig,
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Daily Appointment Volume',
-                    color: '#374151',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    }
-                }
-            }
-        }
-    });
-
-    // Surveys Chart
-    const surveysCtx = document.getElementById('surveysChart').getContext('2d');
-    new Chart(surveysCtx, {
+    // Activity Chart (Combined Appointments and Surveys)
+    const activityCtx = document.getElementById('activityChart').getContext('2d');
+    new Chart(activityCtx, {
         type: 'bar',
         data: {
             labels: {{ date_labels|safe }},
-            datasets: [{
-                label: 'Survey Responses',
-                data: {{ surveys_data }},
-                backgroundColor: colors.green.bg,
-                borderColor: colors.green.border,
-                borderWidth: 2,
-                borderRadius: 4,
-                borderSkipped: false,
-            }]
-        },
-        options: {
-            ...chartConfig,
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Daily Survey Responses',
-                    color: '#374151',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    }
+            datasets: [
+                {
+                    label: 'Appointments',
+                    data: {{ appointments_data }},
+                    backgroundColor: colors.lightBlue,
+                    borderColor: colors.blue,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Survey Responses',
+                    data: {{ surveys_data }},
+                    backgroundColor: colors.lightGreen,
+                    borderColor: colors.green,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    borderSkipped: false,
                 }
-            }
-        }
+            ]
+        },
+        options: chartOptions
     });
 
     // Satisfaction Chart
@@ -342,102 +256,29 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Satisfaction Score',
                 data: {{ satisfaction_data }},
-                backgroundColor: colors.amber.bg,
-                borderColor: colors.amber.border,
+                backgroundColor: colors.lightAmber,
+                borderColor: colors.amber,
                 borderWidth: 3,
-                pointBackgroundColor: colors.amber.point,
+                pointBackgroundColor: colors.amber,
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 tension: 0.4,
                 fill: true
             }]
         },
         options: {
-            ...chartConfig,
+            ...chartOptions,
             scales: {
-                ...chartConfig.scales,
+                ...chartOptions.scales,
                 y: {
-                    ...chartConfig.scales.y,
+                    ...chartOptions.scales.y,
                     min: 0,
                     max: 5,
                     ticks: {
+                        ...chartOptions.scales.y.ticks,
                         stepSize: 1
-                    }
-                }
-            },
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Daily Satisfaction Ratings (1-5)',
-                    color: '#374151',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
-                    }
-                }
-            }
-        }
-    });
-
-    // Comparison Chart
-    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
-    new Chart(comparisonCtx, {
-        type: 'line',
-        data: {
-            labels: {{ date_labels|safe }},
-            datasets: [
-                {
-                    label: 'Appointments',
-                    data: {{ appointments_data }},
-                    backgroundColor: colors.blue.bg,
-                    borderColor: colors.blue.border,
-                    borderWidth: 3,
-                    pointBackgroundColor: colors.blue.point,
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.4,
-                    fill: false,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Survey Responses',
-                    data: {{ surveys_data }},
-                    backgroundColor: colors.green.bg,
-                    borderColor: colors.green.border,
-                    borderWidth: 3,
-                    pointBackgroundColor: colors.green.point,
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.4,
-                    fill: false,
-                    yAxisID: 'y'
-                }
-            ]
-        },
-        options: {
-            ...chartConfig,
-            scales: {
-                y: {
-                    ...chartConfig.scales.y,
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                ...chartConfig.plugins,
-                title: {
-                    display: true,
-                    text: 'Appointments vs Survey Responses',
-                    color: '#374151',
-                    font: {
-                        size: 16,
-                        weight: 'bold'
                     }
                 }
             }
@@ -447,19 +288,18 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-    .chart-container {
-        position: relative;
-        height: 320px;
-        width: 100%;
+    /* Smooth transitions for all interactive elements */
+    .bg-white {
+        transition: box-shadow 0.2s ease-in-out;
     }
     
-    /* Smooth transitions for chart hover effects */
-    canvas {
-        transition: opacity 0.3s ease;
+    .bg-white:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
     
-    canvas:hover {
-        opacity: 0.9;
+    /* Progress bar animation */
+    .bg-green-600 {
+        transition: width 1s ease-in-out;
     }
 </style>
 {% endblock %}

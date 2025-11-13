@@ -1,559 +1,893 @@
 {% extends 'personel/base.html' %}
-
 {% block title %}
 Caraga State University Cabadbaran Campus(CSUCC)
-{% endblock  %}
+{% endblock %}
 
 {% block content %}
 
-<!-- #10934F -->
-<!-- #FFCC00 -->
-<!-- #bb2124 -->
-
 <style>
-/* Hide badge by default */
-{% comment %} #notification-badge {
-  display: none;
-} {% endcomment %}
-
-/* Swing like a real bell */
+/* Bell animation styles */
 @keyframes swing-bell {
-  0%   { transform: rotate(0deg); }
-  10%  { transform: rotate(20deg); }
-  20%  { transform: rotate(-18deg); }
-  30%  { transform: rotate(16deg); }
-  40%  { transform: rotate(-14deg); }
-  50%  { transform: rotate(12deg); }
-  60%  { transform: rotate(-10deg); }
-  70%  { transform: rotate(8deg); }
-  80%  { transform: rotate(-6deg); }
-  90%  { transform: rotate(4deg); }
-  100% { transform: rotate(0deg); }
+0%   { transform: rotate(0deg); }
+10%  { transform: rotate(20deg); }
+20%  { transform: rotate(-18deg); }
+30%  { transform: rotate(16deg); }
+40%  { transform: rotate(-14deg); }
+50%  { transform: rotate(12deg); }
+60%  { transform: rotate(-10deg); }
+70%  { transform: rotate(8deg); }
+80%  { transform: rotate(-6deg); }
+90%  { transform: rotate(4deg); }
+100% { transform: rotate(0deg); }
 }
 
 .ringing {
-  animation: swing-bell 1s ease-in-out;
-  transform-origin: top center; /* pivot at the top like a real bell */
+animation: swing-bell 1s ease-in-out;
+transform-origin: top center;
 }
 
-/* Pulse for notification badge */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 1; }
+0% { transform: scale(1); opacity: 1; }
+50% { transform: scale(1.3); opacity: 0.7; }
+100% { transform: scale(1); opacity: 1; }
 }
 
 #notification-badge.active {
-  display: flex !important;
-  animation: pulse 1s infinite;
+display: flex !important;
+animation: pulse 1s infinite;
 }
 
-/* Pagination styles */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: auto; /* Push to bottom */
-  padding: 10px 5px;
-  background: white;
-
-  bottom: 0;
-  border-top: 1px solid #e0e0e0;
+/* Font classes */
+.inria-sans-bold {
+font-family: 'Inria Sans', sans-serif;
+font-weight: bold;
 }
 
-.pagination-btn {
-  background-color: #10934F;
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  margin: 0 5px;
-  cursor: pointer;
-  font-size: 14px;
+.medula-one-regular {
+font-family: 'Medula One', cursive;
+font-weight: 400;
 }
 
-.pagination-btn:hover:not(:disabled) {
-  background-color: #10934F;
+/* Table styles */
+.table-auto {
+width: 100%;
+border-collapse: collapse;
 }
 
-.pagination-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
+.table-auto th,
+.table-auto td {
+padding: 8px 4px;
+text-align: left;
+border-bottom: 1px solid #e5e7eb;
 }
 
-.pagination-info {
-  margin: 0 10px;
-  padding: 5px 12px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-}
-
-/* Container styles for proper sticky footer */
-.table-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 300px; /* Ensure minimum height */
-}
-
-.table-scroll {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 300px; /* Limit height and add scroll */
-}
-
-/* Fix overall layout height */
-.main-content {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
-}
-
-.content-section {
-  flex: 1;
-  display: flex;
-  gap: 1rem;
-  min-height: 0; /* Important for flex children to respect overflow */
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .content-section {
-    flex-direction: column;
-  }
-  
-  .left-panel, .right-panel {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
-/* Ensure tables don't overflow */
-table {
-  width: 100%;
-  table-layout: fixed;
-}
-
-th, td {
-  word-wrap: break-word;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.table-auto th {
+font-weight: 600;
+background-color: #f9fafb;
 }
 </style>
+
 {% load static %}
-<div class="flex mt-4 justify-between">
-    <div class="flex gap-2 md:gap-10">
-       <div class="relative">
-            <a href="#" class="text-sm border-b-3 border-[#10934F]">Dashboard</a>
+<div class="flex mt-4 justify-between items-center mb-3">
+    <div class="flex gap-2 md:gap-10 items-center">
+        <a href="#" class="text-sm border-b-3 border-[#10934F]">Dashboard</a>
         
-            <!-- Bell container -->
-            <div class="absolute left-18 top-0">  
-                <div class="relative">
-                    <i id="bell-icon" class="fa fa-bell text-2xl cursor-pointer text-gray-700"></i>
-                    <span id="notification-badge"
-                        class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
-                    </span>
-                </div>
+        <!-- Bell container -->
+        <div class="relative">  
+            <div class="relative">
+                <i id="bell-icon" class="fa fa-bell text-2xl cursor-pointer text-gray-700"></i>
+                <span id="notification-badge"
+                    class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
+                </span>
             </div>
         </div>
-
-        
     </div>
 
-    <div class="flex gap-4">
+    <div class="flex gap-4 items-center">
         <form action="{% url 'auth_logout' %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="cursor-pointer hover:text-red-500">Logout</button>
+            <button type="submit" class="cursor-pointer hover:text-red-500 text-sm">Logout</button>
         </form>
 
-        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-sm text-white px-6 md:px-10 py-1"
+        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-sm text-white px-4 py-1 rounded"
                 type="button"
-                 onclick="document.getElementById('endAllModal').classList.remove('hidden')" >
-                END ALL
+                onclick="document.getElementById('endAllModal').classList.remove('hidden')">
+            END ALL
         </button>
 
         <!-- Confirmation Modal -->
         <div id="endAllModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-white shadow-lg p-6 w-full max-w-md mx-4">
+            <div class="bg-white shadow-lg p-6 w-full max-w-md mx-4 rounded">
                 <h2 class="text-lg font-semibold text-gray-800">Confirm Action</h2>
                 <p class="mt-2 text-gray-600">Are you sure you want to <b>cancel all</b> pending and skipped appointments?</p>
                 
                 <div class="mt-6 flex justify-end gap-3">
-                    <!-- Cancel Button -->
                     <button 
-                        class="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 cursor-pointer"
+                        class="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 cursor-pointer rounded"
                         onclick="document.getElementById('endAllModal').classList.add('hidden')">
                         No, Keep
                     </button>
-
-                    <!-- Confirm Form -->
                     <form method="post" action="{% url 'end_all_appointments' %}">
                         {% csrf_token %}
                         <button type="submit" 
-                            class="px-4 py-2 text-sm bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80">
+                            class="px-4 py-2 text-sm bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80 rounded">
                             Yes, End All
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-
-        
     </div>
 </div>
 
-<section id="student" class="flex flex-col lg:flex-row mt-6 gap-6 min-h-[700px] ">
-   
-    <!-- left -->
-    <div class="flex flex-col bg-white py-4 px-4 w-full lg:max-w-md text-center shadow-[0_4px_10px_rgba(0,0,0,0.6)] ">
-        <audio id="bell-sound" src="{% static 'sound/bell-ring.mp3' %}" preload="auto"></audio>
-
-        <!-- current -->
-        <h2 class="text-gray-700 text-sm font-semibold ">
-                    Current Serving Number
-        </h2>
-        {% if get_current_number %}
-            <div class="min-h-[200px] flex justify-center items-center py-4">
-
-                <div class="flex items-center "> 
-                    <p class="text-[#10934F] text-7xl md:text-8xl medula-one-regular">
-                    {{ get_current_number.ticket_number }}
-                    </p>
-                </div>
-            </div>
-        {% else %}
-            <div class="min-h-[200px] flex flex-col justify-center items-center py-4">
-                <div class="flex flex-col items-center gap-4 ">
-                    <p class="text-gray-500 text-sm ">
-                    No request appointment now
-                    </p>
-                    <form action="{% url 'personel' %}" method="POST">
-                        {% csrf_token %}
-                        <button class="bg-[#10934F] hover:bg-[#10934F]/80 text-sm text-white px-8 py-2 cursor-pointer"
-                            type="submit" name="start" value="start">
-                            Start
-                        </button>
-                    </form>
-                </div>
-            </div>
-        {% endif %}        
-
-        <div class="border-1 border-gray-400 my-4"></div>
-
-        <div class="flex-col table-container">
-            <h1 class="text-center px-4 py-2 text-base font-bold text-white bg-[#10934F]">Waiting List</h1>
-
-            <div class="table-scroll">
-                <table class="w-full">
-                    <thead class="text-base">
-                        <tr>
-                            <th class="text-left px-4 py-1 w-1/2">Number</th>
-                            <th class="text-center px-4 py-1 w-1/2">User</th>
-                        </tr>
-                    </thead>
-                    <tbody id="wait-body">
-                        {% for display_queue in display_queues  %}
-                        <tr class="{% if display_queue.status == 'standby' and display_queue.is_priority == 'no'  %} bg-[#FFCC00]/20 
-                                                    {% elif display_queue.status == 'standby' and display_queue.is_priority == 'yes'  %} bg-[#ED7676]/20
-                                                    {% else %}bg-[#10934F]/20
-                                                    {% endif %} ">
-                            <td class="text-left px-4 py-2 text-sm ">{{ display_queue.ticket_number }}</td>
-                            <td class="px-4 py-2 text-sm text-center">{{ display_queue.user_type }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="pagination-container" id="wait-pagination">
-                <button class="pagination-btn" id="wait-prev-btn" disabled>Prev</button>
-                <span class="pagination-info" id="wait-page-info">Page 1</span>
-                <button class="pagination-btn" id="wait-next-btn">Next</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- right  -->
-    <div class="flex-1 flex flex-col min-h-0">
-        <div class="bg-white shadow-[0_4px_10px_rgba(0,0,0,0.6)] min-h-[250px]">
-            <div class="bg-[#10934F] text-white text-base p-2 text-center">
-                <h2 class="text-base font-bold" >INFORMATION</h2>
-            </div>
-            <div class="mx-4 overflow-x-auto flex ">
-                <table class="w-full border-collapse mt-8 min-w-full">
-                    <thead class="text-base">
-                        <tr class="border-b border-[#DEDEDE] ">
-                            <th class="text-center px-4 py-2 w-full">Full Name</th>
-                            <th class="text-center px-4 py-2 w-full ">Course</th>
-                            <th class="text-center px-4 py-2 w-full">Request</th>
-                        </tr>
-                    </thead> 
-                    <tbody class="text-sm">
+<div class="w-full flex-1 flex flex-col gap-5 my-3">
+    <!-- upper section -->
+    <div class="flex gap-5 flex-1">
+        <!-- serving section -->
+        <div class="flex-1 bg-white flex gap-2 shadow-md h-[420px] max-h-[430px] ">
+            <!-- current serving -->
+            <div class="flex-1 border border-gray-400 px-5 pt-2 pb-8">
+                <h1 class="inria-sans-bold text-lg">Current Serving</h1>
+                
+                <!-- number -->
+                <div class="flex-1 flex justify-center my-4">
+                    <div class="border-b-2 border-gray-300">
                         {% if get_current_number %}
-                        <tr>
-                            <td class="px-4 py-2  w-full text-center">{{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}</td>
-                            <td class="px-4 py-2  w-full text-center">{{ get_current_number.courses }}</td>
-                            <td class="px-4 py-2 w-full text-center">
+                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-[#10934F]">{{ get_current_number.ticket_number }}</h1>
+                        {% else %}
+                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-gray-400">---</h1>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- information -->
+                <div class="flex-1 flex justify-between items-end my-5 mx-2">
+                    <div>
+                        <p class="text-gray-600 text-sm">
+                            Name: <strong id="current-name" class="text-black text-lg">
+                                {% if get_current_number %}
+                                    {{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </strong>
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-600 text-sm">
+                            Course: <strong id="current-course" class="text-black text-sm">
+                                {% if get_current_number %}
+                                    {{ get_current_number.courses }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </strong>
+                        </p>
+                        <p class="text-gray-600 text-sm">
+                            ID: <strong id="current-id" class="text-black text-sm">
+                                {% if get_current_number %}
+                                    {{ get_current_number.student_id }}
+                                {% else %}
+                                    ---
+                                {% endif %}
+                            </strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- request -->
+                <div class="w-full mt-2">
+                    <div class="bg-gray-200 w-full py-2">
+                        <h1 id="current-request" class="text-xl text-center inria-sans-bold">
+                            {% if get_current_number %}
                                 {% if get_current_number.requestType == None %}
                                     {{ get_current_number.custom_request }}
                                 {% else %}
                                     {{ get_current_number.requestType }}
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
+                            {% else %}
+                                No Request
+                            {% endif %}
+                        </h1>
+                    </div>
+                    <p class="w-full text-center text-sm text-gray-600">Request Type</p>
+                </div>
+
+                <!-- buttons -->
+                <div id="current-buttons-container" class="flex-1 flex justify-between gap-2 mt-5">
+                    {% if get_current_number %}
+                    <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}">
+                        <button type="submit" name="action" value="skip"
+                            class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-sm">
+                            Skip
+                        </button>
+                    </form>
+                    <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}">
+                        <button type="submit" name="action" value="done"
+                            class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-sm">
+                            Done
+                        </button>
+                    </form>
+                    {% else %}
+                    <form action="{% url 'personel' %}" method="POST" class="w-full">
+                        {% csrf_token %}
+                        <button type="submit" name="start" value="start"
+                            class="w-full bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer py-2 text-white text-sm">
+                            Start Serving
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <!-- call button -->
+                <div id="call-button-container" class="mt-3">
+                    {% if get_current_number %}
+                    <button onclick="speakNumber('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
+                        type="button"
+                        class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-sm">
+                        Call Number
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- next queue -->
+            <div class="w-[160px] flex items-center gap-3 pt-2 pb-5 px-3 flex-col border bg-[#10420C] text-white" id="next-queue-container">
+                <div class="w-full">
+                    <h1 class="text-base mb-2 text-center text-gray-300">Next Queue</h1>
+                    <div class="w-full border-b border-gray-400"></div>
+                </div>
+                
+                <!-- Queue items container for dynamic updates -->
+                <div id="queue-items-container">
+                    {% for display_queue in display_queues|slice:":5" %}
+                    <div class="text-xl w-full medula-one-regular px-2 mt-2 queue-item">
+                        <div class="w-full">
+                            <h1 class="text-3xl mb-1 text-center {% if forloop.first %}text-[#FFCC00]{% else %}text-white{% endif %}">
+                                {{ display_queue.ticket_number }}
+                            </h1>
+                            <div class="w-full border-b border-gray-400/50"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-xl w-full medula-one-regular px-2 mt-2 queue-item">
+                        <div class="w-full">
+                            <h1 class="text-lg mb-1 text-center text-gray-400">---</h1>
+                            <div class="w-full border-b border-gray-400/50"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- priority queue -->
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px] ">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#ED7676]">
+                <h1 class="font-semibold text-white">PRIORITY QUEUE'S</h1>
+                <!-- Pagination controls -->
+                <div class="flex items-center space-x-2">
+                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="priority-page-info" class="text-white text-sm">Page 1 of 1</span>
+                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 py-2 px-4">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
                         <tr>
-                            <td class="px-4 py-2 text-center " colspan="4">NO REQUEST RIGHT NOW</td>
+                            <th class="px-2 py-2 text-left">Full Name</th>
+                            <th class="px-2 py-2 text-center">Number</th>
+                            <th class="px-2 py-2 text-center">Action</th>
                         </tr>
+                    </thead>
+                    <tbody id="priority-queue-body">
+                        {% if priority_students %}
+                            {% for priority_student in priority_students %}
+                            <tr data-student-id="{{ priority_student.id }}">
+                                <td class="px-2 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
+                                <td class="px-2 py-2 text-center">{{ priority_student.ticket_number }}</td>
+                                <td class="px-2 py-2 text-center">
+                                    <form action="{% url 'priority_standby' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="ticket_number" value="{{ priority_student.id }}">
+                                        <button type="submit" name="action" value="standby"
+                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
+                                            Standby
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Priority Queue Right Now</td>
+                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
-
-            <div class="flex justify-center my-4 px-4 text-sm">
-                <form action="{% url 'done_current_number' %}" method="post" class="w-full">
-                    {% csrf_token %}
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        {% if get_current_number %}
-                            <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}" >
-                            <button type="submit" name="action" value="done"
-                                class="bg-[#10934F] hover:bg-[#10934F]/80 text-white px-6 py-2 cursor-pointer w-full sm:w-auto" >
-                            Done</button>
-                            <button type="submit" name="action" value="skip"
-                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-black px-6 py-2 cursor-pointer w-full sm:w-auto" >Skip</button>
-                            <!-- call  -->
-                            <button onclick="speakNumber('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
-                                type="button"
-                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 cursor-pointer w-full sm:w-auto">
-                                Call
-                            </button>
-                        {% endif %}
-                    </div>
-                </form>
-            </div>
-        </div>  
-        
-        <!-- skip and priority -->
-        <div class="mt-6 flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
-            <!-- Skipped List -->
-            <div class="flex-1 bg-white flex flex-col shadow-[0_4px_10px_rgba(0,0,0,0.6)] table-container min-h-0"> 
-                <div class="bg-[#FFCC00] text-black p-2 text-center">
-                    <h2 class="font-semibold tracking-wide">SKIPPED LIST</h2>
-                </div>
-
-                <div class="table-scroll">
-                    <table class="w-full">
-                        <thead class="text-base">
-                            <tr>
-                                <th class="text-left px-4 py-2 w-2/5">Full Name</th>
-                                <th class="text-left px-4 py-2 w-1/5">Number</th>
-                                <th class="text-center px-4 py-2 w-2/5">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm" id="skip-body">
-                            {% if skip_non_priority_students %}
-                                {% for skip_non_priority_student in skip_non_priority_students %}
-                                    <tr>
-                                        <td class="px-4 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
-                                        <td class="px-4 py-2">{{ skip_non_priority_student.ticket_number }}</td>
-                                        <td class="px-4 py-2">
-                                            <form action="{% url 'standby' %}" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="ticket_number" value="{{skip_non_priority_student.id}}">
-                                                <button type="submit" name="action" value="standby"
-                                                    class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer w-full">
-                                                    Standby
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}     
-                                    <tr>
-                                        <td colspan="3" class="text-center px-4 py-2">No Skipped Right Now</td>
-                                    </tr>
-                            {% endif %}   
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="pagination-container" id="skip-pagination">
-                    <button class="pagination-btn" id="skip-prev-btn" disabled>Prev</button>
-                    <span class="pagination-info" id="skip-page-info">Page 1</span>
-                    <button class="pagination-btn" id="skip-next-btn">Next</button>
-                </div>
-            </div>
-
-            <!-- Priority List -->
-            <div class="flex-1 bg-white flex flex-col shadow-[0_4px_10px_rgba(0,0,0,0.6)] table-container min-h-0"> 
-                <div class="bg-[#ED7676] text-white p-2 text-center">
-                    <h2 class="font-semibold tracking-wide">PRIORITY QUEUE'S</h2>
-                </div>
-
-                <div class="table-scroll">
-                    <table class="w-full">
-                        <thead class="text-base">
-                            <tr>
-                                <th class="text-left px-4 py-2 w-2/5">Full Name</th>
-                                <th class="text-left px-4 py-2 w-1/5">Number</th>
-                                <th class="text-center px-4 py-2 w-2/5">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm" id="priority-body">
-                            {% if priority_students %}
-                                {% for priority_student in priority_students %}
-                                    <tr>
-                                        <td class="px-4 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
-                                        <td class="px-4 py-2">{{ priority_student.ticket_number }}</td>
-                                        <td class="px-4 py-2">
-                                            <form action="{% url 'priority_standby' %}" method="post">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="ticket_number" value="{{priority_student.id}}">
-                                                <button type="submit" name="action" value="standby"
-                                                    class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 p-1 cursor-pointer w-full">
-                                                    Standby
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                {% endfor %}    
-                            {% else %}
-                                <tr>
-                                    <td class="px-4 py-2 text-center" colspan="3">No Pending Right Now</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="pagination-container" id="priority-pagination">
-                    <button class="pagination-btn" id="priority-prev-btn" disabled>Prev</button>
-                    <span class="pagination-info" id="priority-page-info">Page 1</span>
-                    <button class="pagination-btn" id="priority-next-btn">Next</button>
-                </div>
-            </div>
         </div>
     </div>
 
-</section>    
+    <!-- lower section -->
+    <div class="flex gap-5 flex-1 ">
+        <!-- CSMS List -->
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px] ">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-black">
+                <h1 class="font-semibold text-white">Client Survey List</h1>
+                <!-- Pagination controls -->
+                <div class="flex items-center space-x-2">
+                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="csms-page-info" class="text-white text-sm">Page 1 of 1</span>
+                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
 
-<section class="p-6 bg-white mt-8 shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
-  <h1 class="text-xl font-bold mb-6">Client Satisfaction Survey</h1>
+            <div class="flex-1 py-2 px-4">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
+                        <tr>
+                            <th class="px-2 py-2 text-left">Full Name</th>
+                            <th class="px-2 py-2 text-center">Number</th>
+                            <th class="px-2 py-2 text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="csms-list-body">
+                        {% for survey in display_survey %}
+                        <tr>
+                            <td class="px-2 py-2">{{ survey.appointments }}</td>
+                            <td class="px-2 py-2 text-center">{{ survey.code }}</td>
+                            <td class="px-2 py-2 text-center">
+                                {% if survey.status == 'used' %}
+                                    <span class="text-green-600">Done</span>
+                                {% else %}
+                                    <span class="text-yellow-600">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Survey Records Found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-  <div class="flex gap-6 justify-between ">
-    <!-- First table -->
-    <div class="bg-white">
-      <table class="min-w-full border border-gray-300 rounded-lg">
-        <thead class="bg-[#10934F]">
-          <tr class="text-white">
-            <th class="px-4 py-2 border">Code </th>
-            <th class="px-4 py-2 border">Name</th>
-            <th class="px-4 py-2 border">Status</th>
-          </tr>
-        </thead>
-        <tbody id="survey-body">
-            {% for survey in display_survey %}
-            <tr>
-                <td class="px-4 py-2 border">{{ survey.code }}</td>
-                <td class="px-4 py-2 border">{{ survey.appointments }}</td>
-                <td class="px-4 py-2 border">{% if survey.status == 'used' %} done {% endif %}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center py-2 text-gray-500">No survey records found</td>
-            </tr>
-            {% endfor %}
-        </tbody>
 
-      </table>
+
+        <!-- Skipped List -->
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px]">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#FFCC00]">
+                <h1 class="font-semibold">SKIPPED LIST</h1>
+                <!-- Pagination controls -->
+                <div class="flex items-center space-x-2">
+                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="skipped-page-info" class="text-sm">Page 1 of 1</span>
+                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 py-2 px-4">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
+                        <tr>
+                            <th class="px-2 py-2 text-left">Full Name</th>
+                            <th class="px-2 py-2 text-center">Number</th>
+                            <th class="px-2 py-2 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skipped-list-body">
+                        {% if skip_non_priority_students %}
+                            {% for skip_non_priority_student in skip_non_priority_students %}
+                            <tr data-student-id="{{ skip_non_priority_student.id }}">
+                                <td class="px-2 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
+                                <td class="px-2 py-2 text-center">{{ skip_non_priority_student.ticket_number }}</td>
+                                <td class="px-2 py-2 text-center">
+                                    <form action="{% url 'standby' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="ticket_number" value="{{ skip_non_priority_student.id }}">
+                                        <button type="submit" name="action" value="standby"
+                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
+                                            Standby
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Skipped Right Now</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+</div>
 
+<!-- Bell Sound Audio Element -->
+<audio id="bell-sound" preload="auto">
+    <source src="{% static 'sound/bell-ring.mp3' %}" type="audio/mpeg">
+</audio>
 
-    
-  </div>
-</section>
-
-
-
-
+<!-- Debug Panel -->
+<div class="fixed bottom-4 right-4 bg-black text-white p-3 rounded text-xs z-50 opacity-90">
+    <div><strong>DEBUG PANEL</strong></div>
+    <div>WebSocket: <span id="ws-status" class="text-red-400">Disconnected</span></div>
+    <div>Current: <span id="debug-current">---</span></div>
+    <div>Queue Items: <span id="debug-queue-count">0</span></div>
+    <button onclick="forceRefresh()" class="bg-blue-500 px-2 py-1 rounded mt-1 text-xs">Refresh Data</button>
+    <button onclick="testWebSocket()" class="bg-green-500 px-2 py-1 rounded mt-1 text-xs">Test WS</button>
+</div>
 
 <script>
-// Pagination function for all three tables
-function setupPagination(tableId, prevBtnId, nextBtnId, pageInfoId, rowsPerPage = 5) {
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    
-    const rows = Array.from(table.getElementsByTagName('tr'));
-    const prevBtn = document.getElementById(prevBtnId);
-    const nextBtn = document.getElementById(nextBtnId);
-    const pageInfo = document.getElementById(pageInfoId);
-    
-    let currentPage = 1;
-    const totalPages = Math.max(Math.ceil(rows.length / rowsPerPage), 1);
-    
-    function showPage(page) {
-        // Hide all rows
-        rows.forEach(row => row.style.display = 'none');
-        
-        // Show rows for current page
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        
-        for (let i = start; i < end && i < rows.length; i++) {
-            rows[i].style.display = '';
-        }
-        
-        // Update buttons
-        if (prevBtn) prevBtn.disabled = (page === 1);
-        if (nextBtn) nextBtn.disabled = (page === totalPages);
-        
-        // Update page info
-        if (pageInfo) pageInfo.textContent = ` ${page} : ${totalPages}`;
-    }
-    
-    // Event listeners
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                showPage(currentPage);
-            }
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                showPage(currentPage);
-            }
-        });
-    }
-    
-    // Initialize
-    showPage(1);
+// Global variable to store all queue data
+let allQueuesData = [];
+let queueSocket;
+
+// Debug functions
+function forceRefresh() {
+    console.log('🔄 Force refreshing page...');
+    window.location.reload();
 }
 
-// Initialize pagination for all three tables when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    setupPagination('wait-body', 'wait-prev-btn', 'wait-next-btn', 'wait-page-info');
-    setupPagination('skip-body', 'skip-prev-btn', 'skip-next-btn', 'skip-page-info');
-    setupPagination('priority-body', 'priority-prev-btn', 'priority-next-btn', 'priority-page-info');
-});
-    
-function speakNumber(ticketNumber, fullname) {
-    // Stop ongoing speech
-    window.speechSynthesis.cancel();
+function testWebSocket() {
+    console.log('🔍 Testing WebSocket...');
+    if (queueSocket && queueSocket.readyState === WebSocket.OPEN) {
+        console.log('✅ WebSocket is connected and ready');
+    } else {
+        console.log('❌ WebSocket is not connected');
+    }
+}
 
+// Update debug panel
+function updateDebugPanel() {
+    const statusElement = document.getElementById('ws-status');
+    const currentElement = document.getElementById('debug-current');
+    const queueCountElement = document.getElementById('debug-queue-count');
+    
+    if (queueSocket) {
+        const states = ['Connecting', 'Open', 'Closing', 'Closed'];
+        statusElement.textContent = states[queueSocket.readyState];
+        statusElement.className = queueSocket.readyState === 1 ? 'text-green-400' : 'text-red-400';
+    }
+    
+    currentElement.textContent = document.getElementById('current-ticket-number')?.textContent || '---';
+    queueCountElement.textContent = allQueuesData.length;
+}
+
+setInterval(updateDebugPanel, 1000);
+
+// Enhanced bell sound function
+function playBell() {
+    const bellSound = document.getElementById("bell-sound");
+    if (bellSound) {
+        console.log("🔔 Playing bell sound");
+        
+        // Reset and play the sound
+        bellSound.currentTime = 0;
+        
+        const playPromise = bellSound.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("🔇 Bell sound play was prevented:", error);
+            });
+        }
+    }
+}
+
+// Debug function to see what's happening with queue data
+function debugQueueData(queueData, currentTicketNumber) {
+    console.log('🔍 DEBUG QUEUE DATA:');
+    console.log('   - Raw queue data:', queueData);
+    console.log('   - Current ticket:', currentTicketNumber);
+    
+    if (queueData && queueData.length > 0) {
+        console.log('   - Queue items:');
+        queueData.forEach((item, index) => {
+            console.log(`     ${index + 1}. ${item.ticket_number} (matches current: ${item.ticket_number === currentTicketNumber})`);
+        });
+    }
+}
+
+// Function to update the next queue display - FIXED VERSION
+// Function to update the next queue display - SMART PRESERVATION VERSION
+function updateNextQueue(queueData) {
+    const queueItemsContainer = document.getElementById('queue-items-container');
+    
+    if (!queueItemsContainer) {
+        console.error('❌ Queue items container not found');
+        return;
+    }
+    
+    // Store all queue data
+    allQueuesData = Array.isArray(queueData) ? queueData : [];
+    
+    console.log('🔄 WebSocket sent queue data:', allQueuesData.length, 'items');
+    
+    // Get current ticket number for filtering
+    const currentTicketNumber = document.getElementById('current-ticket-number')?.textContent;
+    
+    // DEBUG: Show what we're working with
+    debugQueueData(allQueuesData, currentTicketNumber);
+    
+    // Check if we have existing queue items
+    const existingItems = queueItemsContainer.querySelectorAll('.queue-item');
+    const hasExistingData = existingItems.length > 0;
+    
+    console.log('📋 Existing queue items:', existingItems.length);
+    
+    // DECISION LOGIC: When to update?
+    // 1. If WebSocket has data AND it's different from what we have → UPDATE
+    // 2. If WebSocket has no data → PRESERVE existing
+    // 3. If WebSocket data is empty after filtering → PRESERVE existing
+    
+    if (allQueuesData.length === 0) {
+        console.log('⚠️  No queue data from WebSocket - preserving existing display');
+        return;
+    }
+    
+    // Filter out the current serving student
+    const filteredQueueData = allQueuesData.filter(queue => {
+        return !(currentTicketNumber && currentTicketNumber !== '---' && queue.ticket_number === currentTicketNumber);
+    });
+    
+    console.log('📊 Filtered queue data:', filteredQueueData.length, 'items');
+    
+    // Only update if we have new data to show
+    if (filteredQueueData.length > 0) {
+        // Check if the data is actually different from what we have
+        const shouldUpdate = shouldUpdateQueue(existingItems, filteredQueueData);
+        
+        if (shouldUpdate) {
+            console.log('🔄 Data has changed - updating queue display');
+            queueItemsContainer.innerHTML = '';
+            
+            const displayCount = Math.min(filteredQueueData.length, 5);
+            
+            for (let i = 0; i < displayCount; i++) {
+                const queue = filteredQueueData[i];
+                const queueItem = document.createElement('div');
+                queueItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
+                queueItem.innerHTML = `
+                    <div class="w-full">
+                        <h1 class="text-3xl mb-1 text-center ${i === 0 ? 'text-[#FFCC00]' : 'text-white'}">
+                            ${queue.ticket_number || '---'}
+                        </h1>
+                        <div class="w-full border-b border-gray-400/50"></div>
+                    </div>
+                `;
+                queueItemsContainer.appendChild(queueItem);
+            }
+            
+            console.log('✅ Next queue updated with', displayCount, 'items');
+        } else {
+            console.log('⚡ Data is the same - no update needed');
+        }
+    } else {
+        console.log('⚠️  No queue items after filtering - preserving existing display');
+    }
+}
+
+// Helper function to check if we should update the queue
+function shouldUpdateQueue(existingItems, newQueueData) {
+    // If no existing items but we have new data → UPDATE
+    if (existingItems.length === 0 && newQueueData.length > 0) {
+        return true;
+    }
+    
+    // If different number of items → UPDATE
+    if (existingItems.length !== newQueueData.length) {
+        return true;
+    }
+    
+    // Check if any ticket numbers are different
+    for (let i = 0; i < Math.min(existingItems.length, newQueueData.length); i++) {
+        const existingNumber = existingItems[i].querySelector('h1')?.textContent;
+        const newNumber = newQueueData[i].ticket_number;
+        
+        if (existingNumber !== newNumber) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// Function to update priority queue
+function updatePriorityQueue(priorityData) {
+    const priorityQueueBody = document.getElementById('priority-queue-body');
+    if (!priorityQueueBody) return;
+
+    priorityQueueBody.innerHTML = '';
+
+    if (priorityData && priorityData.length > 0) {
+        priorityData.forEach(student => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-student-id', student.id);
+            row.innerHTML = `
+                <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
+                <td class="px-2 py-2 text-center">${student.ticket_number}</td>
+                <td class="px-2 py-2 text-center">
+                    <form action="{% url 'priority_standby' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_number" value="${student.id}">
+                        <button type="submit" name="action" value="standby"
+                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
+                            Standby
+                        </button>
+                    </form>
+                </td>
+            `;
+            priorityQueueBody.appendChild(row);
+        });
+    } else {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Priority Queue Right Now</td>
+        `;
+        priorityQueueBody.appendChild(row);
+    }
+}
+
+// Function to update skipped list
+function updateSkippedList(skippedData) {
+    const skippedListBody = document.getElementById('skipped-list-body');
+    if (!skippedListBody) return;
+
+    skippedListBody.innerHTML = '';
+
+    if (skippedData && skippedData.length > 0) {
+        skippedData.forEach(student => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-student-id', student.id);
+            row.innerHTML = `
+                <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
+                <td class="px-2 py-2 text-center">${student.ticket_number}</td>
+                <td class="px-2 py-2 text-center">
+                    <form action="{% url 'standby' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_number" value="${student.id}">
+                        <button type="submit" name="action" value="standby"
+                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
+                            Standby
+                        </button>
+                    </form>
+                </td>
+            `;
+            skippedListBody.appendChild(row);
+        });
+    } else {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Skipped Right Now</td>
+        `;
+        skippedListBody.appendChild(row);
+    }
+}
+
+// Function to update current serving - SMART VERSION
+function updateCurrentServing(currentData) {
+    console.log('🔄 updateCurrentServing called with:', currentData);
+    
+    // Check what we currently have displayed
+    const currentTicketElement = document.getElementById('current-ticket-number');
+    const serverHasData = currentTicketElement && currentTicketElement.textContent !== '---';
+    
+    // If WebSocket sends null but server has data, preserve server data
+    if (!currentData && serverHasData) {
+        console.log('⚠️  Preserving server-rendered current student data');
+        return;
+    }
+    
+    if (!currentData || currentData === null) {
+        console.log('❌ No current student data from WebSocket');
+        // Only clear if server also doesn't have data
+        if (!serverHasData) {
+            document.getElementById('current-ticket-number').textContent = '---';
+            document.getElementById('current-name').textContent = '---';
+            document.getElementById('current-course').textContent = '---';
+            document.getElementById('current-id').textContent = '---';
+            document.getElementById('current-request').textContent = 'No Request';
+            
+            // Update buttons container
+            const buttonsContainer = document.getElementById('current-buttons-container');
+            buttonsContainer.innerHTML = `
+                <form action="{% url 'personel' %}" method="POST" class="w-full">
+                    {% csrf_token %}
+                    <button type="submit" name="start" value="start"
+                        class="w-full bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer py-2 text-white text-sm">
+                        Start Serving
+                    </button>
+                </form>
+            `;
+            
+            // Hide call button
+            const callButtonContainer = document.getElementById('call-button-container');
+            callButtonContainer.innerHTML = '';
+        }
+        return;
+    }
+
+    // Update current serving information with personnel consumer data structure
+    document.getElementById('current-ticket-number').textContent = currentData.ticket_number || '---';
+    
+    const firstName = currentData.firstName || '';
+    const middleName = currentData.middleName ? currentData.middleName + '.' : '';
+    const lastName = currentData.lastName || '';
+    document.getElementById('current-name').textContent = `${firstName} ${middleName} ${lastName}`.trim();
+    
+    document.getElementById('current-course').textContent = currentData.courses || '---';
+    document.getElementById('current-id').textContent = currentData.student_id || '---';
+    
+    // Personnel consumer uses 'requestType' field directly
+    const requestType = currentData.requestType || 'No Request';
+    document.getElementById('current-request').textContent = requestType;
+
+    // Update buttons
+    const buttonsContainer = document.getElementById('current-buttons-container');
+    buttonsContainer.innerHTML = `
+        <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
+            {% csrf_token %}
+            <input type="hidden" name="ticket_number" value="${currentData.id}">
+            <button type="submit" name="action" value="skip"
+                class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-sm">
+                Skip
+            </button>
+        </form>
+        <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
+            {% csrf_token %}
+            <input type="hidden" name="ticket_number" value="${currentData.id}">
+            <button type="submit" name="action" value="done"
+                class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-sm">
+                Done
+            </button>
+        </form>
+    `;
+
+    // Update call button
+    const callButtonContainer = document.getElementById('call-button-container');
+    callButtonContainer.innerHTML = `
+        <button onclick="speakNumber('${currentData.ticket_number}', '${currentData.firstName || ''} ${currentData.lastName || ''}')"
+            type="button"
+            class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-sm">
+            Call Number
+        </button>
+    `;
+    
+    console.log('✅ Current serving updated successfully');
+}
+
+// WebSocket for real-time updates - USING CORRECT URL
+function connectWebSocket() {
+    try {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/queue/`;  // CORRECT URL
+        
+        console.log('🔄 Connecting to WebSocket:', wsUrl);
+        
+        queueSocket = new WebSocket(wsUrl);
+
+        queueSocket.onmessage = function (event) {
+            try {
+                console.log('📨 WebSocket message received:', event.data);
+                const data = JSON.parse(event.data);
+                
+                // Handle full update from personnel consumer
+                if (data.type === 'full_update' && data.data) {
+                    console.log('🔄 Full update received from source:', data.source);
+                    console.log('📊 Full data structure:', data.data);
+                    
+                    // SMART UPDATE: Only update if WebSocket has valid data
+                    const serverHasCurrentStudent = document.getElementById('current-ticket-number')?.textContent !== '---';
+                    const websocketHasCurrentStudent = data.data.current_student !== null && data.data.current_student !== undefined;
+                    
+                    console.log('🔍 Data check - Server has current:', serverHasCurrentStudent, 'WebSocket has current:', websocketHasCurrentStudent);
+                    
+                    // Update next queue
+                    if (data.data.next_queue !== undefined) {
+                        console.log('🎯 Updating next queue with:', data.data.next_queue.length, 'items');
+                        updateNextQueue(data.data.next_queue);
+                    }
+                    
+                    // Update priority queue
+                    if (data.data.priority_queue !== undefined) {
+                        console.log('🎯 Updating priority queue with:', data.data.priority_queue.length, 'items');
+                        updatePriorityQueue(data.data.priority_queue);
+                    }
+                    
+                    // Update skipped list
+                    if (data.data.skipped_list !== undefined) {
+                        console.log('🎯 Updating skipped list with:', data.data.skipped_list.length, 'items');
+                        updateSkippedList(data.data.skipped_list);
+                    }
+                    
+                    // SMART CURRENT STUDENT UPDATE: Only update if WebSocket has valid data
+                    if (websocketHasCurrentStudent) {
+                        console.log('🎯 Updating current serving with:', data.data.current_student);
+                        updateCurrentServing(data.data.current_student);
+                    } else if (!websocketHasCurrentStudent && !serverHasCurrentStudent) {
+                        console.log('🎯 No current student - showing empty state');
+                        updateCurrentServing(null);
+                    } else {
+                        console.log('⚠️  WebSocket has no current student, but server has data - preserving server data');
+                        // Don't update - keep server-rendered data
+                    }
+                    
+                    // Play bell for new student submissions
+                    if (data.source === 'student_submission') {
+                        console.log('🎓 New student joined the queue!');
+                        playBell();
+                    }
+                } else {
+                    console.log('❌ Not a full_update message, type was:', data.type);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error processing WebSocket message:', error);
+            }
+        };
+
+        queueSocket.onopen = function() {
+            console.log('✅ WebSocket connection established');
+        };
+
+        queueSocket.onclose = function(e) {
+            console.log('🔴 WebSocket connection closed:', e);
+            // Attempt to reconnect after 2 seconds
+            setTimeout(connectWebSocket, 2000);
+        };
+
+        queueSocket.onerror = function(err) {
+            console.error('❌ WebSocket error:', err);
+        };
+    } catch (error) {
+        console.error('❌ Error creating WebSocket:', error);
+    }
+}
+
+// SIMPLE FORM HANDLER - Allow all forms to submit normally
+document.addEventListener('submit', function(event) {
+    const form = event.target;
+    console.log('📝 Form submitting normally:', form.action);
+    // Don't prevent default - allow normal form submission and page reload
+    // This ensures server-side data is always fresh
+});
+
+// Speech functions
+function speakNumber(ticketNumber, fullname) {
+    window.speechSynthesis.cancel();
     const text = `Calling ${ticketNumber}, ${fullname}. Please come to the window.`;
     const message = new SpeechSynthesisUtterance(text);
 
     message.lang = "en-US";
-    message.rate = 0.8;   // normal speaking speed
-    message.pitch = 1.5; // slightly higher pitch → more feminine
+    message.rate = 0.8;
+    message.pitch = 1.5;
     message.volume = 1;
 
     let voices = speechSynthesis.getVoices();
-
     if (voices.length === 0) {
         speechSynthesis.onvoiceschanged = () => {
             voices = speechSynthesis.getVoices();
@@ -567,125 +901,102 @@ function speakNumber(ticketNumber, fullname) {
 }
 
 function setFemaleVoice(message, voices) {
-    // Pick Microsoft Zira if available
-    const preferred = voices.find(v => v.name.includes("Zira"))
-        || voices.find(v => v.name.includes("Female")) // fallback (if other browsers use "Female" in name)
-        || voices[0]; // last fallback: first available
-
+    const preferred = voices.find(v => v.name.includes("Zira")) ||
+                    voices.find(v => v.name.includes("Female")) ||
+                    voices[0];
     if (preferred) {
         message.voice = preferred;
-        console.log("Selected voice:", preferred.name);
     }
 }
 
-const socket = new WebSocket("ws://" + window.location.host + "/ws/queue/");
-const notificationCountEl = document.getElementById("notification-count");
-
-function playBell() {
-    const bellSound = document.getElementById("bell-sound");
-    bellSound.src = bellSound.src.split("?")[0] + "?v=" + new Date().getTime(); 
-    bellSound.load();
-    bellSound.play().catch(e => console.log("Autoplay blocked:", e));
-
-}
-
-
-let pendingCount = 0;
-let lastPendingCount = 0;
-socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-
-    if (data.stats) {
-        const totalPending = data.stats.non_priority_count + data.stats.priority_count;
-        const bellIcon = document.getElementById("bell-icon");
-        const badge = document.getElementById("notification-badge");
-        const bellSound = document.getElementById("bell-sound");
-
-        if (totalPending > 0) {
-            badge.textContent = totalPending;
-            badge.classList.add("active");
-
-            bellIcon.classList.add("ringing");
-            playBell();
-
-
-            setTimeout(() => {
-                bellIcon.classList.remove("ringing");
-            }, 1200);
-        } else {
-            badge.classList.remove("active");
-            badge.style.display = "none";
-        }
-
-        // ✅ Render waiting list table
-        if (data.waiting_list) {
-            const tbody = document.getElementById("wait-body");
-            tbody.innerHTML = ""; // clear table
-
-            data.waiting_list.forEach(item => {
-                let rowClass = "";
-                if (item.status === "standby" && item.is_priority === "no") {
-                    rowClass = "bg-[#FFCC00]/20";
-                } else if (item.status === "standby" && item.is_priority === "yes") {
-                    rowClass = "bg-[#ED7676]/20";
-                } else {
-                    rowClass = "bg-[#10934F]/20";
-                }
-
-                const row = `
-                    <tr class="${rowClass}">
-                        <td class="text-left px-4 py-2 text-sm">${item.ticket_number}</td>
-                        <td class="px-4 py-2 text-sm text-center">${item.user_type}</td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML("beforeend", row);
-            });
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Initializing real-time updates...');
+    
+    // Check if there's server-rendered current student data
+    const currentTicketElement = document.getElementById('current-ticket-number');
+    const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
+    
+    if (hasCurrentStudent) {
+        console.log('🎯 Server has current student data, keeping server-rendered content');
+        // Don't clear the queue container if we have server data
+    } else {
+        // Clear any server-rendered content and let WebSocket handle the updates
+        const queueItemsContainer = document.getElementById('queue-items-container');
+        if (queueItemsContainer) {
+            queueItemsContainer.innerHTML = '';
+            
+            // Add temporary loading indicator
+            const loadingItem = document.createElement('div');
+            loadingItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
+            loadingItem.innerHTML = `
+                <div class="w-full">
+                    <h1 class="text-lg mb-1 text-center text-gray-400">Loading...</h1>
+                    <div class="w-full border-b border-gray-400/50"></div>
+                </div>
+            `;
+            queueItemsContainer.appendChild(loadingItem);
         }
     }
-    // ✅ Handle survey updates
-    if (data.surveys) {
-        const tbody = document.getElementById("survey-body");
-        tbody.innerHTML = ""; // clear old rows
+    
+    // Start WebSocket for real-time updates
+    connectWebSocket();
+    
+    console.log('✅ Real-time updates initialized via WebSocket');
+});
 
-        if (data.surveys.length > 0) {
-            data.surveys.forEach(survey => {
-                console.log("Survey update received:", data.surveys);
-                const row = `
-                    <tr>
-                        <td class="px-4 py-2 border">${survey.code}</td>
-                        <td class="px-4 py-2 border">${survey.appointment}</td>
-                        <td class="px-4 py-2 border">${survey.status}</td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML("beforeend", row);
-            });
-        } else {
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (queueSocket && queueSocket.readyState === WebSocket.OPEN) {
+        queueSocket.close();
+    }
+});
+
+// Export functions for global access
+window.speakNumber = speakNumber;
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // WebSocket connection
+    const surveySocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/survey/updates/'
+    );
+
+    surveySocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.surveys) {
+            updateSurveyList(data.surveys);
+        }
+    };
+
+    surveySocket.onclose = function(e) {
+        console.error('Survey socket closed unexpectedly');
+    };
+
+    function updateSurveyList(surveys) {
+        const tbody = document.getElementById('csms-list-body');
+        
+        if (surveys.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="3" class="text-center py-2 text-gray-500">
-                        No survey records found
-                    </td>
+                    <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Survey Records Found</td>
                 </tr>
             `;
+            return;
         }
+
+        tbody.innerHTML = surveys.map(survey => `
+            <tr>
+                <td class="px-2 py-2">${survey.appointments || 'N/A'}</td>
+                <td class="px-2 py-2 text-center">${survey.code}</td>
+                <td class="px-2 py-2 text-center">
+                    ${survey.status === 'used' 
+                        ? '<span class="text-green-600">Done</span>' 
+                        : '<span class="text-yellow-600">Pending</span>'}
+                </td>
+            </tr>
+        `).join('');
     }
-};
-
-
-function updateNotification() {
-    if (pendingCount > 0) {
-        notificationCountEl.textContent = pendingCount;
-        notificationCountEl.classList.remove("hidden");
-    } else {
-        notificationCountEl.classList.add("hidden");
-    }
-}
-
-    setInterval(() => {
-    const bellSound = document.getElementById("bell-sound");
-    console.log(bellSound);
-    bellSound.load(); // reloads audio into memory
-}, 5 * 60 * 1000); // every 5 minutes
+});
 </script>
-
-{% endblock  %}
+{% endblock %}

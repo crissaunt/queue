@@ -1,0 +1,328 @@
+{% extends 'personel/base.html' %}
+
+{% block title %}
+Caraga State University Cabadbaran Campus(CSUCC)
+{% endblock %}
+
+{% block content %}
+
+<div class="w-full flex-1 flex flex-col gap-5 my-3">
+    <!-- upper -->
+    <div class="flex gap-5 flex-1">
+        <!-- serving -->
+        <div class="flex-1 bg-white flex gap-2">
+            <!-- current serving -->
+            <div class="flex-1 border border-gray-400 px-5 pt-2 pb-8">
+                <h1 class="inria-sans-bold">Current Serving</h1>
+                <!-- number -->
+                <div class="flex-1 flex justify-center">
+                    <div class="border-b-2">
+                        <h1 class="text-9xl medula-one-regular text-[#10934F]">G-008</h1>
+                    </div>
+                </div>
+                <!-- information -->
+                <div class="flex-1 flex justify-between items-end my-5 mx-5">
+                    <div>
+                        <p class="text-gray-600">Name: <strong class="text-black text-xl">Juan Dela Cruz</strong></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Course: <strong class="text-black text-sm">BSInfoTech</strong></p>
+                        <p class="text-gray-600">Id: <strong class="text-black text-sm">2022-0945</strong></p>
+                    </div>
+                </div>
+
+                <!-- request -->
+                <div class="w-full mt-2">
+                    <div class="bg-gray-200 w-full py-2">
+                        <h1 class="text-2xl text-center inria-sans-bold">Id Printing</h1>
+                    </div>
+                    <p class="w-full text-center text-sm">Request Type</p>
+                </div>
+
+                <!-- button -->
+                <div class="flex-1 flex justify-between gap-2 mt-5">
+                    <button class="flex-1 bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2">Skip</button>
+                    <button class="flex-1 bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white">Done</button>
+                </div>
+            </div>
+            <!-- next Q -->
+            <div class="w-[140px] flex items-center gap-3 pt-2 pb-5 px-5 flex-col border bg-[#10420C] text-white">
+                <div class="w-full">
+                    <h1 class="text-lg mb-1.5 text-center text-gray-400">Next</h1>
+                    <div class="w-full border-b-1 border-gray-300"></div>
+                </div>
+                <div class="text-2xl w-full medula-one-regular px-5 mt-2">
+                    <div class="w-full">
+                        <h1 class="text-xl mb-1.5 text-center text-[#FFCC00]">G-009</h1>
+                        <div class="w-full border-b-1 border-gray-300"></div>
+                    </div>
+                </div>
+                <div class="text-2xl w-full medula-one-regular px-5 mt-2">
+                    <div class="w-full">
+                        <h1 class="text-xl mb-1.5 text-center">G-009</h1>
+                        <div class="w-full border-b-1 border-gray-300"></div>
+                    </div>
+                </div>
+                <div class="text-2xl w-full medula-one-regular px-5 mt-2">
+                    <div class="w-full">
+                        <h1 class="text-xl mb-1.5 text-center">G-009</h1>
+                        <div class="w-full border-b-1 border-gray-300"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- priority -->
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#ED7676]">
+                <h1 class="font-semibold text-white">PRIORITY QUEUE'S</h1>
+                <!-- Pagination controls for priority queue -->
+                <div class="flex items-center space-x-2">
+                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="priority-page-info" class="text-white text-sm">Page 1 of 1</span>
+                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 py-2 px-7">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
+                        <tr>
+                            <th class="px-2 py-1">Full Name</th>
+                            <th class="px-2 py-1">Number</th>
+                            <th class="px-2 py-1">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priority-queue-body">
+                        <!-- Priority queue data will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- lower -->
+    <div class="flex gap-5 flex-1">
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-black">
+                <h1 class="font-semibold text-white">CSMS List</h1>
+                <!-- Pagination controls for CSMS list -->
+                <div class="flex items-center space-x-2">
+                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="csms-page-info" class="text-white text-sm">Page 1 of 1</span>
+                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 py-2 px-7">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
+                        <tr>
+                            <th class="px-2 py-1">Full Name</th>
+                            <th class="px-2 py-1">Number</th>
+                            <th class="px-2 py-1">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="csms-list-body">
+                        <!-- CSMS list data will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#FFCC00]">
+                <h1 class="font-semibold">SKIPPED LIST</h1>
+                <!-- Pagination controls for skipped list -->
+                <div class="flex items-center space-x-2">
+                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt; Prev
+                    </button>
+                    <span id="skipped-page-info" class="text-sm">Page 1 of 1</span>
+                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Next &gt;
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 py-2 px-7">
+                <table class="w-full table-auto">
+                    <thead class="border-b border-gray-300">
+                        <tr>
+                            <th class="px-2 py-1">Full Name</th>
+                            <th class="px-2 py-1">Number</th>
+                            <th class="px-2 py-1">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skipped-list-body">
+                        <!-- Skipped list data will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sample data - in a real application, this would come from your backend
+const priorityQueueData = [
+    { name: "Juan Dela Cruz", number: "S-003" },
+    { name: "Maria Santos", number: "S-004" },
+    { name: "Pedro Reyes", number: "S-005" },
+    { name: "Ana Lopez", number: "S-006" },
+    { name: "Carlos Garcia", number: "S-007" },
+    { name: "Elena Torres", number: "S-008" },
+    { name: "Miguel Cruz", number: "S-009" },
+    { name: "Sofia Ramirez", number: "S-010" },
+    { name: "Jose Hernandez", number: "S-011" },
+    { name: "Isabel Mendoza", number: "S-012" },
+    { name: "Roberto Castro", number: "S-013" },
+    { name: "Carmen Vega", number: "S-014" },
+    { name: "Fernando Ruiz", number: "S-015" },
+    { name: "Patricia Morales", number: "S-016" }
+];
+
+const csmsListData = [
+    { name: "Juan Dela Cruz", number: "S-003", status: "Done" },
+    { name: "Maria Santos", number: "S-004", status: "Done" },
+    { name: "Pedro Reyes", number: "S-005", status: "Done" },
+    { name: "Ana Lopez", number: "S-006", status: "Done" },
+    { name: "Carlos Garcia", number: "S-007", status: "Done" },
+    { name: "Elena Torres", number: "S-008", status: "Done" },
+    { name: "Miguel Cruz", number: "S-009", status: "Done" },
+    { name: "Sofia Ramirez", number: "S-010", status: "Done" },
+    { name: "Jose Hernandez", number: "S-011", status: "Done" },
+    { name: "Isabel Mendoza", number: "S-012", status: "Done" },
+    { name: "Roberto Castro", number: "S-013", status: "Done" },
+    { name: "Carmen Vega", number: "S-014", status: "Done" },
+    { name: "Fernando Ruiz", number: "S-015", status: "Done" },
+    { name: "Patricia Morales", number: "S-016", status: "Done" }
+];
+
+const skippedListData = [
+    { name: "Juan Dela Cruz", number: "S-003" },
+    { name: "Maria Santos", number: "S-004" },
+    { name: "Pedro Reyes", number: "S-005" },
+    { name: "Ana Lopez", number: "S-006" },
+    { name: "Carlos Garcia", number: "S-007" },
+    { name: "Elena Torres", number: "S-008" },
+    { name: "Miguel Cruz", number: "S-009" },
+    { name: "Sofia Ramirez", number: "S-010" },
+    { name: "Jose Hernandez", number: "S-011" },
+    { name: "Isabel Mendoza", number: "S-012" },
+    { name: "Roberto Castro", number: "S-013" },
+    { name: "Carmen Vega", number: "S-014" },
+    { name: "Fernando Ruiz", number: "S-015" },
+    { name: "Patricia Morales", number: "S-016" },
+    { name: "Ricardo Ortega", number: "S-017" },
+    { name: "Laura Jimenez", number: "S-018" }
+];
+
+// Pagination configuration
+const ITEMS_PER_PAGE = 7;
+
+// Initialize pagination state
+let currentPriorityPage = 1;
+let currentCsmsPage = 1;
+let currentSkippedPage = 1;
+
+// Function to render table data with pagination
+function renderTableData(data, containerId, currentPage, type) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, data.length);
+    const pageData = data.slice(startIndex, endIndex);
+    
+    pageData.forEach(item => {
+        const row = document.createElement('tr');
+        
+        if (type === 'priority' || type === 'skipped') {
+            row.innerHTML = `
+                <td class="px-2 py-1">${item.name}</td>
+                <td class="px-2 text-center py-1">${item.number}</td>
+                <td class="px-2 text-center py-1">
+                    <button class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer w-full px-3 py-1">Next</button>
+                </td>
+            `;
+        } else if (type === 'csms') {
+            row.innerHTML = `
+                <td class="px-2 py-1">${item.name}</td>
+                <td class="px-2 text-center py-1">${item.number}</td>
+                <td class="px-2 text-center py-1">${item.status}</td>
+            `;
+        }
+        
+        container.appendChild(row);
+    });
+    
+    // Update pagination info
+    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    document.getElementById(`${type}-page-info`).textContent = `Page ${currentPage} of ${totalPages}`;
+    
+    // Update button states
+    document.getElementById(`${type}-prev`).disabled = currentPage === 1;
+    document.getElementById(`${type}-next`).disabled = currentPage === totalPages;
+}
+
+// Initialize the tables
+renderTableData(priorityQueueData, 'priority-queue-body', currentPriorityPage, 'priority');
+renderTableData(csmsListData, 'csms-list-body', currentCsmsPage, 'csms');
+renderTableData(skippedListData, 'skipped-list-body', currentSkippedPage, 'skipped');
+
+// Event listeners for pagination buttons
+document.getElementById('priority-prev').addEventListener('click', () => {
+    if (currentPriorityPage > 1) {
+        currentPriorityPage--;
+        renderTableData(priorityQueueData, 'priority-queue-body', currentPriorityPage, 'priority');
+    }
+});
+
+document.getElementById('priority-next').addEventListener('click', () => {
+    const totalPages = Math.ceil(priorityQueueData.length / ITEMS_PER_PAGE);
+    if (currentPriorityPage < totalPages) {
+        currentPriorityPage++;
+        renderTableData(priorityQueueData, 'priority-queue-body', currentPriorityPage, 'priority');
+    }
+});
+
+document.getElementById('csms-prev').addEventListener('click', () => {
+    if (currentCsmsPage > 1) {
+        currentCsmsPage--;
+        renderTableData(csmsListData, 'csms-list-body', currentCsmsPage, 'csms');
+    }
+});
+
+document.getElementById('csms-next').addEventListener('click', () => {
+    const totalPages = Math.ceil(csmsListData.length / ITEMS_PER_PAGE);
+    if (currentCsmsPage < totalPages) {
+        currentCsmsPage++;
+        renderTableData(csmsListData, 'csms-list-body', currentCsmsPage, 'csms');
+    }
+});
+
+document.getElementById('skipped-prev').addEventListener('click', () => {
+    if (currentSkippedPage > 1) {
+        currentSkippedPage--;
+        renderTableData(skippedListData, 'skipped-list-body', currentSkippedPage, 'skipped');
+    }
+});
+
+document.getElementById('skipped-next').addEventListener('click', () => {
+    const totalPages = Math.ceil(skippedListData.length / ITEMS_PER_PAGE);
+    if (currentSkippedPage < totalPages) {
+        currentSkippedPage++;
+        renderTableData(skippedListData, 'skipped-list-body', currentSkippedPage, 'skipped');
+    }
+});
+</script>
+
+{% endblock %}

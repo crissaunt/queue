@@ -8,11 +8,29 @@
     <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Iceland&family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Monoton&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=La+Belle+Aurore&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Racing+Sans+One&family=Roboto:ital,wght@0,100..900;1,100..900&family=Sora:wght@100..800&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+        
     <link href="{% static 'src/output.css' %}" rel="stylesheet">
     <title>{% block title %} {% endblock %}</title>
 </head>
 <style>
+    .medula-one-regular {
+    font-family: "Medula One", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    }
+    .inria-sans-regular {
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+    .inria-sans-bold {
+  font-family: "Inria Sans", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
     .custom-bg {
                 background-image: url("{% static 'images/background.png' %}");
                 background-size: cover;        
@@ -24,13 +42,13 @@
 </style>
 <body class="inria-sans-regular h-screen custom-bg flex flex-col" >
 
-    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-t-[40px] border-[#10934F]">
-        <div class="gap-4 mt-5 max-w-screen-2xl w-full mx-auto ">
+    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-b-[10px] border-[#10420C]">
+        <div class="gap-4 my-2 max-w-screen-2xl w-full mx-auto flex items-center ">
             <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
         </div>
     </header>
 
-    <main class="max-w-[1500px] mx-auto flex-1 px-4 mb-5">
+    <main class="max-w-[1500px] w-full mx-auto flex-1 mb-5 ">
         {% block content %}
         {% endblock %}
     </main>

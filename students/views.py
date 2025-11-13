@@ -1,3 +1,4 @@
+# students/views.py
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
@@ -10,73 +11,45 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import random, string
 
-
-
-now_ph = localtime(timezone.now())
-today = now_ph.date() 
-
-from django.utils.timezone import localtime
-
-from django.db.models import Q
-
 def broadcast_queue_update():
+    """Broadcast queue updates to all connected clients with CONSISTENT date handling"""
     now_ph = localtime(timezone.now())
     today = now_ph.date()
 
-    non_priority_count = Appointments.objects.filter(
-        Q(status="pending") | Q(status="skip"),
-        is_priority="no",
-        datetime__date=today
-    ).count()
-
-    priority_count = Appointments.objects.filter(
-        Q(status="pending") | Q(status="skip"),
-        is_priority="yes",
-        datetime__date=today
-    ).count()
-
-    # ✅ Get waiting list
-    waiting_list = list(
-        Appointments.objects.filter(
-            status="pending",
-            is_priority="no",
-            datetime__date=today
-        )
-        .order_by("datetime")
-        .values("ticket_number", "user_type", "status", "is_priority")[:5]  # 👈 limit 5
-    )
-
-
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "queue",
-        {
-            "type": "send_update",
-            "data": {
-                "action": "queue_update",
-                "stats": {
-                    "non_priority_count": non_priority_count,
-                    "priority_count": priority_count,
-                    "display_queues": len(waiting_list),
-                },
-                "waiting_list": waiting_list,  # ✅ send queue data
+    try:
+        channel_layer = get_channel_layer()
+        
+        print("🔄 Broadcasting queue update to ALL groups...")
+        
+        # Send to queue_updates group (for personnel consumer)
+        async_to_sync(channel_layer.group_send)(
+            "queue_updates",
+            {
+                "type": "queue_update",  # This will trigger queue_update method in personnel consumer
             },
-        },
-    )
+        )
+        
+        # Send to students_live_updates group (for student consumer AND personnel consumer)
+        async_to_sync(channel_layer.group_send)(
+            "students_live_updates",
+            {
+                "type": "chat_message",  # This will trigger chat_message method in both consumers
+                "message": "student_submission"  # More specific message type
+            },
+        )
+        
+        print("✅ Student submission broadcasted to BOTH WebSocket groups")
 
-
-
+    except Exception as e:
+        print(f"❌ Error broadcasting update: {e}")
 
 def generate_unique_survey_code():
- 
     while True:
         letters = ''.join(random.choices(string.ascii_uppercase, k=2))
         number = random.randint(100, 9999)  
         code = f"{letters}-{number}"
         if not Code.objects.filter(code=code).exists():
             return code    
-
-
 
 def generate_sequential_ticket(is_priority: str) -> str:
     """ticket number that resets daily
@@ -107,29 +80,20 @@ def generate_sequential_ticket(is_priority: str) -> str:
 
     return f"{prefix}-{last_num + 1:03d}"
 
-
-
 def home(request):
     courses = Courses.objects.all()
     requests = RequestType.objects.all()
-  # last 10
 
     template = loader.get_template('students/home.html')
     context = {
         'courses': courses,
         'requests': requests,
-    
     }
     return HttpResponse(template.render(context, request))
 
-
-
-
 def student_submit(request):
     if request.method == "POST":
-    
         first_name = request.POST.get("firstName")
-        # middle_name = request.POST.get("middleName")
         last_name = request.POST.get("lastName")
         course_id = request.POST.get("course")
         request_id = request.POST.get("request")
@@ -148,7 +112,6 @@ def student_submit(request):
 
         student = Appointments.objects.create(
             firstName=first_name,
-            # middleName=middle_name,
             lastName=last_name,
             courses=course,
             requestType=request_type,
@@ -161,21 +124,20 @@ def student_submit(request):
         survey_code = generate_unique_survey_code()
 
         survey = Code.objects.create(
-                                appointments = student,
-                                code=survey_code,
-                                
-                            )
+            appointments = student,
+            code=survey_code,
+        )
+        
+        print(f"🎓 New student created: {student.ticket_number} (Priority: {is_priority})")
         broadcast_queue_update()
 
         return JsonResponse({"success": True, "ticket": student.ticket_number, "survey_code": survey.code })
 
     return redirect("home")
 
-
 def guest_submit(request):
     if request.method == "POST":
         firstName = request.POST.get("firstName")
-        # middleName = request.POST.get("middleName", "")
         lastName = request.POST.get("lastName")
         requestType_id = request.POST.get("request")
         is_priority = "yes" if request.POST.get("is_priority") else "no"
@@ -190,7 +152,6 @@ def guest_submit(request):
 
         guest = Appointments.objects.create(
             firstName=firstName,
-            # middleName=middleName,
             lastName=lastName,
             user_type="guest",
             is_priority=is_priority,
@@ -202,23 +163,16 @@ def guest_submit(request):
         survey_code = generate_unique_survey_code()
 
         survey = Code.objects.create(
-                                appointments = guest,         
-                                code=survey_code,
-                                
-                            )
+            appointments = guest,         
+            code=survey_code,
+        )
+        
+        print(f"🎓 New guest created: {guest.ticket_number} (Priority: {is_priority})")
         broadcast_queue_update()
-
-
 
         return JsonResponse({"success": True, "ticket": guest.ticket_number, "survey_code": survey.code })
 
     return JsonResponse({"success": False, "error": "Invalid request"})
-
-
-    
-
-
-
 
 def form(request):
     courses = Courses.objects.all()

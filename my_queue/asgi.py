@@ -1,3 +1,4 @@
+# my_queue/asgi.py
 """
 ASGI config for my_queue project.
 
@@ -7,15 +8,6 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 """
 
-# import os
-
-# from django.core.asgi import get_asgi_application
-
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_queue.settings')
-
-# application = get_asgi_application()
-
-
 import os
 
 from channels.auth import AuthMiddlewareStack
@@ -23,12 +15,15 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+# FIX: Change 'mysite.settings' to 'my_queue.settings'
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "my_queue.settings")
+
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-from .routing import websocket_urlpatterns
+# Import routing after Django setup
+from my_queue.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter(
     {
