@@ -105,16 +105,24 @@ WSGI_APPLICATION = 'my_queue.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'my_queue',
+#         'USER': 'postgres',        
+#         'PASSWORD': 'postgres',     
+#         'HOST': 'localhost',      
+#         'PORT': '5432',        
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'my_queue',
-        'USER': 'postgres',        
-        'PASSWORD': 'postgres',     
-        'HOST': 'localhost',      
-        'PORT': '5432',        
+        'ENGINE': 'django.db.backends.sqlite3',  # Use SQLite instead of PostgreSQL
+        'NAME': BASE_DIR / 'db.sqlite3',  # The database file will be located in the project root directory
     }
 }
+
 
 
 # Password validation

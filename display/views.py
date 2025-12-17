@@ -47,12 +47,12 @@ def start_scheduler():
     scheduler.start()
 
 # Create your views here.
-def home(request):
-    template = loader.get_template('display/home.html')
-    context = {
+# def home(request):
+#     template = loader.get_template('display/home.html')
+#     context = {
         
-    }
-    return HttpResponse(template.render(context, request))
+#     }
+#     return HttpResponse(template.render(context, request))
 
 
 def current_serving(request):

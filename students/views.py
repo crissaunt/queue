@@ -145,10 +145,14 @@ def guest_submit(request):
         requestType_id = request.POST.get("request")
         is_priority = "yes" if request.POST.get("is_priority") else "no"
 
-        try:
-            requestType = RequestType.objects.get(id=requestType_id)
-        except RequestType.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Invalid request type"})
+        # Handle case when 'requestType_id' is 'other'
+        if requestType_id == "other":
+            requestType = None  # Set requestType to None when 'other' is selected
+        else:
+            try:
+                requestType = RequestType.objects.get(id=requestType_id)
+            except RequestType.DoesNotExist:
+                return JsonResponse({"success": False, "error": "Invalid request type"})
 
         # Generate ticket
         new_ticket_number = generate_sequential_ticket(is_priority)
@@ -166,7 +170,7 @@ def guest_submit(request):
         survey_code = generate_unique_survey_code()
 
         survey = Code.objects.create(
-            appointments = guest,         
+            appointments = guest,
             code=survey_code,
         )
         
@@ -176,6 +180,7 @@ def guest_submit(request):
         return JsonResponse({"success": True, "ticket": guest.ticket_number, "survey_code": survey.code })
 
     return JsonResponse({"success": False, "error": "Invalid request"})
+
 
 def form(request):
     courses = Courses.objects.all()

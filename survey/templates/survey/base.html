@@ -10,7 +10,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=La+Belle+Aurore&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Racing+Sans+One&family=Roboto:ital,wght@0,100..900;1,100..900&family=Sora:wght@100..800&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
-        
+        <script>
+        // Disable right-click (context menu)
+        document.addEventListener("contextmenu", function(event) {
+            event.preventDefault(); // This will disable the right-click menu
+        });
+
+        // Disable F12 key (Developer tools)
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "F12" || event.key === "f12") {
+                event.preventDefault(); // This will disable F12 key
+            }
+        });
+    </script>
     <style>
         .odor-mean-chey-regular {
             font-family: "Odor Mean Chey", serif;
@@ -273,24 +285,23 @@
         }
     </style>
 </head>
-<body class="custom-bg inria-sans-regular flex flex-col min-h-screen">
-    <header class="w-full bg-transparent p-4 md:p-6">
-        <div class="flex items-center justify-start max-w-[1312px] mx-auto px-4 md:px-6 lg:px-8">
+<body class="custom-bg inria-sans-regular  flex flex-col min-h-screen">
+    <header class="flex w-full mx-auto bg-transparent p-4   md:p-2 border-t-[20px]  border-[#10420C]">
+        <div class="gap-4  max-w-screen-2xl w-full mx-auto px-4 md:px-0">
             <img src="{% static 'images/header-logo.svg' %}" 
-                 alt="Caraga State University Cabadbaran Campus Logo" 
-                 class="h-12 md:h-16 pl-4 md:pl-8 w-auto"
-                 loading="lazy">
+                 alt="CSUCC Logo" 
+                 class="pl-4 md:pl-9 h-10 md:h-12 w-auto">
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col w-full max-w-[1312px] mx-auto mb-15 px-4 md:px-6 lg:px-8">
+    <main class="flex-1 flex flex-col items-center  w-full max-w-[1312px] mx-auto ">
         {% block content %}
         {% endblock %}
     </main>
 
     <footer class="bg-[#10420C] w-full min-h-[50px] flex items-center justify-center text-white px-4 md:px-6 py-2 md:py-3">
         <p class="text-sm md:text-base text-center px-2">
-            &copy; {{ now|date:"Y" }} Caraga State University Cabadbaran Campus
+            &copy; Caraga State University Cabadbaran Campus
         </p>
     </footer>
 </body>

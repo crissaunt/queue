@@ -99,7 +99,7 @@ def get_next_in_line(today, next_should_be_priority):
     
     print(f"🔍 DEBUG get_next_in_line: today={today}, next_should_be_priority={next_should_be_priority}")
     
-    # 1. First check for standby students (highest priority)
+    # 1. First check for standby students (highest priority) - BOTH priority and non-priority
     standby_student = Appointments.objects.filter(
         status="standby",
         datetime__date=today
@@ -148,12 +148,13 @@ def get_next_in_line(today, next_should_be_priority):
 def get_display_queue(today, limit=8):
     """
     Build the display queue with:
-    - All standby students
-    - Non-priority pending students (is_priority="no")
-    - EXCLUDE priority pending students (is_priority="yes")
+    - ALL standby students (both priority and non-priority)
+    - ONLY non-priority pending students
+    - Priority pending students NEVER appear in Next Queue
     """
     queue = []
     
+    # 1. First get ALL standby students (highest priority)
     standby_students = list(
         Appointments.objects.filter(
             status="standby",
@@ -165,7 +166,9 @@ def get_display_queue(today, limit=8):
     if len(queue) >= limit:
         return queue[:limit]
     
-    non_priority_students = list(
+    # 2. Then get ONLY non-priority pending students
+    # Priority pending students are EXCLUDED from Next Queue
+    non_priority_pending_students = list(
         Appointments.objects.filter(
             status="pending",
             is_priority="no",
@@ -173,19 +176,19 @@ def get_display_queue(today, limit=8):
         ).order_by("datetime")
     )
     
-    for student in non_priority_students:
+    for student in non_priority_pending_students:
         if len(queue) >= limit:
             break
         queue.append(student)
     
     return queue[:limit]
 
+
 def get_full_queue(today):
     return Appointments.objects.filter(
         datetime__date=today
     ).exclude(status__in=["done", "cancel"]) \
      .order_by("datetime")
-
 
 
 def home(request):
@@ -210,7 +213,7 @@ def home(request):
         appt.status = "cancel"
         appt.save()
 
-    # DEBUG: Check current student with same query as consumer
+    # DEBUG: Check current student
     get_current_number = Appointments.objects.filter(
         status="current",
         datetime__date=today 
@@ -218,20 +221,10 @@ def home(request):
     
     print(f"🔍 PERSONNEL VIEW - Current student query result: {get_current_number}")
 
-    # Calculate served count for priority logic
-    served_today = Appointments.objects.filter(
-        status__in=["done", "current"],
-        datetime__date=today
-    ).count()
-
-    next_should_be_priority = (served_today % 3) == 2
-
     if request.method == "POST":
         if 'start' in request.POST:
             print(f"🔍 PERSONNEL VIEW: Start Serving button clicked")
-            print(f"🔍 PERSONNEL VIEW: Served today: {served_today}, Next should be priority: {next_should_be_priority}")
 
-            
             if not is_queue_running():
                 print("🔍 PERSONNEL VIEW: Queue is stopped, auto-starting queue...")
                 qc = QueueControl.get_queue_control()
@@ -241,13 +234,13 @@ def home(request):
                 messages.info(request, "Queue has been automatically started.")
 
             # Only move to next if queue is running
-            next_student = get_next_in_line(today, next_should_be_priority)
+            next_student = get_next_in_line(today, False)  # No rotation needed
             print(f"🔍 PERSONNEL VIEW: Next student to start: {next_student}")
             
             if next_student:
                 next_student.status = "current"
                 next_student.save()
-                print(f"🔍 PERSONNEL VIEW: Started serving: {next_student.ticket_number} (Priority: {next_student.is_priority})")
+                print(f"🔍 PERSONNEL VIEW: Started serving: {next_student.ticket_number}")
                 broadcast_update()
                 broadcast_queue_update()
             else:
@@ -299,14 +292,8 @@ def home(request):
             status="skip",
             datetime__date=today 
         ).order_by("datetime"),
-        'next_in_line': get_next_in_line(today, next_should_be_priority),
+        'next_in_line': get_next_in_line(today, False),  # No rotation
         'display_queues': display_queues,
-        'next_should_be_priority': next_should_be_priority,
-        'get_first_non_priority_students': Appointments.objects.filter(
-            is_priority="no",
-            status="pending",
-            datetime__date=today 
-        ).order_by("datetime").first(),
         'display_survey': display_survey,
         'full_queue': get_full_queue(today),
     }
@@ -385,24 +372,19 @@ def done_current_number(request):
 
             today = timezone.now().date()
 
-            served_today = Appointments.objects.filter(
-                status__in=["done", "current"],
-                datetime__date=today
-            ).count()
-
-            next_should_be_priority = (served_today % 3) == 2
-
-            next_student = get_next_in_line(today, next_should_be_priority)
-            
-            if next_student:
-                next_student.status = "current"
-                next_student.save()
-                broadcast_update()
-                broadcast_queue_update()
-                print(f"Set next student as current: {next_student.ticket_number} (Priority: {next_student.is_priority})")
-            else:
-                print("No next student found")
+            # ALWAYS get next student if queue is running
+            if is_queue_running():
+                next_student = get_next_in_line(today, False)  # No rotation
                 
+                if next_student:
+                    next_student.status = "current"
+                    next_student.save()
+                    broadcast_update()
+                    broadcast_queue_update()
+                    print(f"Set next student as current: {next_student.ticket_number}")
+                else:
+                    print("No next student found")
+                    
         return redirect('personel')
     return redirect('personel')
 
@@ -461,11 +443,39 @@ def priority_standby(request):
             student = get_object_or_404(Appointments, id=ticket_id)
 
             if action == "standby":
-                student.status = "standby"
-                student.save()
-                broadcast_update()
-                broadcast_queue_update()
-                messages.info(request, f"Priority student {student.ticket_number} moved to standby.")
+                # Check if student is already standby
+                if student.status == "standby":
+                    messages.info(request, f"Student {student.ticket_number} is already on standby.")
+                else:
+                    student.status = "standby"
+                    student.save()
+                    broadcast_update()
+                    broadcast_queue_update()
+                    messages.success(request, f"Priority student {student.ticket_number} moved to standby.")
+                    
+                    # If queue is running and no current student, auto-start serving
+                    if is_queue_running():
+                        today = timezone.now().date()
+                        current_student = Appointments.objects.filter(
+                            status="current",
+                            datetime__date=today
+                        ).first()
+                        
+                        if not current_student:
+                            # Calculate served count
+                            served_today = Appointments.objects.filter(
+                                status__in=["done", "current"],
+                                datetime__date=today
+                            ).count()
+                            next_should_be_priority = (served_today % 3) == 2
+                            
+                            next_student = get_next_in_line(today, next_should_be_priority)
+                            if next_student:
+                                next_student.status = "current"
+                                next_student.save()
+                                broadcast_update()
+                                broadcast_queue_update()
+                                messages.info(request, f"Auto-started serving next student: {next_student.ticket_number}")
 
         except (ValueError, TypeError):
             messages.error(request, "Invalid student ID format.")

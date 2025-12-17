@@ -78,11 +78,11 @@ background-color: #f9fafb;
 
 /* Confirmation Modal Styles */
 .confirmation-modal {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.1s ease-out;
 }
 
 .confirmation-modal-content {
-    animation: slideIn 0.3s ease-out;
+    animation: slideIn 0.1s ease-out;
 }
 
 @keyframes fadeIn {
@@ -114,7 +114,7 @@ background-color: #f9fafb;
     z-index: 1000;
     text-align: center;
     display: none;
-    animation: fadeInScale 0.5s ease-out;
+    animation: fadeInScale 0.1s ease-out;
 }
 
 .action-indication.show {
@@ -155,102 +155,134 @@ background-color: #f9fafb;
     font-size: 14px;
     color: #666;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-container {
+        width: 90% !important;
+        margin: 0 16px;
+    }
+    
+    #current-ticket-number {
+        font-size: 4rem !important;
+    }
+    
+    .queue-item h1 {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    #current-ticket-number {
+        font-size: 3rem !important;
+    }
+    
+    .current-request {
+        font-size: 1rem !important;
+    }
+}
+
+/* Responsive table styles */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 </style>
 
 {% load static %}
 
-<div class="flex mt-4 justify-between items-center mb-3">
+<div class="flex flex-col md:flex-row mt-4 justify-between items-start md:items-center mb-3 gap-3 md:gap-0">
     <div class="flex gap-2 md:gap-10 items-center">
-        <a href="#" class="text-xs border-b-3 border-[#10420C]">Dashboard</a>
+        <a href="{% url 'personel' %}" class="text-xs border-b-3 border-[#10420C]">Dashboard</a>
         
         <!-- Bell container -->
         <div class="relative">  
             <div class="relative">
-                <i id="bell-icon" class="fa fa-bell text-2xl cursor-pointer text-gray-700"></i>
+                <i id="bell-icon" class="fa fa-bell text-xl md:text-2xl cursor-pointer text-gray-700"></i>
                 <span id="notification-badge"
-                    class="absolute -top-2 -right-2 bg-red-600 text-white text-[11px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
+                    class="absolute -top-3 md:-top-4 -left-10 md:-left-12 bg-red-600 text-white text-[10px] md:text-[11px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
                 </span>
             </div>
         </div>
         
         <!-- Test button for bell sound -->
-        <button onclick="testBellSound()" class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
+        <!-- <button onclick="testBellSound()" class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
             Test Bell
-        </button>
+        </button> -->
     </div>
 
-    <div class="flex gap-4 items-center">
+    <div class="flex gap-2 md:gap-4 items-center">
         <button type="button" onclick="showLogoutConfirmation()" 
-                class="cursor-pointer hover:text-red-500 text-xs">
+                class="cursor-pointer hover:text-red-500 text-xs px-2 py-1">
             Logout
         </button>
 
-        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-xs text-white px-4 py-1 "
+        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-xs text-white px-3 md:px-4 py-1"
                 type="button"
                 onclick="document.getElementById('endAllModal').classList.remove('hidden')">
             END ALL
         </button>
 
         <!-- Confirmation Modal -->
-        <div id="endAllModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 confirmation-modal">
-            <div class="bg-white shadow-lg p-6 w-full max-w-md mx-4  confirmation-modal-content">
+        <div id="endAllModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 confirmation-modal px-4">
+            <div class="bg-white shadow-lg p-4 md:p-6 w-full max-w-md confirmation-modal-content">
                 <h2 class="text-lg font-semibold text-gray-800">Confirm Action</h2>
-                <p class="mt-2 text-gray-600">Are you sure you want to <b>cancel all</b> pending and skipped appointments?</p>
+                <p class="mt-2 text-gray-600 text-sm md:text-base">Are you sure you want to <b>cancel all</b> pending and skipped appointments?</p>
                 
                 <div class="mt-6 flex justify-end gap-3">
                     <button 
-                        class="px-4 py-2 text-xs bg-gray-300 hover:bg-gray-400 cursor-pointer "
+                        class="px-3 md:px-4 py-2 text-xs bg-gray-300 hover:bg-gray-400 cursor-pointer"
                         onclick="document.getElementById('endAllModal').classList.add('hidden')">
                         No, Keep
                     </button>
                     <form method="post" action="{% url 'end_all_appointments' %}">
                         {% csrf_token %}
                         <button type="submit" 
-                            class="px-4 py-2 text-xs bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80 ">
+                            class="px-3 md:px-4 py-2 text-xs bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80">
                             Yes, End All
                         </button>
                     </form>
                 </div>
             </div>
-</div>
+        </div>
     </div>
 </div>
 
 <!-- Audio status indicator -->
-<div class="flex items-center gap-4 mb-2">
+<!-- <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-2">
     <div class="flex items-center gap-2">
         <div id="queue-status-indicator" class="w-3 h-3 rounded-full {% if queue_state %}bg-green-500 animate-pulse{% else %}bg-red-500{% endif %}"></div>
         <span id="queue-status-text" class="text-xs {% if queue_state %}text-green-600{% else %}text-red-600{% endif %} font-medium">
             {% if get_current_number %}
                 Queue: {% if queue_state %}RUNNING{% else %}STOPPED{% endif %}
             {% else %}
-                NO CURRENT
+                NO Queue
             {% endif %}
         </span>
     </div>
     
-    <div id="audio-status" class="flex items-center gap-2 hidden">
+ <div id="audio-status" class="flex items-center gap-2 hidden">
         <div id="audio-status-indicator" class="w-3 h-3 rounded-full bg-gray-400"></div>
         <span class="text-xs text-gray-600 font-medium">Audio: Locked</span>
-    </div>
+    </div> -->
 </div>
 
 <!-- Logout Confirmation Modal -->
-<div id="logoutConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white  p-6 w-96 confirmation-modal-content">
+<div id="logoutConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md md:w-96 confirmation-modal-content">
         <div class="text-center">
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Confirm Logout</h2>
-            <p class="text-gray-600 mb-6">Are you sure you want to logout from the system?</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Confirm Logout</h2>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">Are you sure you want to logout from the system?</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('logoutConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400  cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form action="{% url 'auth_logout' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" 
-                        class="px-5 py-2 bg-red-700 hover:bg-red-900 text-white  cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-red-700 hover:bg-red-900 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Logout
                 </button>
             </form>
@@ -271,32 +303,32 @@ background-color: #f9fafb;
     <div class="indication-subtext">Announcing student number...</div>
 </div>
 
-<div class="w-full flex-1 flex flex-col gap-5 my-3">
+<div class="w-full flex-1 flex flex-col gap-3 md:gap-5 my-3">
     <!-- upper section -->
-    <div class="flex gap-5 flex-1">
+    <div class="flex flex-col lg:flex-row gap-3 md:gap-5 flex-1">
         <!-- serving section -->
-        <div class="flex-1 bg-white flex gap-2 shadow-md ">
+        <div class="flex-1 bg-white flex flex-col md:flex-row gap-2 shadow-md">
             <!-- current serving -->
-            <div class="flex-1 border border-gray-400 py-2">
-                <div class="w-full px-5">
-                    <h1 class="inria-sans-regular">CURRENT SERVING</h1>
+            <div class="flex-1 border border-gray-400 py-2 md:py-4">
+                <div class="w-full px-3 md:px-5">
+                    <h1 class="inria-sans-regular text-sm md:text-base">CURRENT SERVING</h1>
                 </div>
                 
                 <!-- number -->
-                <div class="flex-1 flex justify-center">
+                <div class="flex-1 flex justify-center my-2 md:my-4">
                     <div class="border-b-2 border-gray-300">
                         {% if get_current_number %}
-                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-[#10420C]">{{ get_current_number.ticket_number }}</h1>
+                            <h1 id="current-ticket-number" class="text-5xl sm:text-6xl md:text-8xl medula-one-regular text-[#10420C]">{{ get_current_number.ticket_number }}</h1>
                         {% else %}
-                            <h1 id="current-ticket-number" class="text-8xl text-gray-400">---</h1>
+                            <h1 id="current-ticket-number" class="text-5xl sm:text-6xl md:text-8xl text-gray-400">---</h1>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- request -->
-                <div class="w-full mt-2 px-5">
+                <div class="w-full mt-2 px-3 md:px-5">
                     <div class="bg-gray-200 inset-shadow-2xs w-full py-2">
-                        <h1 id="current-request" class="text-2xl text-center inria-sans-bold capitalize">
+                        <h1 id="current-request" class="text-lg md:text-2xl text-center inria-sans-bold capitalize px-2">
                             {% if get_current_number %}
                                 {% if get_current_number.requestType == None %}
                                     {{ get_current_number.custom_request }}
@@ -304,20 +336,20 @@ background-color: #f9fafb;
                                     {{ get_current_number.requestType }}
                                 {% endif %}
                             {% else %}
-                                No Request
+                                -----
                             {% endif %}
                         </h1>
                     </div>
-                    <p class="w-full text-center text-[11px] text-gray-600">Request Type</p>
+                    <p class="w-full text-center text-[10px] md:text-[11px] text-gray-600">Request Type</p>
                 </div>
                 
                 <!-- information -->
-                <div class="mx-5">
+                <div class="mx-3 md:mx-5 mt-3">
                     <table class="w-full text-left border-collapse">
                         <tbody class="">
                             <tr class="border-b">
-                                <td class="text-gray-600 text-[11px] font-medium">Name:</td>
-                                <td id="current-name" class="text-black font-semibold text-right">
+                                <td class="text-gray-600 text-[10px] md:text-[11px] font-medium py-1">Name:</td>
+                                <td id="current-name" class="text-black font-semibold text-right text-xs md:text-sm py-1">
                                     {% if get_current_number %}
                                         {{ get_current_number.firstName }} {{ get_current_number.middleName }} {{ get_current_number.lastName }}
                                     {% else %}
@@ -327,8 +359,8 @@ background-color: #f9fafb;
                             </tr>
 
                             <tr>
-                                <td class="text-gray-600 text-[11px] font-medium">Course:</td>
-                                <td id="current-course" class="text-black font-semibold text-right">
+                                <td class="text-gray-600 text-[10px] md:text-[11px] font-medium py-1">Course:</td>
+                                <td id="current-course" class="text-black font-semibold text-right text-xs md:text-sm py-1">
                                     {% if get_current_number %}
                                         {{ get_current_number.courses }}
                                     {% else %}
@@ -341,7 +373,7 @@ background-color: #f9fafb;
                 </div>
 
                 <!-- buttons -->
-                <div id="current-buttons-container" class="flex-1 flex justify-between gap-2 mt-5 px-5">
+                <div id="current-buttons-container" class="flex-1 flex justify-between gap-2 mt-4 md:mt-5 px-3 md:px-5">
                     {% if get_current_number %}
                    <button type="button" onclick="showSkipConfirmation('{{ get_current_number.id }}', '{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
                             class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-xs {% if not queue_state %}opacity-50 cursor-not-allowed{% endif %}"
@@ -375,10 +407,10 @@ background-color: #f9fafb;
                 </div>
 
                 <!-- call button and queue control -->
-                <div id="call-button-container" class="mt-3 px-5">
-                    <div class="flex gap-2">
+                <div id="call-button-container" class="mt-3 px-3 md:px-5">
+                    {% if get_current_number %}
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <!-- Call Number button (only when there's a current student) -->
-                        {% if get_current_number %}
                         <div class="flex-1">
                             <button type="button" onclick="showCallAction('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
                                 class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-xs {% if not queue_state %}opacity-50 cursor-not-allowed{% endif %}"
@@ -387,11 +419,8 @@ background-color: #f9fafb;
                                 Call Number
                             </button>
                         </div>
-                        {% else %}
-                        <div class="flex-1"></div>
-                        {% endif %}
                         
-                        <!-- Queue Control Button (ALWAYS shown) -->
+                        <!-- Queue Control Button (only when there's a current student) -->
                         <div class="flex-1">
                             {% if queue_state %}
                                 <button type="button" onclick="showPauseConfirmation()"
@@ -408,25 +437,26 @@ background-color: #f9fafb;
                             {% endif %}
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             
             <!-- next queue -->
-            <div class="w-[160px] flex items-center gap-3 pt-2 pb-5 px-3 flex-col border bg-[#10420C] text-white" id="next-queue-container">
+            <div class="w-full md:w-[160px] flex items-center gap-3 pt-2 pb-5 px-3 flex-col border bg-[#10420C] text-white" id="next-queue-container">
                 <div class="w-full">
-                    <h1 class="mb-2 text-center text-gray-300">Next Queue</h1>
+                    <h1 class="mb-2 text-center text-gray-300 text-sm md:text-base">Next Queue</h1>
                     <div class="w-full border-b border-gray-400"></div>
                 </div>
                 
                 <!-- Queue items container for dynamic updates -->
-                <div id="queue-items-container">
+                <div id="queue-items-container" class="w-full flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible py-2">
                     {% for display_queue in display_queues|slice:":5" %}
-                    <div class="text-xl w-full medula-one-regular px-2 mt-2 queue-item">
+                    <div class="text-xl w-full md:w-auto medula-one-regular px-2 md:mt-2 queue-item flex-shrink-0 md:flex-shrink">
                         <div class="w-full">
-                            <h1 class="text-3xl mb-1 text-center {% if forloop.first %}text-[#FFCC00]{% else %}text-white{% endif %}">
+                            <h1 class="text-xl md:text-3xl mb-1 text-center {% if forloop.first %}text-[#FFCC00]{% else %}text-white{% endif %}">
                                 {{ display_queue.ticket_number }}
                             </h1>
-                            <div class="w-full border-b border-gray-400/50"></div>
+                            <div class="w-full border-b border-gray-400/50 md:block hidden"></div>
                         </div>
                     </div>
                     {% empty %}
@@ -441,7 +471,7 @@ background-color: #f9fafb;
                 {% if display_queues|length > 5 %}
                 <button onclick="openQueueModal()" 
                         class="mt-4 px-4 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer text-black text-[11px] relative">
-                    View more <p class="absolute text-red-500 rounded-full text-[11px] font-semibold top-1 right-1">1+</p>
+                    View more <span class="absolute text-red-500 rounded-full text-[11px] font-semibold top-1 right-1">1+</span>
                 </button>
                 {% endif %}
             </div>
@@ -449,158 +479,164 @@ background-color: #f9fafb;
 
         <!-- priority queue -->
         <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md">
-            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#ED7676]">
-                <h1 class="font-semibold text-white">PRIORITY QUEUE'S</h1>
+            <div class="p-2 px-3 md:px-5 h-[47px] flex items-center justify-between bg-[#ED7676]">
+                <h1 class="font-semibold text-white text-sm md:text-base">PRIORITY QUEUE'S</h1>
                 <!-- Pagination controls -->
-                <div class="flex items-center space-x-2">
-                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        &lt; Prev
+                <div class="flex items-center space-x-1 md:space-x-2">
+                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt;
                     </button>
-                    <span id="priority-page-info" class="text-white text-xs">Page 1 of 1</span>
-                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Next &gt;
+                    <span id="priority-page-info" class="text-white text-xs hidden md:inline">Page 1 of 1</span>
+                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &gt;
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 py-2 px-4">
-                <table class="w-full table-auto">
-                    <thead class="border-b border-gray-300">
-                        <tr>
-                            <th class="px-2 py-2 text-left">Full Name</th>
-                            <th class="px-2 py-2 text-center">Number</th>
-                            <th class="px-2 py-2 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="priority-queue-body">
-                        {% if priority_students %}
-                            {% for priority_student in priority_students %}
-                            <tr data-student-id="{{ priority_student.id }}">
-                                <td class="px-2 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
-                                <td class="px-2 py-2 text-center">{{ priority_student.ticket_number }}</td>
-                                <td class="px-2 py-2 text-center">
-                                    <button type="button" onclick="showPriorityStandbyConfirmation('{{ priority_student.id }}', '{{ priority_student.ticket_number }}', '{{ priority_student.firstName }} {{ priority_student.lastName }}')"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
-                                        Standby
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
+            <div class="flex-1 py-2 px-2 md:px-4">
+                <div class="table-responsive">
+                    <table class="w-full table-auto min-w-[300px]">
+                        <thead class="border-b border-gray-300">
                             <tr>
-                                <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Priority Queue Right Now</td>
+                                <th class="px-1 md:px-2 py-2 text-left text-xs">Full Name</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Number</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Action</th>
                             </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="priority-queue-body">
+                            {% if priority_students %}
+                                {% for priority_student in priority_students %}
+                                <tr data-student-id="{{ priority_student.id }}">
+                                    <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
+                                    <td class="px-1 md:px-2 py-2 text-center text-xs">{{ priority_student.ticket_number }}</td>
+                                    <td class="px-1 md:px-2 py-2 text-center">
+                                        <button type="button" onclick="showPriorityStandbyConfirmation('{{ priority_student.id }}', '{{ priority_student.ticket_number }}', '{{ priority_student.firstName }} {{ priority_student.lastName }}')"
+                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-2 md:px-3 py-1 text-xs w-full">
+                                            Standby
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Priority Queue Right Now</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- lower section -->
-    <div class="flex gap-5 flex-1">
+    <div class="flex flex-col lg:flex-row gap-3 md:gap-5 flex-1">
         <!-- CSMS List -->
-        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px]">
-            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-gray-900">
-                <h1 class="font-semibold text-white">Client Survey List</h1>
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[300px] md:h-[420px] max-h-[430px]">
+            <div class="p-2 px-3 md:px-5 h-[47px] flex items-center justify-between bg-gray-900">
+                <h1 class="font-semibold text-white text-sm md:text-base">Client Survey List</h1>
                 <!-- Pagination controls -->
-                <div class="flex items-center space-x-2">
-                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        &lt; Prev
+                <div class="flex items-center space-x-1 md:space-x-2">
+                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt;
                     </button>
-                    <span id="csms-page-info" class="text-white text-xs">Page 1 of 1</span>
-                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Next &gt;
+                    <span id="csms-page-info" class="text-white text-xs hidden md:inline">Page 1 of 1</span>
+                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &gt;
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 py-2 px-4">
-                <table class="w-full table-auto">
-                    <thead class="border-b border-gray-300">
-                        <tr>
-                            <th class="px-2 py-2 text-left">Full Name</th>
-                            <th class="px-2 py-2 text-center">Number</th>
-                            <th class="px-2 py-2 text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="csms-list-body">
-                        {% for survey in display_survey %}
-                        <tr>
-                            <td class="px-2 py-2">{{ survey.appointments }}</td>
-                            <td class="px-2 py-2 text-center">{{ survey.code }}</td>
-                            <td class="px-2 py-2 text-center">
-                                {% if survey.status == 'used' %}
-                                    <span class="text-green-600">Done</span>
-                                {% else %}
-                                    <span class="text-yellow-600">Pending</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Survey Records Found</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="flex-1 py-2 px-2 md:px-4">
+                <div class="table-responsive">
+                    <table class="w-full table-auto min-w-[300px]">
+                        <thead class="border-b border-gray-300">
+                            <tr>
+                                <th class="px-1 md:px-2 py-2 text-left text-xs">Full Name</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Number</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csms-list-body">
+                            {% for survey in display_survey %}
+                            <tr>
+                                <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">{{ survey.appointments }}</td>
+                                <td class="px-1 md:px-2 py-2 text-center text-xs">{{ survey.code }}</td>
+                                <td class="px-1 md:px-2 py-2 text-center">
+                                    {% if survey.status == 'used' %}
+                                        <span class="text-green-600 text-xs">Done</span>
+                                    {% else %}
+                                        <span class="text-yellow-600 text-xs">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Survey Records Found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Skipped List -->
-        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px]">
-            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#FFCC00]">
-                <h1 class="font-semibold">SKIPPED LIST</h1>
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[300px] md:h-[420px] max-h-[430px]">
+            <div class="p-2 px-3 md:px-5 h-[47px] flex items-center justify-between bg-[#FFCC00]">
+                <h1 class="font-semibold text-sm md:text-base">SKIPPED LIST</h1>
                 <!-- Pagination controls -->
-                <div class="flex items-center space-x-2">
-                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        &lt; Prev
+                <div class="flex items-center space-x-1 md:space-x-2">
+                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &lt;
                     </button>
-                    <span id="skipped-page-info" class="text-xs">Page 1 of 1</span>
-                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Next &gt;
+                    <span id="skipped-page-info" class="text-xs hidden md:inline">Page 1 of 1</span>
+                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-2 md:px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        &gt;
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 py-2 px-4">
-                <table class="w-full table-auto">
-                    <thead class="border-b border-gray-300">
-                        <tr>
-                            <th class="px-2 py-2 text-left">Full Name</th>
-                            <th class="px-2 py-2 text-center">Number</th>
-                            <th class="px-2 py-2 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="skipped-list-body">
-                        {% if skip_non_priority_students %}
-                            {% for skip_non_priority_student in skip_non_priority_students %}
-                            <tr data-student-id="{{ skip_non_priority_student.id }}">
-                                <td class="px-2 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
-                                <td class="px-2 py-2 text-center">{{ skip_non_priority_student.ticket_number }}</td>
-                                <td class="px-2 py-2 text-center">
-                                    <button type="button" onclick="showStandbyConfirmation('{{ skip_non_priority_student.id }}', '{{ skip_non_priority_student.ticket_number }}', '{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.lastName }}')"
-                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
-                                        Standby
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
+            <div class="flex-1 py-2 px-2 md:px-4">
+                <div class="table-responsive">
+                    <table class="w-full table-auto min-w-[300px]">
+                        <thead class="border-b border-gray-300">
                             <tr>
-                                <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Skipped Right Now</td>
+                                <th class="px-1 md:px-2 py-2 text-left text-xs">Full Name</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Number</th>
+                                <th class="px-1 md:px-2 py-2 text-center text-xs">Action</th>
                             </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="skipped-list-body">
+                            {% if skip_non_priority_students %}
+                                {% for skip_non_priority_student in skip_non_priority_students %}
+                                <tr data-student-id="{{ skip_non_priority_student.id }}">
+                                    <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
+                                    <td class="px-1 md:px-2 py-2 text-center text-xs">{{ skip_non_priority_student.ticket_number }}</td>
+                                    <td class="px-1 md:px-2 py-2 text-center">
+                                        <button type="button" onclick="showStandbyConfirmation('{{ skip_non_priority_student.id }}', '{{ skip_non_priority_student.ticket_number }}', '{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.lastName }}')"
+                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-2 md:px-3 py-1 text-xs w-full">
+                                            Standby
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Skipped Right Now</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Queue Modal -->
-<div id="queueModal" class="hidden fixed inset-0 backdrop-blur-xs bg-black/20 flex items-center justify-center z-50">
-    <div class="bg-white w-150 shadow-lg p-4">
+<div id="queueModal" class="hidden fixed inset-0 backdrop-blur-xs bg-black/20 flex items-center justify-center z-50 px-4">
+    <div class="bg-white w-full max-w-md md:max-w-lg shadow-lg p-4">
         <h2 class="text-xl font-bold mb-3 text-center">All Next Queue</h2>
 
         <div class="max-h-80 overflow-y-auto p-2">
@@ -627,19 +663,19 @@ background-color: #f9fafb;
 </div>
 
 <!-- EMPTY QUEUE VALIDATION MODAL -->
-<div id="emptyQueueModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="emptyQueueModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-exclamation-triangle text-red-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-exclamation-triangle text-red-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Cannot Start Serving</h2>
-            <p class="text-gray-600 mb-6">No students are currently in the queue.</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Cannot Start Serving</h2>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">No students are currently in the queue.</p>
             <p class="text-sm text-gray-500">Please wait for students to join the queue before starting service.</p>
         </div>
         <div class="flex justify-center mt-6">
             <button onclick="closeConfirmationModal('emptyQueueModal')" 
-                    class="px-5 py-2 bg-gray-800 hover:bg-gray-900 text-white cursor-pointer">
+                    class="px-5 py-2 bg-gray-800 hover:bg-gray-900 text-white cursor-pointer text-sm">
                 OK, I Understand
             </button>
         </div>
@@ -647,24 +683,24 @@ background-color: #f9fafb;
 </div>
 
 <!-- Confirmation Modals -->
-<div id="startServingModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="startServingModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-play text-green-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-play text-green-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Start Serving Student?</h2>
-            <p class="text-gray-600 mb-6">Are you sure you want to start serving the next student in queue?</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Start Serving Student?</h2>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">Are you sure you want to start serving the next student in queue?</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('startServingModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form action="{% url 'personel' %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" name="start" value="start"
-                        class="px-5 py-2 bg-[#10420C] hover:bg-[#10420C]/80 text-white cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-[#10420C] hover:bg-[#10420C]/80 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Start
                 </button>
             </form>
@@ -673,19 +709,19 @@ background-color: #f9fafb;
 </div>
 
 <!-- Skip Confirmation Modal -->
-<div id="skipConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="skipConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-forward text-yellow-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-forward text-yellow-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Skip This Student?</h2>
-            <p class="text-gray-600 mb-2" id="skipStudentInfo">Student: ---</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Skip This Student?</h2>
+            <p class="text-gray-600 mb-2 text-sm md:text-base" id="skipStudentInfo">Student: ---</p>
             <p class="text-yellow-600 text-xs mb-6">Student will be moved to skipped list.</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('skipConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form id="skipForm" action="{% url 'done_current_number' %}" method="post">
@@ -693,7 +729,7 @@ background-color: #f9fafb;
                 <input type="hidden" name="ticket_number" id="skipStudentId" value="">
                 <input type="hidden" name="action" value="skip">
                 <button type="submit" 
-                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-black cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-black cursor-pointer text-xs md:text-sm">
                     Yes, Skip
                 </button>
             </form>
@@ -701,24 +737,24 @@ background-color: #f9fafb;
     </div>
 </div>
 
-<div id="startQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="startQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-play text-green-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-play text-green-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Start the Queue?</h2>
-            <p class="text-gray-600 mb-6">The queue will begin processing waiting students.</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Start the Queue?</h2>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">The queue will begin processing waiting students.</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('startQueueConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form id="startQueueForm" method="POST" action="{% url 'toggle_queue' %}">
                 {% csrf_token %}
                 <button type="submit" 
-                        class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-green-500 hover:bg-green-600 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Start Queue
                 </button>
             </form>
@@ -726,24 +762,24 @@ background-color: #f9fafb;
     </div>
 </div>
 
-<div id="pauseQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="pauseQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-pause text-orange-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-pause text-orange-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Pause the Queue?</h2>
-            <p class="text-gray-600 mb-6">No new students will be served until queue is resumed.</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Pause the Queue?</h2>
+            <p class="text-gray-600 mb-6 text-sm md:text-base">No new students will be served until queue is resumed.</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('pauseQueueConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form id="pauseQueueForm" method="POST" action="{% url 'toggle_queue' %}">
                 {% csrf_token %}
                 <button type="submit" 
-                        class="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Pause Queue
                 </button>
             </form>
@@ -751,19 +787,19 @@ background-color: #f9fafb;
     </div>
 </div>
 
-<div id="standbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="standbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-arrow-right text-yellow-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-arrow-right text-yellow-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Move to Standby?</h2>
-            <p class="text-gray-600 mb-2" id="standbyStudentInfo">Student: ---</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Move to Standby?</h2>
+            <p class="text-gray-600 mb-2 text-sm md:text-base" id="standbyStudentInfo">Student: ---</p>
             <p class="text-yellow-600 text-xs mb-6">Student will return to the main queue.</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('standbyConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form id="standbyForm" action="{% url 'standby' %}" method="post">
@@ -771,7 +807,7 @@ background-color: #f9fafb;
                 <input type="hidden" name="ticket_number" id="standbyStudentId">
                 <input type="hidden" name="action" value="standby">
                 <button type="submit" 
-                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Move to Standby
                 </button>
             </form>
@@ -779,19 +815,19 @@ background-color: #f9fafb;
     </div>
 </div>
 
-<div id="priorityStandbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
-    <div class="bg-white p-6 w-96 confirmation-modal-content">
+<div id="priorityStandbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal px-4">
+    <div class="bg-white p-4 md:p-6 w-full max-w-md confirmation-modal-content">
         <div class="text-center">
-            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa fa-arrow-right text-yellow-600 text-2xl"></i>
+            <div class="w-12 h-12 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-arrow-right text-yellow-600 text-xl md:text-2xl"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Move Priority to Standby?</h2>
-            <p class="text-gray-600 mb-2" id="priorityStandbyStudentInfo">Student: ---</p>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 mb-2">Move Priority to Standby?</h2>
+            <p class="text-gray-600 mb-2 text-sm md:text-base" id="priorityStandbyStudentInfo">Student: ---</p>
             <p class="text-yellow-600 text-xs mb-6">Student will return to the main queue.</p>
         </div>
         <div class="flex justify-center gap-3">
             <button onclick="closeConfirmationModal('priorityStandbyConfirmationModal')" 
-                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                    class="px-4 md:px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer text-xs md:text-sm">
                 Cancel
             </button>
             <form id="priorityStandbyForm" action="{% url 'priority_standby' %}" method="post">
@@ -799,7 +835,7 @@ background-color: #f9fafb;
                 <input type="hidden" name="ticket_number" id="priorityStandbyStudentId">
                 <input type="hidden" name="action" value="standby">
                 <button type="submit" 
-                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer">
+                        class="px-4 md:px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer text-xs md:text-sm">
                     Yes, Move to Standby
                 </button>
             </form>
@@ -1051,13 +1087,13 @@ function updateNextQueue(queueData) {
         for (let i = 0; i < displayCount; i++) {
             const queue = filteredQueueData[i];
             const queueItem = document.createElement('div');
-            queueItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
+            queueItem.className = 'text-xl w-full md:w-auto medula-one-regular px-2 md:mt-2 queue-item flex-shrink-0 md:flex-shrink';
             queueItem.innerHTML = `
                 <div class="w-full">
-                    <h1 class="text-3xl mb-1 text-center ${i === 0 ? 'text-[#FFCC00]' : 'text-white'}">
+                    <h1 class="text-xl md:text-3xl mb-1 text-center ${i === 0 ? 'text-[#FFCC00]' : 'text-white'}">
                         ${queue.ticket_number || '---'}
                     </h1>
-                    <div class="w-full border-b border-gray-400/50"></div>
+                    <div class="w-full border-b border-gray-400/50 md:block hidden"></div>
                 </div>
             `;
             queueItemsContainer.appendChild(queueItem);
@@ -1089,11 +1125,11 @@ function updatePriorityQueue(priorityData) {
             const row = document.createElement('tr');
             row.setAttribute('data-student-id', student.id);
             row.innerHTML = `
-                <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
-                <td class="px-2 py-2 text-center">${student.ticket_number}</td>
-                <td class="px-2 py-2 text-center">
+                <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
+                <td class="px-1 md:px-2 py-2 text-center text-xs">${student.ticket_number}</td>
+                <td class="px-1 md:px-2 py-2 text-center">
                     <button type="button" onclick="showPriorityStandbyConfirmation('${student.id}', '${student.ticket_number}', '${student.firstName} ${student.lastName}')"
-                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-2 md:px-3 py-1 text-xs w-full">
                         Standby
                     </button>
                 </td>
@@ -1103,7 +1139,7 @@ function updatePriorityQueue(priorityData) {
     } else {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Priority Queue Right Now</td>
+            <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Priority Queue Right Now</td>
         `;
         priorityQueueBody.appendChild(row);
     }
@@ -1120,11 +1156,11 @@ function updateSkippedList(skippedData) {
             const row = document.createElement('tr');
             row.setAttribute('data-student-id', student.id);
             row.innerHTML = `
-                <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
-                <td class="px-2 py-2 text-center">${student.ticket_number}</td>
-                <td class="px-2 py-2 text-center">
+                <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
+                <td class="px-1 md:px-2 py-2 text-center text-xs">${student.ticket_number}</td>
+                <td class="px-1 md:px-2 py-2 text-center">
                     <button type="button" onclick="showStandbyConfirmation('${student.id}', '${student.ticket_number}', '${student.firstName} ${student.lastName}')"
-                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-2 md:px-3 py-1 text-xs w-full">
                         Standby
                     </button>
                 </td>
@@ -1134,7 +1170,7 @@ function updateSkippedList(skippedData) {
     } else {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Skipped Right Now</td>
+            <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Skipped Right Now</td>
         `;
         skippedListBody.appendChild(row);
     }
@@ -1160,7 +1196,7 @@ function updateCurrentServing(currentData) {
         
         const requestElement = document.getElementById('current-request');
         if (requestElement) {
-            requestElement.textContent = 'No Request';
+            requestElement.textContent = '----';
         }
         
         const buttonsContainer = document.getElementById('current-buttons-container');
@@ -1174,27 +1210,10 @@ function updateCurrentServing(currentData) {
             `;
         }
         
-        // Updated call button container - ALWAYS show queue control button
+        // Updated call button container - Hide when there's NO Queue student
         const callButtonContainer = document.getElementById('call-button-container');
         if (callButtonContainer) {
-            callButtonContainer.innerHTML = `
-                <div class="flex gap-2">
-                    <div class="flex-1"></div>
-                    <div class="flex-1">
-                        <!-- Queue control button - will be updated by updateQueueStatus() -->
-                        <button type="button" onclick="showPauseConfirmation()"
-                            class="w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs"
-                            id="queueControlButton">
-                            <i class="fa fa-pause mr-1"></i> Stop Queue
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // Update the button state based on current queue status
-            if (window.currentQueueStatus) {
-                updateQueueStatus(window.currentQueueStatus);
-            }
+            callButtonContainer.innerHTML = ''; // Empty container when NO Queue student
         }
         
         if (window.currentQueueStatus) {
@@ -1222,7 +1241,7 @@ function updateCurrentServing(currentData) {
         courseCell.textContent = currentData.courses || '---';
     }
     
-    const requestType = currentData.requestType || 'No Request';
+    const requestType = currentData.requestType || '----';
     const requestElement = document.getElementById('current-request');
     if (requestElement) {
         requestElement.textContent = requestType;
@@ -1254,7 +1273,7 @@ function updateCurrentServing(currentData) {
     const callButtonContainer = document.getElementById('call-button-container');
     if (callButtonContainer) {
         callButtonContainer.innerHTML = `
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <div class="flex-1">
                     <button type="button" onclick="showCallAction('${currentData.ticket_number}', '${currentData.firstName} ${currentData.lastName}')"
                         class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-xs"
@@ -1416,7 +1435,7 @@ function initializeButtonStates() {
             statusIndicator.classList.add('bg-gray-400');
             statusText.classList.remove('text-green-600', 'text-red-600');
             statusText.classList.add('text-gray-600');
-            statusText.textContent = 'NO CURRENT';
+            statusText.textContent = 'NO Queue';
         }
     }
     
@@ -1466,36 +1485,85 @@ function updateQueueStatus(queueStatus) {
         statusIndicator.classList.add('bg-gray-400');
         statusText.classList.remove('text-green-600', 'text-red-600');
         statusText.classList.add('text-gray-600');
-        statusText.textContent = 'NO CURRENT';
+        statusText.textContent = 'NO Queue';
     }
+
+        // Update ALL action buttons when queue status changes
+    const actionButtons = ['callButton', 'skipButton', 'doneButton'];
     
-    // Update Queue Control button - ALWAYS update this regardless of current student
+    actionButtons.forEach(buttonId => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            const currentTicketElement = document.getElementById('current-ticket-number');
+            const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
+            
+            if (hasCurrentStudent) {
+                if (!isRunning) {
+                    button.disabled = true;
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                    
+                    // Remove hover effects based on button type
+                    if (buttonId === 'callButton') {
+                        button.classList.remove('hover:bg-blue-700');
+                    } else if (buttonId === 'skipButton') {
+                        button.classList.remove('hover:bg-[#FFCC00]/80');
+                    } else if (buttonId === 'doneButton') {
+                        button.classList.remove('hover:bg-[#10420C]/80');
+                    }
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Add back hover effects
+                    if (buttonId === 'callButton') {
+                        button.classList.add('hover:bg-blue-700');
+                    } else if (buttonId === 'skipButton') {
+                        button.classList.add('hover:bg-[#FFCC00]/80');
+                    } else if (buttonId === 'doneButton') {
+                        button.classList.add('hover:bg-[#10420C]/80');
+                    }
+                }
+            }
+        }
+    });
+    
+    // Update Queue Control button - ONLY update when there's a current student
     const queueControlButton = document.getElementById('queueControlButton');
     if (queueControlButton) {
-        if (isRunning) {
-            queueControlButton.innerHTML = '<i class="fa fa-pause mr-1"></i> Stop Queue';
-            queueControlButton.className = 'w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs';
-            queueControlButton.onclick = function() { showPauseConfirmation(); };
-        } else {
-            queueControlButton.innerHTML = '<i class="fa fa-play mr-1"></i> Start Queue';
-            queueControlButton.className = 'w-full bg-green-500 hover:bg-green-600 cursor-pointer py-2 text-white text-xs';
-            queueControlButton.onclick = function() { showStartQueueConfirmation(); };
+        const currentTicketElement = document.getElementById('current-ticket-number');
+        const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
+        
+        if (hasCurrentStudent) {
+            if (isRunning) {
+                queueControlButton.innerHTML = '<i class="fa fa-pause mr-1"></i> Stop Queue';
+                queueControlButton.className = 'w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs';
+                queueControlButton.onclick = function() { showPauseConfirmation(); };
+            } else {
+                queueControlButton.innerHTML = '<i class="fa fa-play mr-1"></i> Start Queue';
+                queueControlButton.className = 'w-full bg-green-500 hover:bg-green-600 cursor-pointer py-2 text-white text-xs';
+                queueControlButton.onclick = function() { showStartQueueConfirmation(); };
+            }
         }
     }
     
     // Update Call button state
-    const callButton = document.getElementById('callButton');
-    if (callButton) {
-        if (!isRunning) {
-            callButton.disabled = true;
-            callButton.classList.add('opacity-50', 'cursor-not-allowed');
-            callButton.classList.remove('hover:bg-blue-700');
-        } else {
-            callButton.disabled = false;
-            callButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            callButton.classList.add('hover:bg-blue-700');
-        }
-    }
+    // const callButton = document.getElementById('callButton');
+    // if (callButton) {
+    //     const currentTicketElement = document.getElementById('current-ticket-number');
+    //     const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
+        
+    //     if (hasCurrentStudent) {
+    //         if (!isRunning) {
+    //             callButton.disabled = true;
+    //             callButton.classList.add('opacity-50', 'cursor-not-allowed');
+    //             callButton.classList.remove('hover:bg-blue-700');
+    //         } else {
+    //             callButton.disabled = false;
+    //             callButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    //             callButton.classList.add('hover:bg-blue-700');
+    //         }
+    //     }
+    // }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1516,7 +1584,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
             loadingItem.innerHTML = `
                 <div class="w-full">
-                    <h1 class="text-lg mb-1 text-center text-gray-400">Loading...</h1>
+                    <h1 class="text-lg mb-1 text-center text-gray-400">---</h1>
                     <div class="w-full border-b border-gray-400/50"></div>
                 </div>
             `;
@@ -1582,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (surveys.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="3" class="px-2 py-4 text-center text-gray-500">No Survey Records Found</td>
+                    <td colspan="3" class="px-2 py-4 text-center text-gray-500 text-sm">No Survey Records Found</td>
                 </tr>
             `;
             return;
@@ -1590,12 +1658,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tbody.innerHTML = surveys.map(survey => `
             <tr>
-                <td class="px-2 py-2">${survey.appointments || 'N/A'}</td>
-                <td class="px-2 py-2 text-center">${survey.code}</td>
-                <td class="px-2 py-2 text-center">
+                <td class="px-1 md:px-2 py-2 text-xs truncate max-w-[120px]">${survey.appointments || 'N/A'}</td>
+                <td class="px-1 md:px-2 py-2 text-center text-xs">${survey.code}</td>
+                <td class="px-1 md:px-2 py-2 text-center">
                     ${survey.status === 'used' 
-                        ? '<span class="text-green-600">Done</span>' 
-                        : '<span class="text-yellow-600">Pending</span>'}
+                        ? '<span class="text-green-600 text-xs">Done</span>' 
+                        : '<span class="text-yellow-600 text-xs">Pending</span>'}
                 </td>
             </tr>
         `).join('');
@@ -1610,11 +1678,11 @@ function showDoneAction(ticketNumber, studentName) {
         
         setTimeout(() => {
             document.getElementById('doneForm').submit();
-        }, 1000);
+        }, 500);
         
         setTimeout(() => {
             indication.classList.remove('show');
-        }, 2000);
+        }, 1000);
     } else {
         document.getElementById('doneForm').submit();
     }
