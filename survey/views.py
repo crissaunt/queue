@@ -1,51 +1,32 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-
+from django.urls import reverse
 from django.http import HttpResponse
 from django.template import loader
 from personel.models import Code
 from .models import (
     ClientType, CCchoices, CCquestion,
     ServiceQualityDimension, SQDResponse,
-    SatisfactionSurvey, CCResponse
+    SatisfactionSurvey, CCResponse, SurveyYear,
+    QuestionYear, SQDYear
 )
-from .models import SatisfactionSurvey, CCquestion, CCchoices, CCResponse, QuestionYear, SQDYear
-
-
 from django.db.models import Q
+from django.db import transaction
 
-
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
-def mark_survey_used(request, code_id):
-    survey = Code.objects.get(id=code_id)
-    survey.status = "used"
-    survey.save()
-
-    # ✅ Send websocket update to refresh frontend
-    channel_layer = get_channel_layer()
-    
-    # Get the latest surveys for display
-    surveys = Code.objects.filter(status="used").order_by("-created_at")[:20]
-    survey_list = [
-        {
-            "appointments": str(s.appointments), 
-            "code": s.code, 
-            "status": s.status
-        }
-        for s in surveys
-    ]
-
-    async_to_sync(channel_layer.group_send)(
-        "survey_updates",  # group name
-        {
-            "type": "survey_update",
-            "surveys": survey_list
-        }
-    )
-
-    return redirect("personel")
+def mark_survey_used(code_id):
+    """
+    Marks a survey code as used (without WebSocket updates).
+    WebSocket updates should be handled by the personnel app.
+    """
+    try:
+        survey = Code.objects.get(id=code_id)
+        survey.status = "used"
+        survey.save()
+        print(f"✅ Survey code {survey.code} marked as used")
+        return True
+    except Code.DoesNotExist:
+        print(f"❌ Code with id {code_id} does not exist")
+        return False
 
 # ---------------- HOME ----------------
 def home(request):
@@ -63,8 +44,7 @@ def validate_code(request):
             if code_obj.status == "used":
                 print("❌ Code has already been used.")
                 messages.error(request, "This code has already been used!")
-                # You can add a message to the user instead of redirecting silently
-                return redirect('survey')  # or render a template with an error
+                return redirect('survey')
             else:
                 print("Found code:", code_obj.code, "Status:", code_obj.status)
                 request.session['code_obj'] = get_code
@@ -73,7 +53,7 @@ def validate_code(request):
                 return redirect('form')
         else:
             print("❌ Code not found.")
-            messages.error(request, " Code not found!")
+            messages.error(request, "Code not found!")
 
     return redirect('survey')
 
@@ -94,6 +74,11 @@ def validate_form(request):
         if not code_obj:
             return redirect('survey')
 
+        # DEBUG: Print what we're receiving
+        print("DEBUG - Form POST data:")
+        for key, value in request.POST.items():
+            print(f"  {key}: {value} (type: {type(value)})")
+        
         # ✅ Store all form values in session
         request.session['form_data'] = {
             "client_type_id": request.POST.get('client_type'),
@@ -106,7 +91,7 @@ def validate_form(request):
             "service_availed": request.POST.get('service_availed'),
         }
 
-        print("✅ Form data stored in session")
+        print("✅ Form data stored in session:", request.session['form_data'])
         print("SESSION STATE:", dict(request.session))
 
         return redirect('question1')
@@ -138,7 +123,15 @@ def validate_question1(request):
     if request.method == 'POST':
         cc_answers = {}
 
-        for question in CCquestion.objects.all():
+        # Get current year for filtering
+        current_year = SurveyYear.objects.order_by('-year').first()
+        
+        # Only get questions for current year
+        questions = CCquestion.objects.filter(
+            year_links__year=current_year
+        ).distinct()
+        
+        for question in questions:
             selected_choice = request.POST.get(f'choice_{question.id}')
             if selected_choice:
                 cc_answers[str(question.id)] = int(selected_choice)
@@ -171,11 +164,6 @@ def question2(request):
     return render(request, "survey/q2.html", {"sqds": sqds})
 
 
-
-
-from django.db import transaction
-from .models import SurveyYear
-
 def validate_question2(request):
     if not request.session.get('code_obj'):
         return redirect('survey')
@@ -184,23 +172,57 @@ def validate_question2(request):
         code_obj = Code.objects.get(code=request.session.get('code_obj'))
         form_data = request.session.get('form_data', {})
         cc_answers = request.session.get('cc_answers', {})
-
+        
+        # DEBUG: Print form_data to see what's in it
+        print("DEBUG - Form Data:", form_data)
+        print("DEBUG - client_type_id value:", form_data.get("client_type_id"))
+        print("DEBUG - Type of client_type_id:", type(form_data.get("client_type_id")))
+        
         survey_year = SurveyYear.objects.order_by("-year").first()
 
         with transaction.atomic():
             # --- Create the survey ---
-            survey = SatisfactionSurvey.objects.create(
-                code=code_obj,
-                survey_year=survey_year,  
-                client_type_id=int(form_data.get("client_type_id")) if form_data.get("client_type_id") else None,
-                visit_date=form_data.get("date") or None,
-                sex=form_data.get("sex"),
-                age=int(form_data.get("age")) if form_data.get("age") else None,
-                government=form_data.get("government"),
-                region=form_data.get("region"),
-                office_person=form_data.get("person_visited"),
-                service_availed=form_data.get("service_availed")
-            )
+            try:
+                # Safely convert client_type_id to int
+                client_type_id = form_data.get("client_type_id")
+                if client_type_id:
+                    # Try to convert to int, if it fails, set to None
+                    try:
+                        client_type_id_int = int(client_type_id)
+                    except (ValueError, TypeError):
+                        client_type_id_int = None
+                        print(f"WARNING: Could not convert client_type_id '{client_type_id}' to integer")
+                else:
+                    client_type_id_int = None
+                
+                # Safely convert age to int
+                age_str = form_data.get("age")
+                if age_str:
+                    try:
+                        age_int = int(age_str)
+                    except (ValueError, TypeError):
+                        age_int = None
+                        print(f"WARNING: Could not convert age '{age_str}' to integer")
+                else:
+                    age_int = None
+                
+                survey = SatisfactionSurvey.objects.create(
+                    code=code_obj,
+                    survey_year=survey_year,  
+                    client_type_id=client_type_id_int,  # Use the safely converted value
+                    visit_date=form_data.get("date") or None,
+                    sex=form_data.get("sex"),
+                    age=age_int,  # Use the safely converted value
+                    government=form_data.get("government"),
+                    region=form_data.get("region"),
+                    office_person=form_data.get("person_visited"),
+                    service_availed=form_data.get("service_availed")
+                )
+                
+            except Exception as e:
+                print(f"ERROR creating survey: {e}")
+                messages.error(request, "Error creating survey. Please try again.")
+                return redirect('question2')
 
             # --- Save CC Responses ---
             for q_id, choice_id in cc_answers.items():
@@ -215,11 +237,17 @@ def validate_question2(request):
                         question_year=question_year,
                         choice_id=choice_id
                     )
-                except QuestionYear.DoesNotExist:
+                except (QuestionYear.DoesNotExist, CCquestion.DoesNotExist) as e:
+                    print(f"Warning: Could not save CC response for question {q_id}: {e}")
                     continue
 
             # --- Save SQD Responses ---
-            for sqd in ServiceQualityDimension.objects.all():
+            # Get only SQDs for current year
+            current_sqds = ServiceQualityDimension.objects.filter(
+                year_links__year=survey.survey_year
+            ).distinct()
+            
+            for sqd in current_sqds:
                 rating_value = request.POST.get(f'rating_{sqd.id}')
                 if rating_value:
                     try:
@@ -232,7 +260,8 @@ def validate_question2(request):
                             sqd_year=sqd_year,
                             rating=int(rating_value)
                         )
-                    except SQDYear.DoesNotExist:
+                    except (SQDYear.DoesNotExist, ValueError) as e:
+                        print(f"Warning: Could not save SQD response for {sqd.name}: {e}")
                         continue
 
             # --- Feedback + email ---
@@ -243,19 +272,18 @@ def validate_question2(request):
                 survey.email = email
                 survey.save()
 
-            # --- Mark code as used ---
+            # --- Mark code as used (without WebSocket updates) ---
             if code_obj.status == 'unused':
-                code_obj.status = 'used'
-                mark_survey_used(request, code_obj.id)
-                code_obj.save()
+                # Use the simplified function without request parameter
+                mark_survey_used(code_obj.id)
 
         # ✅ Selectively clear only survey-related session keys
         for key in ['code_obj', 'form_data', 'cc_answers']:
             request.session.pop(key, None)
         print("SESSION AFTER CLEAR:", dict(request.session))
 
-        return redirect('survey')
+        # ADD THIS: Redirect with success parameter
+        messages.success(request, "Survey submitted successfully! Thank you for your feedback.")
+        return redirect(f"{reverse('survey')}?submitted=true")
 
     return redirect('question2')
-
-

@@ -128,7 +128,7 @@ class CCResponse(models.Model):
 class SQDResponse(models.Model):
     survey = models.ForeignKey(SatisfactionSurvey, on_delete=models.CASCADE, related_name="sqd_responses", null=True)
     sqd_year = models.ForeignKey(SQDYear, on_delete=models.CASCADE, related_name="responses", null=True)
-    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], null=True)
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(0, 6)], null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):

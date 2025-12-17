@@ -190,5 +190,19 @@ class Code(models.Model):
     def __str__(self):
         return self.code
     
+# models.py
+class QueueControl(models.Model):
+    is_running = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "Queue Running" if self.is_running else "Queue Stopped"
+    
+    @classmethod
+    def get_queue_control(cls):
+        """Get or create the queue control object"""
+        obj, created = cls.objects.get_or_create(id=1)
+        return obj
+
+    
 
 

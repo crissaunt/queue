@@ -17,9 +17,34 @@ from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now, timedelta
 
 
+from .models import QueueControl
 
 
+def is_queue_running():
+    qc = QueueControl.get_queue_control()
+    return qc.is_running
 
+
+def check_authentication(user):
+    return user.is_authenticated
+
+# In personel/views.py
+def toggle_queue(request):
+    if request.method == "POST":
+        qc = QueueControl.get_queue_control()
+        qc.is_running = not qc.is_running
+        qc.save()
+
+        status = "started" if qc.is_running else "stopped"
+        messages.success(request, f"Queue has been {status}.")
+        
+        # Broadcast update to ALL connected clients (personnel AND display)
+        broadcast_update()
+        broadcast_queue_update()
+
+    return redirect("personel")
+
+# In personel/views.py - update broadcast functions
 def broadcast_update():
     """Broadcast updates to BOTH groups"""
     try:
@@ -31,7 +56,7 @@ def broadcast_update():
             {"type": "queue_update"}
         )
         
-        # Broadcast to students_live_updates group (student consumer)
+        # Broadcast to students_live_updates group (student consumer AND display)
         async_to_sync(channel_layer.group_send)(
             "students_live_updates",
             {"type": "chat_message", "message": "personnel_action"}
@@ -52,7 +77,7 @@ def broadcast_queue_update():
             {"type": "queue_update"}
         )
         
-        # Broadcast to students_live_updates group (student consumer)  
+        # Broadcast to students_live_updates group (student consumer AND display)  
         async_to_sync(channel_layer.group_send)(
             "students_live_updates",
             {"type": "chat_message", "message": "queue_update"}
@@ -155,7 +180,14 @@ def get_display_queue(today, limit=8):
     
     return queue[:limit]
 
-@login_required
+def get_full_queue(today):
+    return Appointments.objects.filter(
+        datetime__date=today
+    ).exclude(status__in=["done", "cancel"]) \
+     .order_by("datetime")
+
+
+
 def home(request):
     print("🔍 PERSONNEL VIEW: Current user:", request.user)
     
@@ -185,15 +217,6 @@ def home(request):
     ).order_by("datetime").first()
     
     print(f"🔍 PERSONNEL VIEW - Current student query result: {get_current_number}")
-    if get_current_number:
-        print(f"🔍 PERSONNEL VIEW - Current student details: {get_current_number.ticket_number}, {get_current_number.status}, Date: {get_current_number.datetime.date() if get_current_number.datetime else 'No date'}")
-    else:
-        print(f"🔍 PERSONNEL VIEW - No current student found for date: {today}")
-        # Debug all students
-        all_students = Appointments.objects.filter(datetime__date=today)
-        print(f"🔍 PERSONNEL VIEW - All students today: {all_students.count()}")
-        for s in all_students:
-            print(f"     - {s.ticket_number}: {s.status}")
 
     # Calculate served count for priority logic
     served_today = Appointments.objects.filter(
@@ -208,8 +231,17 @@ def home(request):
             print(f"🔍 PERSONNEL VIEW: Start Serving button clicked")
             print(f"🔍 PERSONNEL VIEW: Served today: {served_today}, Next should be priority: {next_should_be_priority}")
 
-            next_student = get_next_in_line(today, next_should_be_priority)
             
+            if not is_queue_running():
+                print("🔍 PERSONNEL VIEW: Queue is stopped, auto-starting queue...")
+                qc = QueueControl.get_queue_control()
+                qc.is_running = True
+                qc.save()
+                broadcast_queue_update()
+                messages.info(request, "Queue has been automatically started.")
+
+            # Only move to next if queue is running
+            next_student = get_next_in_line(today, next_should_be_priority)
             print(f"🔍 PERSONNEL VIEW: Next student to start: {next_student}")
             
             if next_student:
@@ -236,11 +268,9 @@ def home(request):
         created_at__date__gte=since
     ).order_by("-created_at")
 
-    print(f"🔍 PERSONNEL VIEW - Display queues count: {len(display_queues)}")
-    print(f"🔍 PERSONNEL VIEW - Survey count: {display_survey.count()}")
-
     template = loader.get_template('personel/home.html')
     context = {
+        'queue_state': is_queue_running(),
         'non_priority_students': Appointments.objects.filter(
             is_priority="no",
             status="pending",
@@ -278,19 +308,36 @@ def home(request):
             datetime__date=today 
         ).order_by("datetime").first(),
         'display_survey': display_survey,
+        'full_queue': get_full_queue(today),
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+
 def done_current_number(request):
     if request.method == 'POST':
+        # Check if queue is active
+        if not is_queue_running():
+            messages.error(request, "Queue is currently stopped. Cannot process actions.")
+            return redirect('personel')
+            
         action = request.POST.get('action')
         ticket_id = request.POST.get('ticket_number')
 
-        current_number = get_object_or_404(Appointments, id=ticket_id)
+        # Validate ticket_id
+        if not ticket_id or ticket_id.strip() == '':
+            messages.error(request, "Invalid student ID. Please try again.")
+            return redirect('personel')
         
-        today = timezone.now().date()
-        now_ph = localtime(timezone.now())
+        try:
+            # Ensure ticket_id can be converted to integer
+            ticket_id = int(ticket_id)
+            current_number = get_object_or_404(Appointments, id=ticket_id)
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid student ID format.")
+            return redirect('personel')
+        except Appointments.DoesNotExist:
+            messages.error(request, "Student not found.")
+            return redirect('personel')
 
         if current_number:
             # Get or create Personel for the current user
@@ -304,18 +351,37 @@ def done_current_number(request):
                 current_number.save()
                 broadcast_update()
                 broadcast_queue_update()
+                messages.success(request, f"Student {current_number.ticket_number} marked as done.")
+                
             elif action == 'skip':
+                print(f"🔍 SKIP ACTION DEBUG:")
+                print(f"   - Student: {current_number.ticket_number}")
+                print(f"   - Priority: {current_number.is_priority}")
+                print(f"   - Status before: {current_number.status}")
+                
+                # Mark as served by
+                current_number.served_by = personel
+                
+                # Handle skip based on priority
                 if current_number.is_priority == 'yes':
+                    print(f"   - Priority student skip logic")
                     current_number.status = 'skip'
-                    current_number.served_by = personel
                     current_number.save()
-                    broadcast_update()
-                    broadcast_queue_update()
                 else:
-                    current_number.served_by = personel
-                    current_number.handle_skip() 
-                    broadcast_update()
-                    broadcast_queue_update()
+                    print(f"   - Non-priority student skip logic")
+                    # Check if handle_skip method exists
+                    if hasattr(current_number, 'handle_skip'):
+                        current_number.handle_skip()
+                    else:
+                        # Fallback: simple skip
+                        current_number.status = 'skip'
+                        current_number.save()
+                
+                print(f"   - Status after: {current_number.status}")
+                
+                broadcast_update()
+                broadcast_queue_update()
+                messages.info(request, f"Student {current_number.ticket_number} skipped.")
 
             today = timezone.now().date()
 
@@ -340,39 +406,77 @@ def done_current_number(request):
         return redirect('personel')
     return redirect('personel')
 
-@login_required
 def standby(request):
     if request.method == 'POST':
+        if not is_queue_running():
+            messages.error(request, "Queue is currently stopped. Cannot process actions.")
+            return redirect('personel')
+            
         action = request.POST.get('action')
-        ticket_id = request.POST.get('ticket_number') 
+        ticket_id = request.POST.get('ticket_number')
+        
+        # Check if ticket_id is empty
+        if not ticket_id or ticket_id.strip() == '':
+            messages.error(request, "Invalid student ID. Please try again.")
+            return redirect('personel')
+            
+        try:
+            # Convert to integer
+            ticket_id = int(ticket_id)
+            current_number = get_object_or_404(Appointments, id=ticket_id)
 
-        current_number = get_object_or_404(Appointments, id=ticket_id)
-
-        if current_number:
-            if action == 'standby':
-                current_number.status = 'standby'
-                current_number.save()
-                broadcast_update()
-                broadcast_queue_update()
+            if current_number:
+                if action == 'standby':
+                    current_number.status = 'standby'
+                    current_number.save()
+                    
+                    broadcast_update()
+                    broadcast_queue_update()
+                    messages.info(request, f"Student {current_number.ticket_number} moved to standby.")
+                    
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid student ID format.")
+        except Appointments.DoesNotExist:
+            messages.error(request, "Student not found.")
+            
         return redirect('personel')
 
-@login_required
+
 def priority_standby(request):
     if request.method == "POST":
+        if not is_queue_running():
+            messages.error(request, "Queue is currently stopped. Cannot process actions.")
+            return redirect("personel")
+            
         ticket_id = request.POST.get("ticket_number")  
         action = request.POST.get("action")  
+        
+        # Validate ticket_id
+        if not ticket_id or ticket_id.strip() == '':
+            messages.error(request, "Invalid student ID. Please try again.")
+            return redirect('personel')
+        
+        try:
+            ticket_id = int(ticket_id)
+            student = get_object_or_404(Appointments, id=ticket_id)
 
-        student = get_object_or_404(Appointments, id=ticket_id)
+            if action == "standby":
+                student.status = "standby"
+                student.save()
+                broadcast_update()
+                broadcast_queue_update()
+                messages.info(request, f"Priority student {student.ticket_number} moved to standby.")
 
-        if action == "standby":
-            student.status = "standby"
-            student.save()
-            broadcast_update()
-            broadcast_queue_update()
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid student ID format.")
+        except Appointments.DoesNotExist:
+            messages.error(request, "Student not found.")
 
     return redirect("personel")
 
-@login_required
+
+
+
 def end_all_appointments(request):
     if request.method == "POST":
         today = timezone.now().date()
@@ -387,7 +491,7 @@ def end_all_appointments(request):
         return redirect("personel")  
     return redirect("personel")
 
-@login_required
+
 def queue_data_api(request):
     """API endpoint to get current queue data for next 3 students"""
     try:
@@ -407,7 +511,7 @@ def queue_data_api(request):
         print(f"Error in queue_data_api: {e}")
         return JsonResponse([], safe=False)
 
-@login_required
+
 def debug_all_students(request):
     """Debug view to see all students"""
     today = timezone.now().date()
@@ -426,6 +530,9 @@ def debug_all_students(request):
     return JsonResponse({'students': result})
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('personel')
+    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -445,6 +552,9 @@ def login(request):
     return HttpResponse(template.render(context, request))
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('personel')
+    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")

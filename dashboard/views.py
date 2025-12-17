@@ -23,7 +23,7 @@ from django.db.models import Count, Avg, Q
 from survey.models import SatisfactionSurvey, SurveyYear, CCquestion, ServiceQualityDimension,SQDResponse
 from personel.models import Appointments, Code
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def home(request):
     """Dashboard focused on graphs and time-based analytics"""
     
@@ -126,6 +126,7 @@ def home(request):
 # AUTHENTICATION VIEWS
 # =========================
 # In your views.py
+
 def login_view(request):
     # If user is already authenticated, redirect to dashboard
     if request.user.is_authenticated:
@@ -184,7 +185,7 @@ def logout_view(request):
 # PROTECTED VIEWS (Add login_required decorator to existing views)
 # =========================
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def survey_year_list(request):
     """List all survey years with auto-create current year functionality"""
     # Get current year
@@ -203,7 +204,7 @@ def survey_year_list(request):
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def create_survey_year(request):
     """Create a new survey year - can be manual or auto-create current year"""
     if request.method == 'POST':
@@ -231,7 +232,7 @@ def create_survey_year(request):
     
     return redirect('survey_year_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def delete_survey_year(request, year_id):
     """Delete a survey year"""
     year = get_object_or_404(SurveyYear, id=year_id)
@@ -239,7 +240,7 @@ def delete_survey_year(request, year_id):
     messages.success(request, f"Survey year {year.year} deleted!")
     return redirect('survey_year_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def question_list(request):
     """List all questions with their assigned years"""
     questions = CCquestion.objects.all().prefetch_related('year_links__year', 'choices')
@@ -258,7 +259,7 @@ def question_list(request):
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def create_question(request):
     """Create a new question with choices"""
     if request.method == 'POST':
@@ -286,7 +287,7 @@ def create_question(request):
     
     return redirect('question_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def edit_question(request, question_id):
     """Edit a question and its choices"""
     question = get_object_or_404(CCquestion, id=question_id)
@@ -320,7 +321,7 @@ def edit_question(request, question_id):
     
     return redirect('question_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def delete_question(request, question_id):
     """Delete a question"""
     question = get_object_or_404(CCquestion, id=question_id)
@@ -328,7 +329,7 @@ def delete_question(request, question_id):
     messages.success(request, "Question deleted successfully!")
     return redirect('question_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def assign_question_to_year(request):
     """Assign a question to a survey year (reuse question)"""
     if request.method == 'POST':
@@ -353,7 +354,7 @@ def assign_question_to_year(request):
     
     return redirect('question_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def remove_question_from_year(request, assignment_id):
     """Remove a question from a survey year"""
     assignment = get_object_or_404(QuestionYear, id=assignment_id)
@@ -362,7 +363,7 @@ def remove_question_from_year(request, assignment_id):
     messages.success(request, f"Question removed from {year}!")
     return redirect('question_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def configure_survey_year(request, year_id):
     """Configure which questions and SQDs are used for a specific year"""
     year = get_object_or_404(SurveyYear, id=year_id)
@@ -422,7 +423,7 @@ def configure_survey_year(request, year_id):
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def sqd_list(request):
     """List all Service Quality Dimensions"""
     sqds = ServiceQualityDimension.objects.all().prefetch_related('year_links__year')
@@ -435,7 +436,7 @@ def sqd_list(request):
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def create_sqd(request):
     """Create a new Service Quality Dimension"""
     if request.method == 'POST':
@@ -448,7 +449,7 @@ def create_sqd(request):
     
     return redirect('sqd_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def assign_sqd_to_year(request):
     """Assign a SQD to a survey year"""
     if request.method == 'POST':
@@ -476,7 +477,7 @@ def assign_sqd_to_year(request):
 # =========================
 # API ENDPOINTS
 # =========================
-@login_required
+@login_required(login_url='/h/auth/login/')
 def get_questions_for_year(request, year_id):
     """API endpoint to get questions for a specific year"""
     year = get_object_or_404(SurveyYear, id=year_id)
@@ -495,7 +496,7 @@ def get_questions_for_year(request, year_id):
     
     return JsonResponse({'questions': questions_data})
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def get_sqds_for_year(request, year_id):
     """API endpoint to get SQDs for a specific year"""
     year = get_object_or_404(SurveyYear, id=year_id)
@@ -508,7 +509,7 @@ def get_sqds_for_year(request, year_id):
     
     return JsonResponse({'sqds': sqds_data})
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def satisfaction_survey_list(request):
     """List all satisfaction surveys"""
     surveys = SatisfactionSurvey.objects.all().select_related(
@@ -526,7 +527,7 @@ def satisfaction_survey_list(request):
     }
     return HttpResponse(template.render(context, request))
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def delete_satisfaction_survey(request, survey_id):
     """Delete a satisfaction survey and all related responses"""
     survey = get_object_or_404(SatisfactionSurvey, id=survey_id)
@@ -537,7 +538,7 @@ def delete_satisfaction_survey(request, survey_id):
     
     return redirect('satisfaction_survey_list')
 
-@login_required
+@login_required(login_url='/h/auth/login/')
 def view_satisfaction_survey(request, survey_id):
     """View detailed information about a specific satisfaction survey"""
     survey = get_object_or_404(SatisfactionSurvey.objects.select_related(
@@ -553,5 +554,14 @@ def view_satisfaction_survey(request, survey_id):
     template = loader.get_template('dashboard/manage/view_satisfaction_survey.html')
     context = {
         'survey': survey,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+
+def printed_layout(request):
+    template = loader.get_template('dashboard/clientSatisfaction_layout/layout.html')
+    context={
+
     }
     return HttpResponse(template.render(context, request))

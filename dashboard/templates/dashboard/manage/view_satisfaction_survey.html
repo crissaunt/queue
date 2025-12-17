@@ -7,170 +7,303 @@ Survey Details #{{ survey.id }}
 {% block content %}
 {% load static %}
 
-<div class="min-h-screen bg-gray-50 px-6 py-10">
-  <!-- HEADER -->
-  <header class="mb-10 border-b border-gray-200 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-center gap-4">
-      <a href="{% url 'satisfaction_survey_list' %}" class="text-[#10420C] hover:text-[#0d3410] transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-      </a>
-      <div>
-        <h1 class="text-lg font-semibold text-gray-900">Survey Details</h1>
-        <p class="text-[11px] text-gray-500 mt-1">Complete information for survey #{{ survey.id }}</p>
-      </div>
-    </div>
-    <a href="{% url 'satisfaction_survey_list' %}" 
-       class="text-[11px] uppercase bg-gray-100 text-gray-800 px-4 py-2 hover:bg-gray-200 font-medium transition">
-      Back to List
-    </a>
-  </header>
+<style>
+    .inria-sans-regular {
+        font-family: "Inria Sans", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
 
-  <!-- CONTENT GRID -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- LEFT COLUMN -->
-    <div class="lg:col-span-1 space-y-8">
-      <!-- SURVEY OVERVIEW -->
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Survey Overview</h2>
-        <div class="space-y-3">
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Survey ID</p>
-            <p class="text-sm text-gray-900">#{{ survey.id }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Survey Year</p>
-            <p class="text-sm text-gray-900">{{ survey.survey_year.year }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Submitted</p>
-            <p class="text-sm text-gray-900">{{ survey.submitted_at|date:"M d, Y H:i" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Status</p>
-            {% if survey.cc_responses.all or survey.sqd_responses.all %}
-            <span class="text-[11px] font-medium text-green-700 bg-green-50 border border-green-200 px-2 py-[2px] uppercase">Completed</span>
-            {% else %}
-            <span class="text-[11px] font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-2 py-[2px] uppercase">Incomplete</span>
-            {% endif %}
-          </div>
-        </div>
-      </section>
+    .inria-serif-regular {
+        font-family: "Inria Serif", serif;
+        font-weight: 400;
+        font-style: normal;
+    }
 
-      <!-- CLIENT INFORMATION -->
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Client Information</h2>
-        <div class="space-y-3">
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Client Type</p>
-            <p class="text-sm text-gray-900">{{ survey.client_type.name|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Government</p>
-            <p class="text-sm text-gray-900">{{ survey.government|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Visit Date</p>
-            <p class="text-sm text-gray-900">{{ survey.visit_date|date:"M d, Y"|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Sex</p>
-            <p class="text-sm text-gray-900">{{ survey.sex|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Age</p>
-            <p class="text-sm text-gray-900">{{ survey.age|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Region</p>
-            <p class="text-sm text-gray-900">{{ survey.region|default:"Not specified" }}</p>
-          </div>
-        </div>
-      </section>
+    /* PRINT ONLY MAIN CONTENT (bond-paper) */
+    @media print {
+    @page {
+        size: 8.5in 13in;
+        margin: 0.2in; /* smaller margins */
+    }
 
-       <!-- SERVICE INFO -->
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Service Information</h2>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Office/Person</p>
-            <p class="text-sm text-gray-900">{{ survey.office_person|default:"Not specified" }}</p>
-          </div>
-          <div>
-            <p class="text-[11px] text-gray-500 uppercase tracking-wide">Service Availed</p>
-            <p class="text-sm text-gray-900">{{ survey.service_availed|default:"Not specified" }}</p>
-          </div>
-        </div>
-      </section>
-    </div>
+    /* Hide everything first */
+    body * {
+        visibility: hidden !important;
+    }
 
-    <!-- RIGHT COLUMN -->
-    <div class="lg:col-span-2 space-y-8">
-    
+    /* Show only the printable area */
+    .bond-paper, 
+    .bond-paper * {
+        visibility: visible !important;
+    }
 
-      <!-- CC RESPONSES -->
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Citizen's Charter Responses</h2>
-        {% if survey.cc_responses.all %}
-        <div class="divide-y divide-gray-100">
-          {% for response in survey.cc_responses.all %}
-          <div class="py-4">
-            <p class="text-sm font-medium text-gray-900 mb-1">{{ response.question_year.question.name }}</p>
-            <p class="text-[11px] text-[#10420C] bg-[#10420C]/10 border border-[#10420C]/20 px-3 py-[3px] inline-block uppercase font-medium">
-              {{ response.choice.name }}
-            </p>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <p class="text-sm text-gray-500 text-center py-4">No Citizen’s Charter responses</p>
-        {% endif %}
-      </section>
+    /* Position the printable content on the page */
+    .bond-paper {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.2in !important; /* smaller padding */
+        box-shadow: none !important;
+    }
 
-      <!-- SQD RESPONSES -->
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Service Quality Dimension Ratings</h2>
-        {% if survey.sqd_responses.all %}
-        <div class="divide-y divide-gray-100">
-          {% for response in survey.sqd_responses.all %}
-          <div class="py-4">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-medium text-gray-900">{{ response.sqd_year.sqd.name }}</p>
-              <div class="flex items-center gap-1">
-                {% for i in "12345" %}
-                  {% if forloop.counter <= response.rating %}
-                  <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                  {% else %}
-                  <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                  {% endif %}
-                {% endfor %}
-                <span class="text-[11px] text-gray-600 ml-1">({{ response.rating }}/5)</span>
-              </div>
+    /* Remove everything marked as no-print */
+    .no-print {
+        display: none !important;
+    }
+}
+
+
+    @media screen {
+        .bond-paper {
+            width: 8.5in;
+            min-height: 13in;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .checkbox-filled {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #374151;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+        vertical-align: middle;
+        font-weight: bold;
+        font-size: 12px;
+    }
+</style>
+
+
+<div class="min-h-screen bg-gray-100 flex flex-col text-sm inria-serif-regular">
+    <!-- Navigation Header (No Print) -->
+    <header class="no-print mb-6 bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'satisfaction_survey_list' %}" class="text-[#10420C] hover:text-[#0d3410] transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </a>
+                <div>
+                    <h1 class="text-lg font-semibold text-gray-900">Survey #{{ survey.id }}</h1>
+                    <p class="text-xs text-gray-500">Printable Form View</p>
+                </div>
             </div>
-          </div>
-          {% endfor %}
+            <a href="{% url 'satisfaction_survey_list' %}" 
+               class="text-xs uppercase bg-gray-100 text-gray-800 px-4 py-2 hover:bg-gray-200 font-medium transition">
+                Back to List
+            </a>
         </div>
-        {% else %}
-        <p class="text-sm text-gray-500 text-center py-4">No SQD ratings recorded</p>
-        {% endif %}
-      </section>
+    </header>
 
-      <!-- FEEDBACK -->
-      {% if survey.feedback %}
-      <section class="bg-white border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Client Feedback</h2>
-        <p class="text-sm text-gray-900 leading-relaxed">{{ survey.feedback }}</p>
-        {% if survey.email %}
-        <p class="text-[11px] text-gray-500 mt-3">Email: {{ survey.email }}</p>
-        {% endif %}
-      </section>
-      {% endif %}
+    <!-- Main Content -->
+    <div class="flex-1 flex items-center justify-center p-4">
+        <!-- Bond Paper Container -->
+        <div class="bond-paper bg-white relative mx-auto px-10 py-6">
+            <!-- Header Section -->
+            <div class="header w-full text-center">
+                <div class="w-full">
+                    <img src="{% static 'images/header-logo.svg' %}" 
+                         alt="Company Logo" 
+                         class="w-full h-auto max-h-24 object-contain mx-auto"
+                         style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                </div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="w-full mt-3">
+                <!-- Survey Title -->
+                <div class="text-center">
+                    <h1 class="font-bold uppercase mb-2">
+                        CLIENT SATISFACTION MEASUREMENT SURVEY
+                    </h1>
+                </div>
+
+                <div class="flex flex-col space-y-3">
+                    <h1 class="text-sm font-bold text-center">
+                        HELP US SERVE YOU BETTER!
+                    </h1>
+                    <p class="text-xs">
+                        The Client Satisfaction Measurement (CSM) tracks the customer experience of government offices. 
+                        Your feedback on your <strong>recently concluded transaction</strong> will help this office provide 
+                        a better service. Personal information shared will be kept confidential and you always have the option 
+                        to not answer this form.
+                    </p>
+
+                    <!-- Client Type -->
+                    1
+
+                    <!-- Government -->
+                    <div class="flex space-x-5 text-xs flex-1 gap-5">
+                        <h1 class="font-bold">Government:</h1>
+                        <div class="flex gap-1">
+                            <span class="checkbox-filled">{% if survey.government == "Employee" %}✔{% endif %}</span>
+                            <label>Employee</label>
+                        </div>
+                        <div class="flex gap-1">
+                            <span class="checkbox-filled">{% if survey.government == "Other Agency" %}✔{% endif %}</span>
+                            <label>Other Agency</label>
+                        </div>
+                    </div>
+
+                    <!-- Date, Sex, Age -->
+                    <div class="flex justify-between text-xs">
+                        <div class="flex gap-1">
+                            <label>Date:</label>
+                            <span class="underline border-b px-2">{{ survey.visit_date|date:"M d, Y"|default:"___________" }}</span>
+                        </div>
+
+                        <div class="flex gap-1 items-center">
+                            <h1>Sex:</h1>
+                            <div class="flex gap-5 items-center">
+                                <div class="flex items-center gap-1">
+                                    <span class="checkbox-filled">{% if survey.sex == "Male" %}✔{% endif %}</span>
+                                    <label>Male</label>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="checkbox-filled">{% if survey.sex == "Female" %}✔{% endif %}</span>
+                                    <label>Female</label>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="checkbox-filled">{% if survey.sex == "Others" %}✔{% endif %}</span>
+                                    <label>Others</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-1 text-xs">
+                            <label>Age:</label>
+                            <span class="underline border-b px-2">{{ survey.age|default:"___" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Region and Office -->
+                    <div class="flex gap-5 text-xs">
+                        <div class="flex gap-1">
+                            <label>Region of Residence:</label>
+                            <span class="underline border-b px-2">{{ survey.region|default:"___________" }}</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <label>Office/Person Visited:</label>
+                            <span class="underline border-b px-2">{{ survey.office_person|default:"___________" }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Service Availed -->
+                    <div class="flex flex-1 text-xs">
+                        <div class="flex gap-1 flex-1">
+                            <label>Service Availed:</label>
+                            <span class="underline border-b flex-1 px-2">{{ survey.service_availed|default:"_____________________" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full border-[1.5px] my-5"></div>
+
+                <!-- CC Questions -->
+                <div class="flex flex-col space-y-3 w-full text-xs">
+                    <div class="flex">
+                        <p class="text-xs">
+                            INSTRUCTION: <strong>Check mark (✔)</strong> your answer to the <strong>Citizen's Charter (CC)</strong> questions. 
+                            The Citizen's Charter is an official document that reflects the services of a government agency/office including 
+                            its requirements, fees, and processing times among others.
+                        </p>
+                    </div>
+
+                    {% for response in survey.cc_responses.all %}
+                    <div class="flex gap-5">
+                        <h1 class="font-bold">CC{{ forloop.counter }}</h1>
+                        <div class="flex flex-col gap-1">
+                            <h1 class="font-bold">{{ response.question_year.question.name }}</h1>
+                            {% for choice in response.question_year.question.choices.all %}
+                            <div class="flex space-x-2">
+                                <span class="checkbox-filled">{% if response.choice == choice %}✔{% endif %}</span>
+                                <label>{{ choice.name }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="w-full border-[1.5px] my-5"></div>
+
+                <!-- SQD Ratings Table -->
+                <div>
+                    <h1 class="font-bold text-xs mb-2">INSTRUCTIONS:</h1>
+                    <div class="text-xs">
+                        <p class="mb-2">For SQD 0-8. Please put a <strong>check mark (✔)</strong> on the column that best corresponds to your answer</p>
+                        <table class="min-w-full border-collapse border">
+                            <thead>
+                                <tr class="bg-gray-200 text-gray-700 text-xs">
+                                    <th class="p-1 border text-center">Service Quality Dimensions</th>
+                                    <th class="p-1 border text-center">
+                                        <i class='bx bx-happy text-3xl'></i><br>Strongly Agree
+                                    </th>
+                                    <th class="p-1 border text-center">
+                                        <i class='bx bx-smile text-3xl'></i><br>Agree
+                                    </th>
+                                    <th class="p-1 border text-center">
+                                        <i class='bx bx-meh text-3xl'></i><br>Neither
+                                    </th>
+                                    <th class="p-1 border text-center">
+                                        <i class='bx bx-sad text-3xl'></i><br>Disagree
+                                    </th>
+                                    <th class="p-1 border text-center">
+                                        <i class='bx bx-angry text-3xl'></i><br>Strongly Disagree
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for response in survey.sqd_responses.all %}
+                                <tr class="hover:bg-gray-50 even:bg-gray-50">
+                                    <td class="px-2 py-2 border">SQD{{ forloop.counter0 }}. {{ response.sqd_year.sqd.name }}</td>
+                                    <td class="px-2 py-2 border text-center">{% if response.rating == 5 %}✔{% endif %}</td>
+                                    <td class="px-2 py-2 border text-center">{% if response.rating == 4 %}✔{% endif %}</td>
+                                    <td class="px-2 py-2 border text-center">{% if response.rating == 3 %}✔{% endif %}</td>
+                                    <td class="px-2 py-2 border text-center">{% if response.rating == 2 %}✔{% endif %}</td>
+                                    <td class="px-2 py-2 border text-center">{% if response.rating == 1 %}✔{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                {% if survey.feedback %}
+                <div class="mt-5 text-base">
+                    <h1 class="font-bold text-xs mb-2">Suggestion in how we can urther improve our services (optional):</h1>
+                    <div class="p-3 text-xs">
+                        <p class="underline text-lg font-medium">{{ survey.feedback }}</p>
+                    </div>  
+                </div>
+                {% endif %}
+
+                {% if survey.email %}
+                  <div class=" p-3 text-base space-x-1">
+                    <h1 class="  flex ">Email address (optional): <p class="underline text-lg font-medium"> {{ survey.email }}</p> </h1>
+                  </div>
+                {% endif %}
+            </div>
+
+            <h1 class="text-center">THANK YOU!</h1>
+
+            <h1>F-XSMS-001a</h1>
+            <h1>Rev .0,, 02/26/2024</h1>
+        </div>
     </div>
-  </div>
+
+    <!-- Print Button -->
+    <button class="no-print fixed bottom-8 right-8 bg-[#10420C] text-white px-6 py-4 rounded-lg shadow-xl hover:bg-[#0d3410] transition-all duration-300 flex items-center gap-3 font-semibold group" onclick="window.print()">
+        <i class='bx bx-printer text-xl group-hover:scale-110 transition-transform'></i>
+        <span>Print Survey Form</span>
+    </button>
 </div>
+
 {% endblock %}

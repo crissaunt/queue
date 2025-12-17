@@ -1,15 +1,17 @@
+# dashboard/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    # Authentication URLs
-    path('register/', views.register_view, name='register'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
+    # Authentication URLs - under /my/admin/
+    path('register/', views.register_view, name='dashboard_register'),
+    path('login/', views.login_view, name='dashboard_login'),
+    path('logout/', views.logout_view, name='dashboard_logout'),
 
-
-    path('', views.home ,name='dashboard'),
+    # Main dashboard - under /my/admin/
+    path('', views.home, name='dashboard'),
+    
     # Survey Year Management
     path('years/', views.survey_year_list, name='survey_year_list'),
     path('years/create/', views.create_survey_year, name='create_survey_year'),
@@ -33,10 +35,10 @@ urlpatterns = [
     path('api/years/<int:year_id>/questions/', views.get_questions_for_year, name='get_questions_for_year'),
     path('api/years/<int:year_id>/sqds/', views.get_sqds_for_year, name='get_sqds_for_year'),
 
-
     # Satisfaction Surveys
     path('surveys/satisfaction/', views.satisfaction_survey_list, name='satisfaction_survey_list'),
     path('surveys/satisfaction/<int:survey_id>/', views.view_satisfaction_survey, name='view_satisfaction_survey'),
     path('surveys/satisfaction/<int:survey_id>/delete/', views.delete_satisfaction_survey, name='delete_satisfaction_survey'),
-  
+
+    path('surveys/printed/layout/', views.printed_layout, name='printed_layout'),
 ]

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Caraga State University Cabadbaran Campus(CSUCC)</title>
+    <title>Caraga State University Cabadbaran Campus (CSUCC)</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
     <link href="{% static 'src/output.css' %}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,192 +12,543 @@
     <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <style>
         .odor-mean-chey-regular {
-                                font-family: "Odor Mean Chey", serif;
-                                font-weight: 400;
-                                font-style: normal;
-                                }
+            font-family: "Odor Mean Chey", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
 
         .medula-one-regular {
-                            font-family: "Medula One", system-ui;
-                            font-weight: 400;
-                            font-style: normal;
-                            }
+            font-family: "Medula One", system-ui;
+            font-weight: 400;
+            font-style: normal;
+        }
 
         .inria-sans-regular {
-                            font-family: "Inria Sans", sans-serif;
-                            font-weight: 400;
-                            font-style: normal;
-                            }
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
 
-         .custom-bg {
-                background-image: url("{% static 'images/bg-image.svg' %}");
-                background-size: cover;        /* fill the screen */
-                /* background-position: center;   center the image */
-                background-repeat: no-repeat;  /* don’t repeat */
-                background-attachment: scroll; /* make background scroll with content */
-                }
+        .custom-bg {
+            background-image: url("{% static 'images/bg-image.svg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            background-position: center;
+        }
 
+        .priority-glow {
+            color: #ED7676 !important;
+            text-shadow: 0 0 5px rgba(237, 118, 118, 0.2), 0 0 40px rgba(237, 118, 118, 0.2);
+        }
 
+        .skip-glow {
+            color: #FFCC00 !important;
+            text-shadow: 0 0 5px rgba(255, 204, 0, 0.2), 0 0 40px rgba(255, 204, 0, 0.2);
+        }
 
+        .stopped-glow {
+            color: #bb2124 !important;
+            text-shadow: 0 0 10px rgba(187, 33, 36, 0.4), 0 0 60px rgba(187, 33, 36, 0.3);
+        }
 
-    .priority-glow {
-        color: #ED7676 !important;
-        text-shadow: 0 0 5px rgba(237, 118, 118, 0.2), 0 0 40px rgba(237, 118, 118, 0.2);
-    }
+        /* Queue Stopped Overlay */
+        .queue-stopped-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(16, 66, 12, 0.95);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            text-align: center;
+            padding: 1rem;
+        }
 
+        .queue-stopped-content {
+            font-family: "Odor Mean Chey", serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
 
-    .skip-glow {
-        color: #FFCC00 !important;
-        text-shadow: 0 0 5px rgba(255, 204, 0, 0.2), 0 0 40px rgba(255, 204, 0, 0.2);
-    }
+        .queue-stopped-subtitle {
+            font-family: "Inria Sans", sans-serif;
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
 
-    /* Shake animation */
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        20%, 60% { transform: translateX(-8px); }
-        40%, 80% { transform: translateX(8px); }
-    }
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
 
-    .shake {
-        animation: shake 0.3s ease-in-out;
-    }
+        /* Blinking animation for stopped state */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
 
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+
+        /* Shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        /* Smooth transitions */
+        .smooth-transition {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .queue-stopped-content {
+                font-size: 1.75rem;
+            }
+            
+            .queue-stopped-subtitle {
+                font-size: 1rem;
+            }
+            
+            .space-y-20 {
+                gap: 2rem !important;
+            }
+            
+            .text-\[96px\] {
+                font-size: 3rem !important;
+            }
+            
+            .text-\[300px\] {
+                font-size: 8rem !important;
+            }
+            
+            .text-3xl {
+                font-size: 1.5rem !important;
+            }
+            
+            .text-\[32px\] {
+                font-size: 1.25rem !important;
+            }
+            
+            .text-\[64px\] {
+                font-size: 2.5rem !important;
+            }
+            
+            .gap-16 {
+                gap: 1rem !important;
+            }
+            
+            .flex.gap-16 {
+                flex-direction: column !important;
+            }
+            
+            .min-w-185 {
+                min-width: 100% !important;
+            }
+            
+            .max-w-50 {
+                max-width: 100% !important;
+                margin-top: 0 !important;
+                text-align: center !important;
+            }
+            
+            .mt-12 {
+                margin-top: 1rem !important;
+            }
+            
+            .border-2.w-2\/3 {
+                width: 90% !important;
+            }
+            
+            .h-\[86px\] {
+                height: 60px !important;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .text-\[96px\] {
+                font-size: 4rem !important;
+            }
+            
+            .text-\[300px\] {
+                font-size: 12rem !important;
+            }
+            
+            .queue-stopped-content {
+                font-size: 4rem;
+            }
+            
+            .queue-stopped-subtitle {
+                font-size: 2rem;
+            }
+            
+            .space-y-20 {
+                gap: 3rem !important;
+            }
+            
+            .gap-16 {
+                gap: 2rem !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .queue-stopped-content {
+                font-size: 8rem;
+            }
+            
+            .queue-stopped-subtitle {
+                font-size: 3rem;
+            }
+            
+            .text-\[96px\] {
+                font-size: 6rem !important;
+            }
+            
+            .text-\[300px\] {
+                font-size: 20rem !important;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .queue-stopped-overlay {
+                display: none !important;
+            }
+            
+            .custom-bg {
+                background-image: none !important;
+                background-color: white !important;
+            }
+            
+            footer {
+                display: none !important;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .queue-stopped-content {
+                font-size: 2rem;
+            }
+            
+            .queue-stopped-subtitle {
+                font-size: 1rem;
+            }
+            
+            .text-\[300px\] {
+                font-size: 6rem !important;
+            }
+            
+            .flex.gap-16 {
+                flex-direction: row !important;
+                flex-wrap: wrap;
+            }
+            
+            .min-w-185 {
+                min-width: 45% !important;
+            }
+            
+            .max-w-50 {
+                min-width: 45% !important;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .shake {
+                animation-duration: 0.5s;
+            }
+            
+            .blink {
+                animation-duration: 2s;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .shake, .blink, .smooth-transition {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
-<body class="custom-bg flex flex-col  min-h-screen  ">
+<body class="custom-bg flex flex-col min-h-screen">
 
-    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-t-[40px] border-[#10420C]">
-        <div class="gap-4 mt-5 max-w-screen-2xl w-full mx-auto ">
-            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+    <!-- Queue Stopped Overlay -->
+    <div id="queueStoppedOverlay" class="queue-stopped-overlay hidden">
+        <div class="queue-stopped-content blink">⏸️ QUEUE STOPPED</div>
+        <div class="queue-stopped-subtitle">Please wait for queue to resume</div>
+    </div>
+
+    <header class="flex w-full mx-auto bg-transparent p-4 md:p-2 border-t-[20px] md:border-t-[30px] border-[#10420C]">
+        <div class="gap-4 mt-3 md:mt-5 max-w-screen-2xl w-full mx-auto px-4 md:px-0">
+            <img src="{% static 'images/header-logo.svg' %}" 
+                 alt="CSUCC Logo" 
+                 class="pl-4 md:pl-9 h-10 md:h-12 w-auto">
         </div>
     </header>
 
-    <main class="flex flex-col space-y-20 max-w-screen-2xl w-full mx-auto px-4 flex-1">
-        <div class="flex flex-col items-center justify-center space-y-0 leading-none">
-            <h2 class="text-[96px] odor-mean-chey-regular text-[#10420C]" id="mainTitle"  >Current Serving</h2>
-            <h1 class="medula-one-regular text-[300px] text-[#10420C]" id="ticketNumber" 
-               >-</h1>
-            <div class="border-2 w-2/3 bg-[#10420C]"></div>
+    <main class="flex flex-col space-y-10 md:space-y-20 max-w-screen-2xl w-full mx-auto px-4 md:px-6 lg:px-8 flex-1 py-4 md:py-0">
+        <div class="flex flex-col items-center justify-center space-y-2 md:space-y-0 leading-none">
+            <h2 class="text-4xl md:text-6xl lg:text-[96px] odor-mean-chey-regular text-[#10420C] text-center" id="mainTitle">Current Serving</h2>
+            <h1 class="medula-one-regular text-8xl md:text-[150px] lg:text-[300px] text-[#10420C] smooth-transition text-center" id="ticketNumber">-</h1>
+            <div class="border-2 w-4/5 md:w-2/3 bg-[#10420C]"></div>
         </div>
 
-        <div class="flex  gap-16  items-center  ">
+        <div class="flex flex-col lg:flex-row gap-6 md:gap-16 items-center">
             <!-- Image -->
-            <div class="flex-1 min-w-185 ">
-                <img src="{% static 'images/carousel1.svg' %}" alt="" class="w-full h-auto">
+            <div class="flex-1 w-full lg:min-w-[185px]">
+                <img src="{% static 'images/carousel1.svg' %}" 
+                     alt="CSUCC Campus" 
+                     class="w-full h-auto max-h-[300px] md:max-h-[400px] object-contain">
             </div>
 
             <!-- Vision Mission -->
-            <div class="flex-1 text-center space-y-5 px-2  ">
-                <h2 class="text-3xl text-[#1E1E1E] odor-mean-chey-regular">Vision Mission</h2>
-                <p class="text-sm inria-sans-regular text-center w-md">
-                    Vision A socially-engaged digital, innovation, and entrepreneurial university excelling globally in science, engineering, and the arts by 2028. 
-                    Mission As a transformative university, CSU is a responsible steward of problem-solvers and value creators who are driven to create a sustainable future for the region, the nation, and beyond. 
-                    General Mandate Caraga State University shall primarily provide advanced …
+            <div class="flex-1 text-center space-y-3 md:space-y-5 px-2">
+                <h2 class="text-xl md:text-2xl lg:text-3xl text-[#1E1E1E] odor-mean-chey-regular">Vision Mission</h2>
+                <p class="text-xs md:text-sm inria-sans-regular text-center">
+                    Vision: A socially-engaged digital, innovation, and entrepreneurial university excelling globally in science, engineering, and the arts by 2028. 
+                    Mission: As a transformative university, CSU is a responsible steward of problem-solvers and value creators who are driven to create a sustainable future for the region, the nation, and beyond. 
+                    General Mandate: Caraga State University shall primarily provide advanced education, higher technological, professional instruction and training in various fields including agriculture, engineering, education, medicine, and information technology.
                 </p>
             </div>
 
             <!-- Date & Time -->
-            <div class="flex-1 flex flex-col max-w-50 leading-none mt-12">
+            <div class="flex-1 flex flex-col max-w-full lg:max-w-[200px] leading-none mt-0 lg:mt-12 text-center lg:text-left">
                 <div class="flex flex-col leading-none">
-                    <h3 id="dayName" class="odor-mean-chey-regular text-[32px] text-[#10420C]" >---</h3>
-                    <p id="dateText" class="text-sm text-[#10420C]">---</p>
+                    <h3 id="dayName" class="odor-mean-chey-regular text-lg md:text-xl lg:text-[32px] text-[#10420C]">---</h3>
+                    <p id="dateText" class="text-xs md:text-sm text-[#10420C]">---</p>
                 </div>
-                <div class="flex mt-2"> 
-                    <p class="odor-mean-chey-regular text-[32px] text-[#10420C]">
-                    <strong id="timeText" class="text-[64px] text-[#1E1E1E] medula-one-regular" >--:--</strong>
-                    <span id="ampm">--</span>
+                <div class="flex mt-2 justify-center lg:justify-start"> 
+                    <p class="odor-mean-chey-regular text-lg md:text-xl lg:text-[32px] text-[#10420C]">
+                        <strong id="timeText" class="text-3xl md:text-5xl lg:text-[64px] text-[#10420C] medula-one-regular">--:--</strong>
+                        <span id="ampm" class="text-base md:text-lg lg:text-[32px]">--</span>
                     </p>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <footer class="bg-[#10420C] h-[86px] w-full">
-
-    </footer>
-
+    
 
     <script>
-window.onload = function() {
-  const ticketEl = document.getElementById("ticketNumber");
+    window.onload = function () {
+        const ticketEl = document.getElementById("ticketNumber");
+        const mainTitle = document.getElementById("mainTitle");
+        const queueStoppedOverlay = document.getElementById("queueStoppedOverlay");
 
-  const mainTitle = document.getElementById("mainTitle");
+        let isQueueRunning = true;
+        let currentStudentData = null;
 
-    function updateTime() {
-    const now = new Date();
+        function updateTime() {
+            const now = new Date();
+            const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+            const months = [
+                "January","February","March","April","May","June",
+                "July","August","September","October","November","December"
+            ];
 
-    const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-    const months = [
-        "January","February","March","April","May","June",
-        "July","August","September","October","November","December"
-    ];
+            const dayName = days[now.getDay()];
+            const month = months[now.getMonth()];
+            const day = now.getDate();
+            const year = now.getFullYear();
 
-    const dayName = days[now.getDay()];
-    const month = months[now.getMonth()];
-    const day = now.getDate();
-    const year = now.getFullYear();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, "0");
+            const ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
 
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; 
+            document.getElementById("dayName").textContent = dayName;
+            document.getElementById("dateText").textContent = `${month} ${day} ${year}`;
+            document.getElementById("timeText").textContent = `${hours}:${minutes}`;
+            document.getElementById("ampm").textContent = ampm;
+        }
 
-    // update DOM
-    document.getElementById("dayName").textContent = dayName;
-    document.getElementById("dateText").textContent = `${month} ${day} ${year}`;
-    document.getElementById("timeText").textContent = `${hours}:${minutes}`;
-    document.getElementById("ampm").textContent = ampm;
-    }
+        // -------------------------------------------------------------
+        //  🔌 WebSocket Connection
+        // -------------------------------------------------------------
+        let socket;
+        
+        function connectWebSocket() {
+            socket = new WebSocket("ws://" + window.location.host + "/ws/display/");
 
-  // WebSocket
-  const socket = new WebSocket("ws://" + window.location.host + "/ws/display/");
+            socket.onopen = function () {
+                console.log("✅ Connected to display WebSocket");
+                socket.send(JSON.stringify({ message: "update" }));
+            };
 
-  socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    console.log("WebSocket payload:", data);
-    updateDisplay(data.current);
-  };
+            socket.onmessage = function (event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log("📡 WS Data:", data);
 
-  function updateDisplay(current) {
-    if (current) {
-      ticketEl.textContent = current.ticket_number || "R-000";
+                    // Handle display_update messages
+                    if (data.type === "display_update" && data.data) {
+                        const displayData = data.data;
+                        
+                        // Extract queue status and current student data
+                        const queueStatus = displayData.queue_status;
+                        const currentStudent = displayData.current;
+                        
+                        // Update queue status first
+                        if (queueStatus !== undefined) {
+                            updateQueueStatus(queueStatus);
+                        }
+                        
+                        // Update student display if queue is running
+                        if (currentStudent !== undefined) {
+                            currentStudentData = currentStudent;
+                            if (isQueueRunning) {
+                                updateDisplay(currentStudent);
+                            }
+                        }
+                    }
+                    // Handle other message types if needed
+                    else if (data.type === "chat_message") {
+                        // Trigger a refresh to get latest data
+                        socket.send(JSON.stringify({ message: "update" }));
+                    }
+                    
+                } catch (error) {
+                    console.error("❌ Error parsing WebSocket data:", error);
+                }
+            };
 
-      mainTitle.classList.remove("priority-glow", "skip-glow", "shake");
+            socket.onerror = function (error) {
+                console.error("❌ WebSocket error:", error);
+            };
 
-      if (current.is_priority === "yes") {
-        ticketEl.style.color = "#ED7676";
+            socket.onclose = function () {
+                console.log("🔌 WebSocket closed");
+                // Try to reconnect after 3 seconds
+                setTimeout(() => {
+                    console.log("🔄 Attempting to reconnect...");
+                    connectWebSocket();
+                }, 3000);
+            };
+        }
 
-        mainTitle.textContent = "Priority Number";
-        mainTitle.classList.add("priority-glow", "shake");
-        setTimeout(() => mainTitle.classList.remove("shake"), 700);
-      } else if (current.skip_count && current.skip_count > 0) {
-        ticketEl.style.color = "#FFCC00";
+        // -------------------------------------------------------------
+        //  🛑 UPDATE QUEUE STATUS (Stop / Start)
+        // -------------------------------------------------------------
+        function updateQueueStatus(queueStatus) {
+            const wasRunning = isQueueRunning;
+            isQueueRunning = queueStatus?.is_running ?? true;
+            
+            console.log("🚦 Queue:", isQueueRunning ? "RUNNING" : "STOPPED");
 
-        mainTitle.textContent = "Recalling Number";
-        mainTitle.classList.add("skip-glow", "shake");
-      } else {
-        ticketEl.style.color = "#10420C";
+            if (!isQueueRunning) {
+                // Show queue stopped overlay
+                queueStoppedOverlay.classList.remove("hidden");
+                
+                // Update main display to show queue is stopped
+                mainTitle.textContent = "QUEUE STOPPED";
+                mainTitle.classList.add("stopped-glow");
+                mainTitle.classList.remove("priority-glow", "skip-glow");
+                
+                // Clear ticket number or show pause symbol
+                ticketEl.textContent = "⏸️";
+                ticketEl.style.color = "#bb2124";
+                
+                console.log("⏸️ Queue stopped overlay displayed");
+                
+            } else {
+                // Hide queue stopped overlay
+                queueStoppedOverlay.classList.add("hidden");
+                
+                // Reset main title
+                mainTitle.classList.remove("stopped-glow");
+                mainTitle.textContent = "CURRENT SERVING";
+                
+                // If we were previously stopped and have student data, show it
+                if (!wasRunning && currentStudentData) {
+                    updateDisplay(currentStudentData);
+                } else if (!currentStudentData) {
+                    ticketEl.textContent = "-";
+                    ticketEl.style.color = "#10420C";
+                }
+                
+                console.log("▶️ Queue running, overlay hidden");
+            }
+        }
 
-        mainTitle.textContent = "CURRENT SERVING";
-      }
-    } else {
-      ticketEl.textContent = "-";
+        // -------------------------------------------------------------
+        //  🎫 UPDATE STUDENT DISPLAY
+        // -------------------------------------------------------------
+        function updateDisplay(current) {
+            // Don't update display if queue is stopped
+            if (!isQueueRunning) {
+                console.log("⛔ Queue stopped — ignoring student display update");
+                return;
+            }
 
-      ticketEl.style.color = "#10934F";
-      
-      mainTitle.textContent = "CURRENT SERVING";
-      mainTitle.classList.remove("priority-glow", "skip-glow");
-    }
-  }
+            if (current) {
+                // Update ticket number
+                ticketEl.textContent = current.ticket_number || "R-000";
+                
+                // Reset styles
+                mainTitle.classList.remove("priority-glow", "skip-glow", "shake", "stopped-glow");
+                ticketEl.style.color = "#10420C";
 
-    updateTime();
-    setInterval(updateTime, 1000); 
+                // Apply special styles based on student type
+                if (current.is_priority === "yes") {
+                    ticketEl.style.color = "#ED7676";
+                    mainTitle.textContent = "Priority Number";
+                    mainTitle.classList.add("priority-glow", "shake");
+                    setTimeout(() => mainTitle.classList.remove("shake"), 700);
+                    
+                } else if (current.skip_count > 0) {
+                    ticketEl.style.color = "#FFCC00";
+                    mainTitle.textContent = "Recalling Number";
+                    mainTitle.classList.add("skip-glow", "shake");
+                    setTimeout(() => mainTitle.classList.remove("shake"), 700);
+                    
+                } else {
+                    mainTitle.textContent = "CURRENT SERVING";
+                }
 
-  
-};
+                console.log(`🎫 Displaying student: ${current.ticket_number}`);
+                
+            } else {
+                // No student currently being served
+                ticketEl.textContent = "-";
+                ticketEl.style.color = "#10420C";
+                mainTitle.textContent = "CURRENT SERVING";
+                mainTitle.classList.remove("priority-glow", "skip-glow", "stopped-glow");
+                
+                console.log("📭 No student currently serving");
+            }
+        }
 
+        // Initial setup
+        updateTime();
+        setInterval(updateTime, 1000);
+        
+        // Start WebSocket connection
+        connectWebSocket();
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ message: "update" }));
+            }
+        });
+    };
     </script>
-</body>
 
+</body>
 </html>

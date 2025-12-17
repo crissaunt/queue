@@ -67,8 +67,20 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'personel.middleware.PersonelAuthMiddleware',
+    'dashboard.middleware.DashboardAuthMiddleware',
     
 ]
+# settings.py
+LOGIN_URL = '/personel/auth/login/'
+LOGIN_REDIRECT_URL = '/personel/'
+LOGOUT_REDIRECT_URL = '/personel/auth/login/'
+
+# Session settings
+# SESSION_COOKIE_AGE = 86400
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
 
 ROOT_URLCONF = 'my_queue.urls'
 

@@ -6,6 +6,16 @@ Caraga State University Cabadbaran Campus(CSUCC)
 {% block content %}
 
 <style>
+    /* Queue status styles */
+.queue-stopped {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+.queue-stopped:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
 /* Bell animation styles */
 @keyframes swing-bell {
 0%   { transform: rotate(0deg); }
@@ -65,120 +75,228 @@ border-bottom: 1px solid #e5e7eb;
 font-weight: 600;
 background-color: #f9fafb;
 }
+
+/* Confirmation Modal Styles */
+.confirmation-modal {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.confirmation-modal-content {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Text Indication Styles */
+.action-indication {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+    display: none;
+    animation: fadeInScale 0.5s ease-out;
+}
+
+.action-indication.show {
+    display: block;
+}
+
+@keyframes fadeInScale {
+    from { 
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to { 
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.indication-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.indication-done .indication-icon {
+    color: #4CAF50;
+}
+
+.indication-call .indication-icon {
+    color: #2196F3;
+}
+
+.indication-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.indication-subtext {
+    font-size: 14px;
+    color: #666;
+}
 </style>
 
 {% load static %}
+
 <div class="flex mt-4 justify-between items-center mb-3">
     <div class="flex gap-2 md:gap-10 items-center">
-        <a href="#" class="text-sm border-b-3 border-[#10934F]">Dashboard</a>
+        <a href="#" class="text-xs border-b-3 border-[#10420C]">Dashboard</a>
         
         <!-- Bell container -->
         <div class="relative">  
             <div class="relative">
                 <i id="bell-icon" class="fa fa-bell text-2xl cursor-pointer text-gray-700"></i>
                 <span id="notification-badge"
-                    class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
+                    class="absolute -top-2 -right-2 bg-red-600 text-white text-[11px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">
                 </span>
             </div>
         </div>
+        
+        <!-- Test button for bell sound -->
+        <button onclick="testBellSound()" class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded">
+            Test Bell
+        </button>
     </div>
 
     <div class="flex gap-4 items-center">
-        <form action="{% url 'auth_logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="cursor-pointer hover:text-red-500 text-sm">Logout</button>
-        </form>
+        <button type="button" onclick="showLogoutConfirmation()" 
+                class="cursor-pointer hover:text-red-500 text-xs">
+            Logout
+        </button>
 
-        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-sm text-white px-4 py-1 rounded"
+        <button class="bg-[#bb2124] hover:bg-[#bb2124]/80 cursor-pointer text-xs text-white px-4 py-1 "
                 type="button"
                 onclick="document.getElementById('endAllModal').classList.remove('hidden')">
             END ALL
         </button>
 
         <!-- Confirmation Modal -->
-        <div id="endAllModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-white shadow-lg p-6 w-full max-w-md mx-4 rounded">
+        <div id="endAllModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 confirmation-modal">
+            <div class="bg-white shadow-lg p-6 w-full max-w-md mx-4  confirmation-modal-content">
                 <h2 class="text-lg font-semibold text-gray-800">Confirm Action</h2>
                 <p class="mt-2 text-gray-600">Are you sure you want to <b>cancel all</b> pending and skipped appointments?</p>
                 
                 <div class="mt-6 flex justify-end gap-3">
                     <button 
-                        class="px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 cursor-pointer rounded"
+                        class="px-4 py-2 text-xs bg-gray-300 hover:bg-gray-400 cursor-pointer "
                         onclick="document.getElementById('endAllModal').classList.add('hidden')">
                         No, Keep
                     </button>
                     <form method="post" action="{% url 'end_all_appointments' %}">
                         {% csrf_token %}
                         <button type="submit" 
-                            class="px-4 py-2 text-sm bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80 rounded">
+                            class="px-4 py-2 text-xs bg-[#bb2124] cursor-pointer text-white hover:bg-[#bb2124]/80 ">
                             Yes, End All
                         </button>
                     </form>
                 </div>
             </div>
+</div>
+    </div>
+</div>
+
+<!-- Audio status indicator -->
+<div class="flex items-center gap-4 mb-2">
+    <div class="flex items-center gap-2">
+        <div id="queue-status-indicator" class="w-3 h-3 rounded-full {% if queue_state %}bg-green-500 animate-pulse{% else %}bg-red-500{% endif %}"></div>
+        <span id="queue-status-text" class="text-xs {% if queue_state %}text-green-600{% else %}text-red-600{% endif %} font-medium">
+            {% if get_current_number %}
+                Queue: {% if queue_state %}RUNNING{% else %}STOPPED{% endif %}
+            {% else %}
+                NO CURRENT
+            {% endif %}
+        </span>
+    </div>
+    
+    <div id="audio-status" class="flex items-center gap-2 hidden">
+        <div id="audio-status-indicator" class="w-3 h-3 rounded-full bg-gray-400"></div>
+        <span class="text-xs text-gray-600 font-medium">Audio: Locked</span>
+    </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div id="logoutConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white  p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Confirm Logout</h2>
+            <p class="text-gray-600 mb-6">Are you sure you want to logout from the system?</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('logoutConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400  cursor-pointer">
+                Cancel
+            </button>
+            <form action="{% url 'auth_logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-5 py-2 bg-red-700 hover:bg-red-900 text-white  cursor-pointer">
+                    Yes, Logout
+                </button>
+            </form>
         </div>
     </div>
+</div>
+
+<!-- Action Text Indications -->
+<div id="doneIndication" class="action-indication indication-done">
+    <div class="indication-icon">✓</div>
+    <div class="indication-text">Marked as Done</div>
+    <div class="indication-subtext">Student has been processed successfully</div>
+</div>
+
+<div id="callIndication" class="action-indication indication-call">
+    <div class="indication-icon">📢</div>
+    <div class="indication-text">Calling Number</div>
+    <div class="indication-subtext">Announcing student number...</div>
 </div>
 
 <div class="w-full flex-1 flex flex-col gap-5 my-3">
     <!-- upper section -->
     <div class="flex gap-5 flex-1">
         <!-- serving section -->
-        <div class="flex-1 bg-white flex gap-2 shadow-md h-[420px] max-h-[430px] ">
+        <div class="flex-1 bg-white flex gap-2 shadow-md ">
             <!-- current serving -->
-            <div class="flex-1 border border-gray-400 px-5 pt-2 pb-8">
-                <h1 class="inria-sans-bold text-lg">Current Serving</h1>
-                
-                <!-- number -->
-                <div class="flex-1 flex justify-center my-4">
-                    <div class="border-b-2 border-gray-300">
-                        {% if get_current_number %}
-                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-[#10934F]">{{ get_current_number.ticket_number }}</h1>
-                        {% else %}
-                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-gray-400">---</h1>
-                        {% endif %}
-                    </div>
+            <div class="flex-1 border border-gray-400 py-2">
+                <div class="w-full px-5">
+                    <h1 class="inria-sans-regular">CURRENT SERVING</h1>
                 </div>
                 
-                <!-- information -->
-                <div class="flex-1 flex justify-between items-end my-5 mx-2">
-                    <div>
-                        <p class="text-gray-600 text-sm">
-                            Name: <strong id="current-name" class="text-black text-lg">
-                                {% if get_current_number %}
-                                    {{ get_current_number.firstName }} {{ get_current_number.middleName }}. {{ get_current_number.lastName }}
-                                {% else %}
-                                    ---
-                                {% endif %}
-                            </strong>
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-600 text-sm">
-                            Course: <strong id="current-course" class="text-black text-sm">
-                                {% if get_current_number %}
-                                    {{ get_current_number.courses }}
-                                {% else %}
-                                    ---
-                                {% endif %}
-                            </strong>
-                        </p>
-                        <p class="text-gray-600 text-sm">
-                            ID: <strong id="current-id" class="text-black text-sm">
-                                {% if get_current_number %}
-                                    {{ get_current_number.student_id }}
-                                {% else %}
-                                    ---
-                                {% endif %}
-                            </strong>
-                        </p>
+                <!-- number -->
+                <div class="flex-1 flex justify-center">
+                    <div class="border-b-2 border-gray-300">
+                        {% if get_current_number %}
+                            <h1 id="current-ticket-number" class="text-8xl medula-one-regular text-[#10420C]">{{ get_current_number.ticket_number }}</h1>
+                        {% else %}
+                            <h1 id="current-ticket-number" class="text-8xl text-gray-400">---</h1>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- request -->
-                <div class="w-full mt-2">
-                    <div class="bg-gray-200 w-full py-2">
-                        <h1 id="current-request" class="text-xl text-center inria-sans-bold">
+                <div class="w-full mt-2 px-5">
+                    <div class="bg-gray-200 inset-shadow-2xs w-full py-2">
+                        <h1 id="current-request" class="text-2xl text-center inria-sans-bold capitalize">
                             {% if get_current_number %}
                                 {% if get_current_number.requestType == None %}
                                     {{ get_current_number.custom_request }}
@@ -190,55 +308,113 @@ background-color: #f9fafb;
                             {% endif %}
                         </h1>
                     </div>
-                    <p class="w-full text-center text-sm text-gray-600">Request Type</p>
+                    <p class="w-full text-center text-[11px] text-gray-600">Request Type</p>
+                </div>
+                
+                <!-- information -->
+                <div class="mx-5">
+                    <table class="w-full text-left border-collapse">
+                        <tbody class="">
+                            <tr class="border-b">
+                                <td class="text-gray-600 text-[11px] font-medium">Name:</td>
+                                <td id="current-name" class="text-black font-semibold text-right">
+                                    {% if get_current_number %}
+                                        {{ get_current_number.firstName }} {{ get_current_number.middleName }} {{ get_current_number.lastName }}
+                                    {% else %}
+                                        ---
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="text-gray-600 text-[11px] font-medium">Course:</td>
+                                <td id="current-course" class="text-black font-semibold text-right">
+                                    {% if get_current_number %}
+                                        {{ get_current_number.courses }}
+                                    {% else %}
+                                        ---
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- buttons -->
-                <div id="current-buttons-container" class="flex-1 flex justify-between gap-2 mt-5">
+                <div id="current-buttons-container" class="flex-1 flex justify-between gap-2 mt-5 px-5">
                     {% if get_current_number %}
-                    <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
+                   <button type="button" onclick="showSkipConfirmation('{{ get_current_number.id }}', '{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
+                            class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-xs {% if not queue_state %}opacity-50 cursor-not-allowed{% endif %}"
+                            {% if not queue_state %}disabled{% endif %}
+                            id="skipButton">
+                        Skip
+                    </button>
+                    
+                    <!-- DONE BUTTON -->
+                    <form id="doneForm" action="{% url 'done_current_number' %}" method="post" class="w-full">
                         {% csrf_token %}
                         <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}">
-                        <button type="submit" name="action" value="skip"
-                            class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-sm">
-                            Skip
-                        </button>
-                    </form>
-                    <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_number" value="{{ get_current_number.id }}">
-                        <button type="submit" name="action" value="done"
-                            class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-sm">
+                        <input type="hidden" name="action" value="done">
+                        <button type="button" onclick="showDoneAction('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
+                                class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-xs {% if not queue_state %}opacity-50 cursor-not-allowed{% endif %}"
+                                {% if not queue_state %}disabled{% endif %}
+                                id="doneButton">
                             Done
                         </button>
                     </form>
                     {% else %}
-                    <form action="{% url 'personel' %}" method="POST" class="w-full">
+                    <form action="{% url 'personel' %}" method="POST" class="w-full" id="startServingForm">
                         {% csrf_token %}
-                        <button type="submit" name="start" value="start"
-                            class="w-full bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer py-2 text-white text-sm">
+                        <button type="button" onclick="showStartConfirmation()"
+                                class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-xs"
+                                id="startServingBtn">
                             Start Serving
                         </button>
                     </form>
                     {% endif %}
                 </div>
 
-                <!-- call button -->
-                <div id="call-button-container" class="mt-3">
-                    {% if get_current_number %}
-                    <button onclick="speakNumber('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
-                        type="button"
-                        class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-sm">
-                        Call Number
-                    </button>
-                    {% endif %}
+                <!-- call button and queue control -->
+                <div id="call-button-container" class="mt-3 px-5">
+                    <div class="flex gap-2">
+                        <!-- Call Number button (only when there's a current student) -->
+                        {% if get_current_number %}
+                        <div class="flex-1">
+                            <button type="button" onclick="showCallAction('{{ get_current_number.ticket_number }}', '{{ get_current_number.firstName }} {{ get_current_number.lastName }}')"
+                                class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-xs {% if not queue_state %}opacity-50 cursor-not-allowed{% endif %}"
+                                {% if not queue_state %}disabled{% endif %}
+                                id="callButton">
+                                Call Number
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="flex-1"></div>
+                        {% endif %}
+                        
+                        <!-- Queue Control Button (ALWAYS shown) -->
+                        <div class="flex-1">
+                            {% if queue_state %}
+                                <button type="button" onclick="showPauseConfirmation()"
+                                    class="w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs"
+                                    id="queueControlButton">
+                                    <i class="fa fa-pause mr-1"></i> Stop Queue
+                                </button>
+                            {% else %}
+                                <button type="button" onclick="showStartQueueConfirmation()"
+                                    class="w-full bg-green-500 hover:bg-green-600 cursor-pointer py-2 text-white text-xs"
+                                    id="queueControlButton">
+                                    <i class="fa fa-play mr-1"></i> Start Queue
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- next queue -->
             <div class="w-[160px] flex items-center gap-3 pt-2 pb-5 px-3 flex-col border bg-[#10420C] text-white" id="next-queue-container">
                 <div class="w-full">
-                    <h1 class="text-base mb-2 text-center text-gray-300">Next Queue</h1>
+                    <h1 class="mb-2 text-center text-gray-300">Next Queue</h1>
                     <div class="w-full border-b border-gray-400"></div>
                 </div>
                 
@@ -262,20 +438,26 @@ background-color: #f9fafb;
                     </div>
                     {% endfor %}
                 </div>
+                {% if display_queues|length > 5 %}
+                <button onclick="openQueueModal()" 
+                        class="mt-4 px-4 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer text-black text-[11px] relative">
+                    View more <p class="absolute text-red-500 rounded-full text-[11px] font-semibold top-1 right-1">1+</p>
+                </button>
+                {% endif %}
             </div>
         </div>
 
         <!-- priority queue -->
-        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px] ">
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md">
             <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#ED7676]">
                 <h1 class="font-semibold text-white">PRIORITY QUEUE'S</h1>
                 <!-- Pagination controls -->
                 <div class="flex items-center space-x-2">
-                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <button id="priority-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         &lt; Prev
                     </button>
-                    <span id="priority-page-info" class="text-white text-sm">Page 1 of 1</span>
-                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <span id="priority-page-info" class="text-white text-xs">Page 1 of 1</span>
+                    <button id="priority-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         Next &gt;
                     </button>
                 </div>
@@ -297,14 +479,10 @@ background-color: #f9fafb;
                                 <td class="px-2 py-2">{{ priority_student.firstName }} {{ priority_student.middleName }} {{ priority_student.lastName }}</td>
                                 <td class="px-2 py-2 text-center">{{ priority_student.ticket_number }}</td>
                                 <td class="px-2 py-2 text-center">
-                                    <form action="{% url 'priority_standby' %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="ticket_number" value="{{ priority_student.id }}">
-                                        <button type="submit" name="action" value="standby"
-                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
-                                            Standby
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="showPriorityStandbyConfirmation('{{ priority_student.id }}', '{{ priority_student.ticket_number }}', '{{ priority_student.firstName }} {{ priority_student.lastName }}')"
+                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                                        Standby
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -320,18 +498,18 @@ background-color: #f9fafb;
     </div>
 
     <!-- lower section -->
-    <div class="flex gap-5 flex-1 ">
+    <div class="flex gap-5 flex-1">
         <!-- CSMS List -->
-        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px] ">
-            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-black">
+        <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px]">
+            <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-gray-900">
                 <h1 class="font-semibold text-white">Client Survey List</h1>
                 <!-- Pagination controls -->
                 <div class="flex items-center space-x-2">
-                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <button id="csms-prev" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         &lt; Prev
                     </button>
-                    <span id="csms-page-info" class="text-white text-sm">Page 1 of 1</span>
-                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <span id="csms-page-info" class="text-white text-xs">Page 1 of 1</span>
+                    <button id="csms-next" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         Next &gt;
                     </button>
                 </div>
@@ -369,19 +547,17 @@ background-color: #f9fafb;
             </div>
         </div>
 
-
-
         <!-- Skipped List -->
         <div class="flex flex-col flex-1 border border-gray-400 bg-white shadow-md h-[420px] max-h-[430px]">
             <div class="p-2 px-5 h-[47px] flex items-center justify-between bg-[#FFCC00]">
                 <h1 class="font-semibold">SKIPPED LIST</h1>
                 <!-- Pagination controls -->
                 <div class="flex items-center space-x-2">
-                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <button id="skipped-prev" class="bg-black/10 hover:bg-black/20 px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         &lt; Prev
                     </button>
-                    <span id="skipped-page-info" class="text-sm">Page 1 of 1</span>
-                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-3 py-1 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <span id="skipped-page-info" class="text-xs">Page 1 of 1</span>
+                    <button id="skipped-next" class="bg-black/10 hover:bg-black/20 px-3 py-1 text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                         Next &gt;
                     </button>
                 </div>
@@ -403,14 +579,10 @@ background-color: #f9fafb;
                                 <td class="px-2 py-2">{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.middleName }}. {{ skip_non_priority_student.lastName }}</td>
                                 <td class="px-2 py-2 text-center">{{ skip_non_priority_student.ticket_number }}</td>
                                 <td class="px-2 py-2 text-center">
-                                    <form action="{% url 'standby' %}" method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="ticket_number" value="{{ skip_non_priority_student.id }}">
-                                        <button type="submit" name="action" value="standby"
-                                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
-                                            Standby
-                                        </button>
-                                    </form>
+                                    <button type="button" onclick="showStandbyConfirmation('{{ skip_non_priority_student.id }}', '{{ skip_non_priority_student.ticket_number }}', '{{ skip_non_priority_student.firstName }} {{ skip_non_priority_student.lastName }}')"
+                                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                                        Standby
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -426,197 +598,486 @@ background-color: #f9fafb;
     </div>
 </div>
 
+<!-- Queue Modal -->
+<div id="queueModal" class="hidden fixed inset-0 backdrop-blur-xs bg-black/20 flex items-center justify-center z-50">
+    <div class="bg-white w-150 shadow-lg p-4">
+        <h2 class="text-xl font-bold mb-3 text-center">All Next Queue</h2>
+
+        <div class="max-h-80 overflow-y-auto p-2">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-[#10420C] text-[#FFCC00]">
+                        <th class="py-2 px-3 w-10 text-center">#</th>
+                        <th class="py-2 px-3 text-center">Ticket Number</th>
+                    </tr>
+                </thead>
+                <tbody id="full-queue-container">
+                    <tr>
+                        <td colspan="2" class="py-3 text-center text-gray-500">Loading queue...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="closeQueueModal()" 
+                class="mt-3 w-full py-2 text-black bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer">
+            Close
+        </button>
+    </div>
+</div>
+
+<!-- EMPTY QUEUE VALIDATION MODAL -->
+<div id="emptyQueueModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Cannot Start Serving</h2>
+            <p class="text-gray-600 mb-6">No students are currently in the queue.</p>
+            <p class="text-sm text-gray-500">Please wait for students to join the queue before starting service.</p>
+        </div>
+        <div class="flex justify-center mt-6">
+            <button onclick="closeConfirmationModal('emptyQueueModal')" 
+                    class="px-5 py-2 bg-gray-800 hover:bg-gray-900 text-white cursor-pointer">
+                OK, I Understand
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modals -->
+<div id="startServingModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-play text-green-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Start Serving Student?</h2>
+            <p class="text-gray-600 mb-6">Are you sure you want to start serving the next student in queue?</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('startServingModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form action="{% url 'personel' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" name="start" value="start"
+                        class="px-5 py-2 bg-[#10420C] hover:bg-[#10420C]/80 text-white cursor-pointer">
+                    Yes, Start
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Skip Confirmation Modal -->
+<div id="skipConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-forward text-yellow-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Skip This Student?</h2>
+            <p class="text-gray-600 mb-2" id="skipStudentInfo">Student: ---</p>
+            <p class="text-yellow-600 text-xs mb-6">Student will be moved to skipped list.</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('skipConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form id="skipForm" action="{% url 'done_current_number' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_number" id="skipStudentId" value="">
+                <input type="hidden" name="action" value="skip">
+                <button type="submit" 
+                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-black cursor-pointer">
+                    Yes, Skip
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="startQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-play text-green-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Start the Queue?</h2>
+            <p class="text-gray-600 mb-6">The queue will begin processing waiting students.</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('startQueueConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form id="startQueueForm" method="POST" action="{% url 'toggle_queue' %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-5 py-2 bg-green-500 hover:bg-green-600 text-white cursor-pointer">
+                    Yes, Start Queue
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="pauseQueueConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-pause text-orange-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Pause the Queue?</h2>
+            <p class="text-gray-600 mb-6">No new students will be served until queue is resumed.</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('pauseQueueConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form id="pauseQueueForm" method="POST" action="{% url 'toggle_queue' %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white cursor-pointer">
+                    Yes, Pause Queue
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="standbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-arrow-right text-yellow-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Move to Standby?</h2>
+            <p class="text-gray-600 mb-2" id="standbyStudentInfo">Student: ---</p>
+            <p class="text-yellow-600 text-xs mb-6">Student will return to the main queue.</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('standbyConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form id="standbyForm" action="{% url 'standby' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_number" id="standbyStudentId">
+                <input type="hidden" name="action" value="standby">
+                <button type="submit" 
+                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer">
+                    Yes, Move to Standby
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="priorityStandbyConfirmationModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 confirmation-modal">
+    <div class="bg-white p-6 w-96 confirmation-modal-content">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-arrow-right text-yellow-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Move Priority to Standby?</h2>
+            <p class="text-gray-600 mb-2" id="priorityStandbyStudentInfo">Student: ---</p>
+            <p class="text-yellow-600 text-xs mb-6">Student will return to the main queue.</p>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button onclick="closeConfirmationModal('priorityStandbyConfirmationModal')" 
+                    class="px-5 py-2 bg-gray-300 hover:bg-gray-400 cursor-pointer">
+                Cancel
+            </button>
+            <form id="priorityStandbyForm" action="{% url 'priority_standby' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="ticket_number" id="priorityStandbyStudentId">
+                <input type="hidden" name="action" value="standby">
+                <button type="submit" 
+                        class="px-5 py-2 bg-[#FFCC00] hover:bg-[#FFCC00]/80 text-white cursor-pointer">
+                    Yes, Move to Standby
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Bell Sound Audio Element -->
 <audio id="bell-sound" preload="auto">
     <source src="{% static 'sound/bell-ring.mp3' %}" type="audio/mpeg">
+    <source src="{% static 'sound/bell-ring.ogg' %}" type="audio/ogg">
+    <source src="{% static 'sound/bell-ring.wav' %}" type="audio/wav">
 </audio>
 
-<!-- Debug Panel -->
-<div class="fixed bottom-4 right-4 bg-black text-white p-3 rounded text-xs z-50 opacity-90">
-    <div><strong>DEBUG PANEL</strong></div>
-    <div>WebSocket: <span id="ws-status" class="text-red-400">Disconnected</span></div>
-    <div>Current: <span id="debug-current">---</span></div>
-    <div>Queue Items: <span id="debug-queue-count">0</span></div>
-    <button onclick="forceRefresh()" class="bg-blue-500 px-2 py-1 rounded mt-1 text-xs">Refresh Data</button>
-    <button onclick="testWebSocket()" class="bg-green-500 px-2 py-1 rounded mt-1 text-xs">Test WS</button>
-</div>
-
 <script>
-// Global variable to store all queue data
+// Global variables
 let allQueuesData = [];
 let queueSocket;
+let userInteracted = false;
+let previousQueueLength = 0;
 
-// Debug functions
-function forceRefresh() {
-    console.log('🔄 Force refreshing page...');
-    window.location.reload();
-}
-
-function testWebSocket() {
-    console.log('🔍 Testing WebSocket...');
-    if (queueSocket && queueSocket.readyState === WebSocket.OPEN) {
-        console.log('✅ WebSocket is connected and ready');
-    } else {
-        console.log('❌ WebSocket is not connected');
+// Function to update the full queue modal with real-time data
+function updateFullQueue(fullQueueData) {
+    const fullQueueContainer = document.getElementById('full-queue-container');
+    
+    if (!fullQueueContainer) return;
+    
+    window.fullQueuesData = Array.isArray(fullQueueData) ? fullQueueData : [];
+    
+    const modal = document.getElementById('queueModal');
+    if (modal && !modal.classList.contains('hidden')) {
+        renderFullQueueModal();
     }
 }
 
-// Update debug panel
-function updateDebugPanel() {
-    const statusElement = document.getElementById('ws-status');
-    const currentElement = document.getElementById('debug-current');
-    const queueCountElement = document.getElementById('debug-queue-count');
+function renderFullQueueModal() {
+    const fullQueueContainer = document.getElementById('full-queue-container');
     
-    if (queueSocket) {
-        const states = ['Connecting', 'Open', 'Closing', 'Closed'];
-        statusElement.textContent = states[queueSocket.readyState];
-        statusElement.className = queueSocket.readyState === 1 ? 'text-green-400' : 'text-red-400';
+    if (!fullQueueContainer || !window.fullQueuesData) return;
+
+    if (window.fullQueuesData.length === 0) {
+        fullQueueContainer.innerHTML = `
+            <tr>
+                <td colspan="2" class="py-3 text-center text-gray-500">
+                    No additional students in queue
+                </td>
+            </tr>
+        `;
+        return;
     }
-    
-    currentElement.textContent = document.getElementById('current-ticket-number')?.textContent || '---';
-    queueCountElement.textContent = allQueuesData.length;
+
+    fullQueueContainer.innerHTML = window.fullQueuesData
+        .map((queue, index) => `
+            <tr class="border-b">
+                <td class="py-2 px-3 text-center">${index + 1}</td>
+                <td class="py-2 px-3 text-center">${queue.ticket_number || '---'}</td>
+            </tr>
+        `)
+        .join('');
 }
 
-setInterval(updateDebugPanel, 1000);
+function openQueueModal() {
+    const modal = document.getElementById('queueModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        renderFullQueueModal();
+    }
+}
 
-// Enhanced bell sound function
-function playBell() {
-    const bellSound = document.getElementById("bell-sound");
-    if (bellSound) {
-        console.log("🔔 Playing bell sound");
+function closeQueueModal() {
+    const modal = document.getElementById('queueModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Bell animation function
+function animateBellIcon() {
+    const bellIcon = document.getElementById("bell-icon");
+    const notificationBadge = document.getElementById("notification-badge");
+    
+    if (bellIcon) {
+        bellIcon.classList.add("ringing");
         
-        // Reset and play the sound
-        bellSound.currentTime = 0;
-        
-        const playPromise = bellSound.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("🔇 Bell sound play was prevented:", error);
-            });
+        if (notificationBadge) {
+            notificationBadge.classList.add("active");
+            notificationBadge.textContent = "1";
+            
+            setTimeout(() => {
+                notificationBadge.classList.remove("active");
+                notificationBadge.textContent = "";
+            }, 5000);
         }
+        
+        setTimeout(() => {
+            bellIcon.classList.remove("ringing");
+        }, 1000);
     }
 }
 
-// Debug function to see what's happening with queue data
-function debugQueueData(queueData, currentTicketNumber) {
-    console.log('🔍 DEBUG QUEUE DATA:');
-    console.log('   - Raw queue data:', queueData);
-    console.log('   - Current ticket:', currentTicketNumber);
+// Alternative bell sound using Web Audio API
+function playBellAlternative() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            throw new Error("Web Audio API not supported");
+        }
+        
+        const audioContext = new AudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.5);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+        animateBellIcon();
+        
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+    } catch (error) {
+        animateBellIcon();
+    }
+}
+
+// Main bell sound function
+function playBell() {
+    animateBellIcon();
     
-    if (queueData && queueData.length > 0) {
-        console.log('   - Queue items:');
-        queueData.forEach((item, index) => {
-            console.log(`     ${index + 1}. ${item.ticket_number} (matches current: ${item.ticket_number === currentTicketNumber})`);
-        });
+    if (!userInteracted) {
+        return;
+    }
+    
+    try {
+        const bellSound = document.getElementById("bell-sound");
+        
+        if (bellSound) {
+            bellSound.pause();
+            bellSound.currentTime = 0;
+            bellSound.volume = 0.7;
+            
+            const playPromise = bellSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {}).catch(error => {
+                    playBellAlternative();
+                });
+            } else {
+                bellSound.play();
+            }
+        } else {
+            playBellAlternative();
+        }
+    } catch (error) {
+        playBellAlternative();
     }
 }
 
-// Function to update the next queue display - FIXED VERSION
-// Function to update the next queue display - SMART PRESERVATION VERSION
+// Test function for bell sound
+function testBellSound() {
+    userInteracted = true;
+    updateAudioStatus();
+    unlockAudioContext();
+    playBell();
+}
+
+// Function to unlock audio context
+function unlockAudioContext() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+            const silentContext = new AudioContext();
+            const buffer = silentContext.createBuffer(1, 1, 22050);
+            const source = silentContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(silentContext.destination);
+            source.start();
+            
+            if (silentContext.state === 'suspended') {
+                silentContext.resume();
+            }
+        }
+    } catch (error) {}
+}
+
+// Function to update audio status display
+function updateAudioStatus() {
+    const audioStatus = document.getElementById('audio-status');
+    const audioIndicator = document.getElementById('audio-status-indicator');
+    const audioText = audioStatus?.querySelector('span');
+    
+    if (audioStatus && audioIndicator && audioText) {
+        if (userInteracted) {
+            audioIndicator.classList.remove('bg-gray-400');
+            audioIndicator.classList.add('bg-green-500', 'animate-pulse');
+            audioText.textContent = 'Audio: Ready';
+            audioText.classList.remove('text-gray-600');
+            audioText.classList.add('text-green-600');
+        } else {
+            audioIndicator.classList.remove('bg-green-500', 'animate-pulse');
+            audioIndicator.classList.add('bg-gray-400');
+            audioText.textContent = 'Audio: Locked';
+            audioText.classList.remove('text-green-600');
+            audioText.classList.add('text-gray-600');
+        }
+        audioStatus.classList.remove('hidden');
+    }
+}
+
 function updateNextQueue(queueData) {
     const queueItemsContainer = document.getElementById('queue-items-container');
+    if (!queueItemsContainer) return;
     
-    if (!queueItemsContainer) {
-        console.error('❌ Queue items container not found');
-        return;
-    }
-    
-    // Store all queue data
     allQueuesData = Array.isArray(queueData) ? queueData : [];
-    
-    console.log('🔄 WebSocket sent queue data:', allQueuesData.length, 'items');
-    
-    // Get current ticket number for filtering
     const currentTicketNumber = document.getElementById('current-ticket-number')?.textContent;
-    
-    // DEBUG: Show what we're working with
-    debugQueueData(allQueuesData, currentTicketNumber);
-    
-    // Check if we have existing queue items
     const existingItems = queueItemsContainer.querySelectorAll('.queue-item');
-    const hasExistingData = existingItems.length > 0;
     
-    console.log('📋 Existing queue items:', existingItems.length);
+    if (allQueuesData.length === 0) return;
     
-    // DECISION LOGIC: When to update?
-    // 1. If WebSocket has data AND it's different from what we have → UPDATE
-    // 2. If WebSocket has no data → PRESERVE existing
-    // 3. If WebSocket data is empty after filtering → PRESERVE existing
-    
-    if (allQueuesData.length === 0) {
-        console.log('⚠️  No queue data from WebSocket - preserving existing display');
-        return;
-    }
-    
-    // Filter out the current serving student
     const filteredQueueData = allQueuesData.filter(queue => {
         return !(currentTicketNumber && currentTicketNumber !== '---' && queue.ticket_number === currentTicketNumber);
     });
     
-    console.log('📊 Filtered queue data:', filteredQueueData.length, 'items');
+    const currentQueueLength = filteredQueueData.length;
     
-    // Only update if we have new data to show
-    if (filteredQueueData.length > 0) {
-        // Check if the data is actually different from what we have
-        const shouldUpdate = shouldUpdateQueue(existingItems, filteredQueueData);
+    if (currentQueueLength > previousQueueLength && userInteracted) {
+        playBell();
+    }
+    
+    previousQueueLength = currentQueueLength;
+    
+    if (filteredQueueData.length > 0 && shouldUpdateQueue(existingItems, filteredQueueData)) {
+        queueItemsContainer.innerHTML = '';
         
-        if (shouldUpdate) {
-            console.log('🔄 Data has changed - updating queue display');
-            queueItemsContainer.innerHTML = '';
-            
-            const displayCount = Math.min(filteredQueueData.length, 5);
-            
-            for (let i = 0; i < displayCount; i++) {
-                const queue = filteredQueueData[i];
-                const queueItem = document.createElement('div');
-                queueItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
-                queueItem.innerHTML = `
-                    <div class="w-full">
-                        <h1 class="text-3xl mb-1 text-center ${i === 0 ? 'text-[#FFCC00]' : 'text-white'}">
-                            ${queue.ticket_number || '---'}
-                        </h1>
-                        <div class="w-full border-b border-gray-400/50"></div>
-                    </div>
-                `;
-                queueItemsContainer.appendChild(queueItem);
-            }
-            
-            console.log('✅ Next queue updated with', displayCount, 'items');
-        } else {
-            console.log('⚡ Data is the same - no update needed');
+        const displayCount = Math.min(filteredQueueData.length, 5);
+        
+        for (let i = 0; i < displayCount; i++) {
+            const queue = filteredQueueData[i];
+            const queueItem = document.createElement('div');
+            queueItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
+            queueItem.innerHTML = `
+                <div class="w-full">
+                    <h1 class="text-3xl mb-1 text-center ${i === 0 ? 'text-[#FFCC00]' : 'text-white'}">
+                        ${queue.ticket_number || '---'}
+                    </h1>
+                    <div class="w-full border-b border-gray-400/50"></div>
+                </div>
+            `;
+            queueItemsContainer.appendChild(queueItem);
         }
-    } else {
-        console.log('⚠️  No queue items after filtering - preserving existing display');
     }
 }
 
-// Helper function to check if we should update the queue
 function shouldUpdateQueue(existingItems, newQueueData) {
-    // If no existing items but we have new data → UPDATE
-    if (existingItems.length === 0 && newQueueData.length > 0) {
-        return true;
-    }
+    if (existingItems.length === 0 && newQueueData.length > 0) return true;
+    if (existingItems.length !== newQueueData.length) return true;
     
-    // If different number of items → UPDATE
-    if (existingItems.length !== newQueueData.length) {
-        return true;
-    }
-    
-    // Check if any ticket numbers are different
     for (let i = 0; i < Math.min(existingItems.length, newQueueData.length); i++) {
         const existingNumber = existingItems[i].querySelector('h1')?.textContent;
         const newNumber = newQueueData[i].ticket_number;
-        
-        if (existingNumber !== newNumber) {
-            return true;
-        }
+        if (existingNumber !== newNumber) return true;
     }
     
     return false;
 }
 
-// Function to update priority queue
 function updatePriorityQueue(priorityData) {
     const priorityQueueBody = document.getElementById('priority-queue-body');
     if (!priorityQueueBody) return;
@@ -631,14 +1092,10 @@ function updatePriorityQueue(priorityData) {
                 <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
                 <td class="px-2 py-2 text-center">${student.ticket_number}</td>
                 <td class="px-2 py-2 text-center">
-                    <form action="{% url 'priority_standby' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_number" value="${student.id}">
-                        <button type="submit" name="action" value="standby"
-                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
-                            Standby
-                        </button>
-                    </form>
+                    <button type="button" onclick="showPriorityStandbyConfirmation('${student.id}', '${student.ticket_number}', '${student.firstName} ${student.lastName}')"
+                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                        Standby
+                    </button>
                 </td>
             `;
             priorityQueueBody.appendChild(row);
@@ -652,7 +1109,6 @@ function updatePriorityQueue(priorityData) {
     }
 }
 
-// Function to update skipped list
 function updateSkippedList(skippedData) {
     const skippedListBody = document.getElementById('skipped-list-body');
     if (!skippedListBody) return;
@@ -667,14 +1123,10 @@ function updateSkippedList(skippedData) {
                 <td class="px-2 py-2">${student.firstName} ${student.middleName || ''} ${student.lastName}</td>
                 <td class="px-2 py-2 text-center">${student.ticket_number}</td>
                 <td class="px-2 py-2 text-center">
-                    <form action="{% url 'standby' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_number" value="${student.id}">
-                        <button type="submit" name="action" value="standby"
-                            class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-sm w-full">
-                            Standby
-                        </button>
-                    </form>
+                    <button type="button" onclick="showStandbyConfirmation('${student.id}', '${student.ticket_number}', '${student.firstName} ${student.lastName}')"
+                        class="bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer px-3 py-1 text-xs w-full">
+                        Standby
+                    </button>
                 </td>
             `;
             skippedListBody.appendChild(row);
@@ -688,195 +1140,222 @@ function updateSkippedList(skippedData) {
     }
 }
 
-// Function to update current serving - SMART VERSION
 function updateCurrentServing(currentData) {
-    console.log('🔄 updateCurrentServing called with:', currentData);
-    
-    // Check what we currently have displayed
     const currentTicketElement = document.getElementById('current-ticket-number');
-    const serverHasData = currentTicketElement && currentTicketElement.textContent !== '---';
     
-    // If WebSocket sends null but server has data, preserve server data
-    if (!currentData && serverHasData) {
-        console.log('⚠️  Preserving server-rendered current student data');
-        return;
-    }
-    
-    if (!currentData || currentData === null) {
-        console.log('❌ No current student data from WebSocket');
-        // Only clear if server also doesn't have data
-        if (!serverHasData) {
-            document.getElementById('current-ticket-number').textContent = '---';
-            document.getElementById('current-name').textContent = '---';
-            document.getElementById('current-course').textContent = '---';
-            document.getElementById('current-id').textContent = '---';
-            document.getElementById('current-request').textContent = 'No Request';
-            
-            // Update buttons container
-            const buttonsContainer = document.getElementById('current-buttons-container');
+    if (!currentData || currentData === null || !currentData.id) {
+        if (currentTicketElement) {
+            currentTicketElement.textContent = '---';
+        }
+        
+        const nameCell = document.getElementById('current-name');
+        if (nameCell) {
+            nameCell.textContent = '---';
+        }
+        
+        const courseCell = document.getElementById('current-course');
+        if (courseCell) {
+            courseCell.textContent = '---';
+        }
+        
+        const requestElement = document.getElementById('current-request');
+        if (requestElement) {
+            requestElement.textContent = 'No Request';
+        }
+        
+        const buttonsContainer = document.getElementById('current-buttons-container');
+        if (buttonsContainer) {
             buttonsContainer.innerHTML = `
-                <form action="{% url 'personel' %}" method="POST" class="w-full">
-                    {% csrf_token %}
-                    <button type="submit" name="start" value="start"
-                        class="w-full bg-[#10934F] hover:bg-[#10934F]/80 cursor-pointer py-2 text-white text-sm">
-                        Start Serving
-                    </button>
-                </form>
+                <button type="button" onclick="showStartConfirmation()"
+                        class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-xs"
+                        id="startServingBtn">
+                    Start Serving
+                </button>
+            `;
+        }
+        
+        // Updated call button container - ALWAYS show queue control button
+        const callButtonContainer = document.getElementById('call-button-container');
+        if (callButtonContainer) {
+            callButtonContainer.innerHTML = `
+                <div class="flex gap-2">
+                    <div class="flex-1"></div>
+                    <div class="flex-1">
+                        <!-- Queue control button - will be updated by updateQueueStatus() -->
+                        <button type="button" onclick="showPauseConfirmation()"
+                            class="w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs"
+                            id="queueControlButton">
+                            <i class="fa fa-pause mr-1"></i> Stop Queue
+                        </button>
+                    </div>
+                </div>
             `;
             
-            // Hide call button
-            const callButtonContainer = document.getElementById('call-button-container');
-            callButtonContainer.innerHTML = '';
+            // Update the button state based on current queue status
+            if (window.currentQueueStatus) {
+                updateQueueStatus(window.currentQueueStatus);
+            }
+        }
+        
+        if (window.currentQueueStatus) {
+            updateQueueStatus(window.currentQueueStatus);
         }
         return;
     }
 
-    // Update current serving information with personnel consumer data structure
-    document.getElementById('current-ticket-number').textContent = currentData.ticket_number || '---';
+    if (currentTicketElement) {
+        currentTicketElement.textContent = currentData.ticket_number || '---';
+    }
     
     const firstName = currentData.firstName || '';
     const middleName = currentData.middleName ? currentData.middleName + '.' : '';
     const lastName = currentData.lastName || '';
-    document.getElementById('current-name').textContent = `${firstName} ${middleName} ${lastName}`.trim();
+    const fullName = `${firstName} ${middleName} ${lastName}`.trim();
     
-    document.getElementById('current-course').textContent = currentData.courses || '---';
-    document.getElementById('current-id').textContent = currentData.student_id || '---';
+    const nameCell = document.getElementById('current-name');
+    if (nameCell) {
+        nameCell.textContent = fullName || '---';
+    }
     
-    // Personnel consumer uses 'requestType' field directly
+    const courseCell = document.getElementById('current-course');
+    if (courseCell) {
+        courseCell.textContent = currentData.courses || '---';
+    }
+    
     const requestType = currentData.requestType || 'No Request';
-    document.getElementById('current-request').textContent = requestType;
+    const requestElement = document.getElementById('current-request');
+    if (requestElement) {
+        requestElement.textContent = requestType;
+    }
 
-    // Update buttons
     const buttonsContainer = document.getElementById('current-buttons-container');
-    buttonsContainer.innerHTML = `
-        <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
-            {% csrf_token %}
-            <input type="hidden" name="ticket_number" value="${currentData.id}">
-            <button type="submit" name="action" value="skip"
-                class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-sm">
+    if (buttonsContainer) {
+        buttonsContainer.innerHTML = `
+            <button type="button" onclick="showSkipConfirmation('${currentData.id}', '${currentData.ticket_number}', '${currentData.firstName} ${currentData.lastName}')"
+                    class="w-full bg-[#FFCC00] hover:bg-[#FFCC00]/80 cursor-pointer py-2 text-xs"
+                    id="skipButton">
                 Skip
             </button>
-        </form>
-        <form action="{% url 'done_current_number' %}" method="post" class="flex-1">
-            {% csrf_token %}
-            <input type="hidden" name="ticket_number" value="${currentData.id}">
-            <button type="submit" name="action" value="done"
-                class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-sm">
-                Done
-            </button>
-        </form>
-    `;
+            
+            <form id="doneForm" action="{% url 'done_current_number' %}" method="post" class="w-full">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}">
+                <input type="hidden" name="ticket_number" value="${currentData.id}">
+                <input type="hidden" name="action" value="done">
+                <button type="button" onclick="showDoneAction('${currentData.ticket_number}', '${currentData.firstName} ${currentData.lastName}')"
+                        class="w-full bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer py-2 text-white text-xs"
+                        id="doneButton">
+                    Done
+                </button>
+            </form>
+        `;
+    }
 
-    // Update call button
+    // Updated call button container - show both Call button and Queue control button
     const callButtonContainer = document.getElementById('call-button-container');
-    callButtonContainer.innerHTML = `
-        <button onclick="speakNumber('${currentData.ticket_number}', '${currentData.firstName || ''} ${currentData.lastName || ''}')"
-            type="button"
-            class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-sm">
-            Call Number
-        </button>
-    `;
+    if (callButtonContainer) {
+        callButtonContainer.innerHTML = `
+            <div class="flex gap-2">
+                <div class="flex-1">
+                    <button type="button" onclick="showCallAction('${currentData.ticket_number}', '${currentData.firstName} ${currentData.lastName}')"
+                        class="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer py-2 text-white text-xs"
+                        id="callButton">
+                        Call Number
+                    </button>
+                </div>
+                <div class="flex-1">
+                    <!-- Queue control button - will be updated by updateQueueStatus() -->
+                    <button type="button" onclick="showPauseConfirmation()"
+                        class="w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs"
+                        id="queueControlButton">
+                        <i class="fa fa-pause mr-1"></i> Stop Queue
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Update the button state based on current queue status
+        if (window.currentQueueStatus) {
+            updateQueueStatus(window.currentQueueStatus);
+        }
+    }
     
-    console.log('✅ Current serving updated successfully');
+    if (window.currentQueueStatus) {
+        updateQueueStatus(window.currentQueueStatus);
+    }
 }
 
-// WebSocket for real-time updates - USING CORRECT URL
 function connectWebSocket() {
     try {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/queue/`;  // CORRECT URL
-        
-        console.log('🔄 Connecting to WebSocket:', wsUrl);
+        const wsUrl = `${protocol}//${window.location.host}/ws/queue/`;
         
         queueSocket = new WebSocket(wsUrl);
 
         queueSocket.onmessage = function (event) {
             try {
-                console.log('📨 WebSocket message received:', event.data);
                 const data = JSON.parse(event.data);
                 
-                // Handle full update from personnel consumer
                 if (data.type === 'full_update' && data.data) {
-                    console.log('🔄 Full update received from source:', data.source);
-                    console.log('📊 Full data structure:', data.data);
+                    try {
+                        if (data.data.next_queue !== undefined) {
+                            updateNextQueue(data.data.next_queue);
+                        }
+                        
+                        if (data.data.full_queue !== undefined) {
+                            updateFullQueue(data.data.full_queue);
+                        }
+                        
+                        if (data.data.priority_queue !== undefined) {
+                            updatePriorityQueue(data.data.priority_queue);
+                        }
+                        
+                        if (data.data.skipped_list !== undefined) {
+                            updateSkippedList(data.data.skipped_list);
+                        }
+                        
+                        if (data.data.queue_status !== undefined) {
+                            window.currentQueueStatus = data.data.queue_status;
+                            updateQueueStatus(data.data.queue_status);
+                        }
+                        
+                        const serverHasCurrentStudent = document.getElementById('current-ticket-number')?.textContent !== '---';
+                        const websocketHasCurrentStudent = data.data.current_student !== null && data.data.current_student !== undefined;
+                        
+                        if (websocketHasCurrentStudent) {
+                            updateCurrentServing(data.data.current_student);
+                        } else if (!websocketHasCurrentStudent && !serverHasCurrentStudent) {
+                            updateCurrentServing(null);
+                        }
+                        
+                        const shouldPlayBell = 
+                            data.source === 'student_submission' ||
+                            data.source === 'new_student' ||
+                            data.type === 'new_student' ||
+                            (data.data.next_queue && data.data.next_queue.length > 0 && !data.data.current_student);
+                        
+                        if (shouldPlayBell) {
+                            playBell();
+                        }
+                        
+                    } catch (innerError) {}
                     
-                    // SMART UPDATE: Only update if WebSocket has valid data
-                    const serverHasCurrentStudent = document.getElementById('current-ticket-number')?.textContent !== '---';
-                    const websocketHasCurrentStudent = data.data.current_student !== null && data.data.current_student !== undefined;
-                    
-                    console.log('🔍 Data check - Server has current:', serverHasCurrentStudent, 'WebSocket has current:', websocketHasCurrentStudent);
-                    
-                    // Update next queue
-                    if (data.data.next_queue !== undefined) {
-                        console.log('🎯 Updating next queue with:', data.data.next_queue.length, 'items');
-                        updateNextQueue(data.data.next_queue);
-                    }
-                    
-                    // Update priority queue
-                    if (data.data.priority_queue !== undefined) {
-                        console.log('🎯 Updating priority queue with:', data.data.priority_queue.length, 'items');
-                        updatePriorityQueue(data.data.priority_queue);
-                    }
-                    
-                    // Update skipped list
-                    if (data.data.skipped_list !== undefined) {
-                        console.log('🎯 Updating skipped list with:', data.data.skipped_list.length, 'items');
-                        updateSkippedList(data.data.skipped_list);
-                    }
-                    
-                    // SMART CURRENT STUDENT UPDATE: Only update if WebSocket has valid data
-                    if (websocketHasCurrentStudent) {
-                        console.log('🎯 Updating current serving with:', data.data.current_student);
-                        updateCurrentServing(data.data.current_student);
-                    } else if (!websocketHasCurrentStudent && !serverHasCurrentStudent) {
-                        console.log('🎯 No current student - showing empty state');
-                        updateCurrentServing(null);
-                    } else {
-                        console.log('⚠️  WebSocket has no current student, but server has data - preserving server data');
-                        // Don't update - keep server-rendered data
-                    }
-                    
-                    // Play bell for new student submissions
-                    if (data.source === 'student_submission') {
-                        console.log('🎓 New student joined the queue!');
-                        playBell();
-                    }
-                } else {
-                    console.log('❌ Not a full_update message, type was:', data.type);
+                } else if (data.type === 'new_student' || data.type === 'student_joined') {
+                    playBell();
                 }
                 
-            } catch (error) {
-                console.error('❌ Error processing WebSocket message:', error);
-            }
+            } catch (error) {}
         };
 
-        queueSocket.onopen = function() {
-            console.log('✅ WebSocket connection established');
-        };
+        queueSocket.onopen = function() {};
 
         queueSocket.onclose = function(e) {
-            console.log('🔴 WebSocket connection closed:', e);
-            // Attempt to reconnect after 2 seconds
             setTimeout(connectWebSocket, 2000);
         };
 
-        queueSocket.onerror = function(err) {
-            console.error('❌ WebSocket error:', err);
-        };
-    } catch (error) {
-        console.error('❌ Error creating WebSocket:', error);
-    }
+        queueSocket.onerror = function(err) {};
+    } catch (error) {}
 }
 
-// SIMPLE FORM HANDLER - Allow all forms to submit normally
-document.addEventListener('submit', function(event) {
-    const form = event.target;
-    console.log('📝 Form submitting normally:', form.action);
-    // Don't prevent default - allow normal form submission and page reload
-    // This ensures server-side data is always fresh
-});
-
-// Speech functions
 function speakNumber(ticketNumber, fullname) {
     window.speechSynthesis.cancel();
     const text = `Calling ${ticketNumber}, ${fullname}. Please come to the window.`;
@@ -909,24 +1388,130 @@ function setFemaleVoice(message, voices) {
     }
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initializing real-time updates...');
+// Initialize button states on page load
+function initializeButtonStates() {
+    const queueStateFromDjango = {% if queue_state %}true{% else %}false{% endif %};
+    const hasCurrentStudent = document.getElementById('current-ticket-number')?.textContent !== '---';
     
-    // Check if there's server-rendered current student data
+    const statusIndicator = document.getElementById('queue-status-indicator');
+    const statusText = document.getElementById('queue-status-text');
+    
+    if (statusIndicator && statusText) {
+        if (hasCurrentStudent) {
+            if (queueStateFromDjango) {
+                statusIndicator.classList.remove('bg-red-500');
+                statusIndicator.classList.add('bg-green-500', 'animate-pulse');
+                statusText.classList.remove('text-red-600');
+                statusText.classList.add('text-green-600');
+                statusText.textContent = 'Queue: RUNNING';
+            } else {
+                statusIndicator.classList.remove('bg-green-500', 'animate-pulse');
+                statusIndicator.classList.add('bg-red-500');
+                statusText.classList.remove('text-green-600');
+                statusText.classList.add('text-red-600');
+                statusText.textContent = 'Queue: STOPPED';
+            }
+        } else {
+            statusIndicator.classList.remove('bg-green-500', 'animate-pulse', 'bg-red-500');
+            statusIndicator.classList.add('bg-gray-400');
+            statusText.classList.remove('text-green-600', 'text-red-600');
+            statusText.classList.add('text-gray-600');
+            statusText.textContent = 'NO CURRENT';
+        }
+    }
+    
+    const skipButton = document.getElementById('skipButton');
+    if (skipButton) {
+        if (!queueStateFromDjango) {
+            skipButton.disabled = true;
+            skipButton.classList.add('opacity-50', 'cursor-not-allowed');
+            skipButton.classList.remove('hover:bg-[#FFCC00]/80');
+        } else {
+            skipButton.disabled = false;
+            skipButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            skipButton.classList.add('hover:bg-[#FFCC00]/80');
+        }
+    }
+}
+
+// Update queue status display
+function updateQueueStatus(queueStatus) {
+    if (!queueStatus) return;
+    
+    const isRunning = queueStatus.is_running;
+    const statusIndicator = document.getElementById('queue-status-indicator');
+    const statusText = document.getElementById('queue-status-text');
+    
+    if (!statusIndicator || !statusText) return;
+    
     const currentTicketElement = document.getElementById('current-ticket-number');
     const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
     
     if (hasCurrentStudent) {
-        console.log('🎯 Server has current student data, keeping server-rendered content');
-        // Don't clear the queue container if we have server data
+        if (isRunning) {
+            statusIndicator.classList.remove('bg-red-500');
+            statusIndicator.classList.add('bg-green-500', 'animate-pulse');
+            statusText.classList.remove('text-red-600');
+            statusText.classList.add('text-green-600');
+            statusText.textContent = 'Queue: RUNNING';
+        } else {
+            statusIndicator.classList.remove('bg-green-500', 'animate-pulse');
+            statusIndicator.classList.add('bg-red-500');
+            statusText.classList.remove('text-green-600');
+            statusText.classList.add('text-red-600');
+            statusText.textContent = 'Queue: STOPPED';
+        }
     } else {
-        // Clear any server-rendered content and let WebSocket handle the updates
+        statusIndicator.classList.remove('bg-green-500', 'animate-pulse', 'bg-red-500');
+        statusIndicator.classList.add('bg-gray-400');
+        statusText.classList.remove('text-green-600', 'text-red-600');
+        statusText.classList.add('text-gray-600');
+        statusText.textContent = 'NO CURRENT';
+    }
+    
+    // Update Queue Control button - ALWAYS update this regardless of current student
+    const queueControlButton = document.getElementById('queueControlButton');
+    if (queueControlButton) {
+        if (isRunning) {
+            queueControlButton.innerHTML = '<i class="fa fa-pause mr-1"></i> Stop Queue';
+            queueControlButton.className = 'w-full bg-orange-500 hover:bg-orange-600 cursor-pointer py-2 text-white text-xs';
+            queueControlButton.onclick = function() { showPauseConfirmation(); };
+        } else {
+            queueControlButton.innerHTML = '<i class="fa fa-play mr-1"></i> Start Queue';
+            queueControlButton.className = 'w-full bg-green-500 hover:bg-green-600 cursor-pointer py-2 text-white text-xs';
+            queueControlButton.onclick = function() { showStartQueueConfirmation(); };
+        }
+    }
+    
+    // Update Call button state
+    const callButton = document.getElementById('callButton');
+    if (callButton) {
+        if (!isRunning) {
+            callButton.disabled = true;
+            callButton.classList.add('opacity-50', 'cursor-not-allowed');
+            callButton.classList.remove('hover:bg-blue-700');
+        } else {
+            callButton.disabled = false;
+            callButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            callButton.classList.add('hover:bg-blue-700');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    window.fullQueuesData = [];
+    window.currentQueueStatus = null;
+    
+    initializeButtonStates();
+    
+    const currentTicketElement = document.getElementById('current-ticket-number');
+    const hasCurrentStudent = currentTicketElement && currentTicketElement.textContent !== '---';
+    
+    if (!hasCurrentStudent) {
         const queueItemsContainer = document.getElementById('queue-items-container');
         if (queueItemsContainer) {
             queueItemsContainer.innerHTML = '';
             
-            // Add temporary loading indicator
             const loadingItem = document.createElement('div');
             loadingItem.className = 'text-xl w-full medula-one-regular px-2 mt-2 queue-item';
             loadingItem.innerHTML = `
@@ -939,25 +1524,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Start WebSocket for real-time updates
+    updateAudioStatus();
+    
+    document.addEventListener('click', function() {
+        if (!userInteracted) {
+            userInteracted = true;
+            updateAudioStatus();
+            unlockAudioContext();
+        }
+    });
+    
+    document.addEventListener('keydown', function() {
+        if (!userInteracted) {
+            userInteracted = true;
+            updateAudioStatus();
+            unlockAudioContext();
+        }
+    });
+    
     connectWebSocket();
     
-    console.log('✅ Real-time updates initialized via WebSocket');
+    const bellIcon = document.getElementById('bell-icon');
+    if (bellIcon) {
+        bellIcon.addEventListener('click', function() {
+            userInteracted = true;
+            updateAudioStatus();
+            playBell();
+        });
+    }
 });
 
-// Cleanup on page unload
 window.addEventListener('beforeunload', function() {
     if (queueSocket && queueSocket.readyState === WebSocket.OPEN) {
         queueSocket.close();
     }
 });
 
-// Export functions for global access
 window.speakNumber = speakNumber;
 
-
 document.addEventListener('DOMContentLoaded', function() {
-    // WebSocket connection
     const surveySocket = new WebSocket(
         'ws://' + window.location.host + '/ws/survey/updates/'
     );
@@ -969,9 +1574,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    surveySocket.onclose = function(e) {
-        console.error('Survey socket closed unexpectedly');
-    };
+    surveySocket.onclose = function(e) {};
 
     function updateSurveyList(surveys) {
         const tbody = document.getElementById('csms-list-body');
@@ -997,6 +1600,153 @@ document.addEventListener('DOMContentLoaded', function() {
             </tr>
         `).join('');
     }
+});
+
+// TEXT INDICATION FUNCTIONS
+function showDoneAction(ticketNumber, studentName) {
+    const indication = document.getElementById('doneIndication');
+    if (indication) {
+        indication.classList.add('show');
+        
+        setTimeout(() => {
+            document.getElementById('doneForm').submit();
+        }, 1000);
+        
+        setTimeout(() => {
+            indication.classList.remove('show');
+        }, 2000);
+    } else {
+        document.getElementById('doneForm').submit();
+    }
+}
+
+function showCallAction(ticketNumber, studentName) {
+    const indication = document.getElementById('callIndication');
+    if (indication) {
+        indication.classList.add('show');
+        
+        setTimeout(() => {
+            speakNumber(ticketNumber, studentName);
+        }, 500);
+        
+        setTimeout(() => {
+            indication.classList.remove('show');
+        }, 3000);
+    } else {
+        speakNumber(ticketNumber, studentName);
+    }
+}
+
+// SKIP CONFIRMATION MODAL FUNCTION
+function showSkipConfirmation(studentId, ticketNumber, studentName) {
+    document.getElementById('skipStudentId').value = studentId;
+    document.getElementById('skipStudentInfo').textContent = `Student: ${ticketNumber} - ${studentName}`;
+    
+    const modal = document.getElementById('skipConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+// OTHER CONFIRMATION MODAL FUNCTIONS
+function closeConfirmationModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function showStartConfirmation() {
+    const queueItems = document.querySelectorAll('.queue-item');
+    const currentNumber = document.getElementById('current-ticket-number')?.textContent;
+    
+    const hasQueueContent = queueItems.length > 0 && 
+        !Array.from(queueItems).every(item => {
+            const text = item.textContent || '';
+            return text.includes('---') || text.includes('Loading...') || text.trim() === '';
+        });
+    
+    const hasCurrentStudent = currentNumber && currentNumber !== '---';
+    
+    let hasQueueFromWebSocket = false;
+    if (window.allQueuesData && Array.isArray(window.allQueuesData)) {
+        hasQueueFromWebSocket = window.allQueuesData.length > 0;
+    }
+    
+    if (!hasCurrentStudent && !hasQueueContent && !hasQueueFromWebSocket) {
+        showEmptyQueueModal();
+        return;
+    }
+    
+    const modal = document.getElementById('startServingModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showEmptyQueueModal() {
+    const modal = document.getElementById('emptyQueueModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showStartQueueConfirmation() {
+    const modal = document.getElementById('startQueueConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showPauseConfirmation() {
+    const modal = document.getElementById('pauseQueueConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showStandbyConfirmation(studentId, ticketNumber, studentName) {
+    document.getElementById('standbyStudentId').value = studentId;
+    document.getElementById('standbyStudentInfo').textContent = `Student: ${ticketNumber} - ${studentName}`;
+    
+    const modal = document.getElementById('standbyConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showPriorityStandbyConfirmation(studentId, ticketNumber, studentName) {
+    document.getElementById('priorityStandbyStudentId').value = studentId;
+    document.getElementById('priorityStandbyStudentInfo').textContent = `Student: ${ticketNumber} - ${studentName}`;
+    
+    const modal = document.getElementById('priorityStandbyConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+function showLogoutConfirmation() {
+    const modal = document.getElementById('logoutConfirmationModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+}
+
+// Close modals when clicking outside
+document.addEventListener('click', function(event) {
+    const modals = [
+        'startServingModal', 'skipConfirmationModal', 'startQueueConfirmationModal',
+        'pauseQueueConfirmationModal', 'standbyConfirmationModal', 
+        'priorityStandbyConfirmationModal', 'logoutConfirmationModal',
+        'emptyQueueModal'
+    ];
+    
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal && !modal.classList.contains('hidden') && event.target === modal) {
+            closeConfirmationModal(modalId);
+        }
+    });
 });
 </script>
 {% endblock %}

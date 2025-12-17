@@ -1,0 +1,432 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <link href="{% static 'src/output.css' %}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=La+Belle+Aurore&family=Medula+One&family=Odor+Mean+Chey&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Racing+Sans+One&family=Roboto:ital,wght@0,100..900;1,100..900&family=Sora:wght@100..800&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>Client Satisfaction Survey</title>
+    <style>
+        .font-medula {
+            font-family: 'Medula One', cursive;
+        }
+
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .inria-sans-light {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .inria-sans-regular {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .inria-sans-bold {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .inria-sans-light-italic {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .inria-sans-regular-italic {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .inria-sans-bold-italic {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+        
+        .inria-serif-light {
+            font-family: "Inria Serif", serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .inria-serif-regular {
+            font-family: "Inria Serif", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .inria-serif-bold {
+            font-family: "Inria Serif", serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .inria-serif-light-italic {
+            font-family: "Inria Serif", serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .inria-serif-regular-italic {
+            font-family: "Inria Serif", serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .inria-serif-bold-italic {
+            font-family: "Inria Serif", serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        /* Long bond paper dimensions: 8.5" x 13" or 8.5" x 14" */
+        @media print {
+            @page {
+                size: 8.5in 13in;
+                margin: 0.5in;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+                zoom: 1;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .bond-paper {
+                width: 100% !important;
+                min-height: 100vh !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                page-break-after: always;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+
+        /* Screen styles for long bond paper */
+        @media screen {
+            .bond-paper {
+                width: 8.5in;
+                min-height: 13in;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        .rating-scale {
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 25%, #eab308 50%, #84cc16 75%, #22c55e 100%);
+        }
+
+        .checkbox-square {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #374151;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="text-black min-h-screen flex flex-col text-sm bg-gray-100 inria-serif-regular">
+    <!-- Main Content -->
+    <div class="flex-1 flex items-center justify-center p-4">
+        <!-- Bond Paper Container -->
+        <div class="bond-paper bg-white relative mx-auto px-10">
+            <!-- Header Section -->
+            <div class="header w-full text-center ">
+                <div class="w-full">
+                    <img src="{% static 'images/header-logo.svg' %}" 
+                         alt="Company Logo" 
+                         class="w-full h-auto max-h-24 object-contain mx-auto"
+                         style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                </div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="w-full mt-3">
+                <!-- Survey Title -->
+                <div class="text-center ">
+                    <h1 class=" font-bold uppercase mb-2">
+                        CLIENT SATISFACTION MEASUREMENT SURVEY
+                    </h1>
+                </div>
+                <div class=" flex flex-col space-y-3">
+                    <h1 class="text-sm  font-bold text-center ">
+                        HELP US SERVE YOU BETTER!
+                    </h1>
+                    <P class="text-xs">The Client Satisfation Measurement (CSM) tracks the customer experience of goverment offies. Your feedback on your <strong>recently concluded transaction</strong>
+                        will help this office provide a better service. Personal informationshared will be kept confidential and you always have the option to not answer this form . 
+                    </P>
+
+
+                    <div class="flex space-x-5 text-xs flex-1 gap-5">
+                        <h1 class="font-bold">Client Type:</h1>
+                        <div class="flex gap-1">
+                            <input type="checkbox">
+                            <label for="">Student Applicant</label>
+                        </div>
+                        <div class="flex gap-1">
+                            <input type="checkbox">
+                            <label for="">Citizen (Student/Parents/Alumni)</label>
+                        </div>
+                        <div class="flex gap-1">
+                            <input type="checkbox">
+                            <label for="">Business</label>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-5 text-xs flex-1 gap-5">
+                        <h1 class="font-bold">Goverment:</h1>
+                        <div class="flex gap-1">
+                            <input type="checkbox">
+                            <label for="">Employee </label>
+                        </div>
+                        <div class="flex gap-1">
+                            <input type="checkbox">
+                            <label for="">Other Agency</label>
+                        </div>
+                    
+                    </div>
+
+                    <div class="flex justify-between text-xs">
+                        <div class="flex gap-1 ">
+                            <label for="">Date: </label>
+                            <input type="text" class="underline border-b">
+                        </div>
+
+                        <div class="flex gap-1 items-center ">
+                            <h1>Sex:</h1>
+                            <div class="flex gap-5 items-center">
+                                <div class="flex items-center gap-1">
+                                    <input type="checkbox">
+                                    <label for="">Male </label>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <input type="checkbox">
+                                    <label for="">Female </label>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <input type="checkbox">
+                                    <label for="">Others </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-1 text-xs ">
+                            <label for="">Age: </label>
+                            <input type="text" class="underline border-b">
+                        </div>
+
+                    
+                    </div>
+
+                    <div class="flex gap-5 text-xs">
+                        <div class="flex gap-1 ">
+                            <label for="">Region of Residence: </label>
+                            <input type="text" class="underline border-b">
+                        </div>
+                        <div class="flex gap-1 ">
+                            <label for="">Office person Visited: </label>
+                            <input type="text" class="underline border-b">
+                        </div>
+
+                    </div>
+
+                    <div class="flex flex-1 text-xs">
+                        <div class="flex gap-1 flex-1">
+                            <label for="">Service Availed: </label>
+                            <input type="text" class="underline border-b flex-1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full border-[1.5px] my-5"></div>
+
+
+                <!-- CC questions -->
+                <div class=" flex flex-col space-y-3 w-full text-xs">
+                    <div class="flex">
+                        <p class="text-xs">
+                            INSTRUCTION:
+                            <strong>Check mark (✔)</strong>
+                            your answer to the <strong>Citizen;s Charter (CC)</strong> questions. The Citizen's Charter is an official document that reflects the services of a goverment agency/office including its requirements,fees , and processing times among others.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-5">
+                        <h1 class="font-bold">CC1</h1>
+                        <div class="flex flex-col gap-1  ">
+                            <h1 class="font-bold">Which of the following best descrbes your awareness of a  CC?</h1>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="flex gap-5">
+                        <h1 class="font-bold">CC1</h1>
+                        <div class="flex flex-col gap-1  ">
+                            <h1 class="font-bold">Which of the following best descrbes your awareness of a  CC?</h1>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="flex gap-5">
+                        <h1 class="font-bold">CC1</h1>
+                        <div class="flex flex-col gap-1  ">
+                            <h1 class="font-bold">Which of the following best descrbes your awareness of a  CC?</h1>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input type="checkbox">
+                                <label for="">I know what a CC is and I saw this office's CC</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div>
+                    <h1>INSTRUCTIONS:</h1>
+                    <div class="text-xs">
+                        <p>FOr SQD 0-.8. Please put a <strong>check mark (✔)</strong> on the column that best corresponds to your answer</p>
+                            <table class="min-w-full border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-200 text-gray-700  text-xs space-y-10">
+                                        <th class="p-1 border min-w-70 text-center">Service Quality Dimensions</th>
+
+                                        <th class="p-1 border text-center">
+                                            <i class='bx bx-happy text-5xl'></i><br> strongly agree
+                                        </th>
+
+                                        <th class="p-1 border text-center">
+                                            <i class='bx bx-smile text-5xl'></i><br> agree
+                                        </th>
+
+                                        <th class="p-1 border text-center">
+                                            <i class='bx bx-meh text-5xl'></i><br> neither agree or disagree
+                                        </th>
+
+                                        <th class="p-1 border text-center">
+                                            <i class='bx bx-sad text-5xl'></i><br> disagree
+                                        </th>
+
+                                        <th class="p-1 border text-center">
+                                            <i class='bx bx-angry text-5xl'></i><br> strongly disagree
+                                        </th>
+
+                                        <th class="p-1 border text-center">N/A Not applicable</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="hover:bg-gray-50 even:bg-gray-50">
+                                    <td class="px-1 py-2 border w-[50px]">SQD0. I am satisfied with service that I availed</td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"> </td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 even:bg-gray-50">
+                                    <td class="px-1 py-2 border w-[50px]">SQD1. I am satisfied with service that I availed</td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"> </td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 even:bg-gray-50">
+                                    <td class="px-1 py-2 border w-[50px]">SQD2. I am satisfied with service that I availed</td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"> </td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                    <td class="px-1 py-2 border"></td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+
+
+                    </div>
+
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <button class="no-print fixed bottom-8 right-8 bg-gray-800 text-white px-6 py-4 rounded-lg shadow-xl hover:bg-gray-900 transition-all duration-300 flex items-center gap-3 font-semibold group" onclick="window.print()">
+        <i class='bx bx-printer text-xl group-hover:scale-110 transition-transform'></i>
+        <span>Print Survey Form</span>
+    </button>
+</body>
+</html>

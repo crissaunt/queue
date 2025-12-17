@@ -1,7 +1,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,54 +12,178 @@
         
     <link href="{% static 'src/output.css' %}" rel="stylesheet">
     <title>{% block title %} {% endblock %}</title>
-</head>
-<style>
-    .medula-one-regular {
-    font-family: "Medula One", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    }
-    .inria-sans-regular {
-  font-family: "Inria Sans", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
+    <style>
+        .medula-one-regular {
+            font-family: "Medula One", system-ui;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        .inria-sans-regular {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
 
-    .inria-sans-bold {
-  font-family: "Inria Sans", sans-serif;
-  font-weight: 700;
-  font-style: normal;
-}
+        .inria-sans-bold {
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
 
-    .custom-bg {
-                background-image: url("{% static 'images/background.png' %}");
-                background-size: cover;        
-                /* background-position: center;  
-                background-repeat: no-repeat;  
-                background-attachment: scroll; 
+        .custom-bg {
+            background-image: url("{% static 'images/background.png' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .custom-bg {
+                background-attachment: scroll;
+                background-position: top center;
             }
+            
+            .border-b-\[10px\] {
+                border-bottom-width: 6px !important;
+            }
+            
+            .border-t-10 {
+                border-top-width: 6px !important;
+            }
+            
+            main.max-w-\[1500px\] {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                width: 100% !important;
+            }
+        }
 
-</style>
-<body class="inria-sans-regular h-screen custom-bg flex flex-col" >
+        @media (max-width: 640px) {
+            .border-b-\[10px\] {
+                border-bottom-width: 4px !important;
+            }
+            
+            .border-t-10 {
+                border-top-width: 4px !important;
+            }
+            
+            .py-5 {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            body.text-base {
+                font-size: 0.875rem;
+            }
+        }
 
-    <header class="flex w-full   mx-auto bg-transparent p-4 md:p-2 border-b-[10px] border-[#10420C]">
-        <div class="gap-4 my-2 max-w-screen-2xl w-full mx-auto flex items-center ">
-            <img src="{% static 'images/header-logo.svg' %}" alt="Logo" class="pl-9 h-12 md:h-12">
+        @media (max-width: 480px) {
+            header.p-4 {
+                padding: 0.75rem !important;
+            }
+            
+            .pl-9 {
+                padding-left: 1rem !important;
+            }
+            
+            .h-12 {
+                height: 2.5rem !important;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .custom-bg {
+                background-position: center center;
+            }
+            
+            .h-screen {
+                min-height: 100vh;
+                height: auto !important;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .custom-bg {
+                background-image: none !important;
+                background-color: white !important;
+            }
+            
+            footer {
+                display: none !important;
+            }
+            
+            header {
+                border-bottom: 1px solid #10420C !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .border-\[\#10420C\] {
+                border-color: #000000 !important;
+            }
+            
+            .bg-\[\#10420C\] {
+                background-color: #000000 !important;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            button, a {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+</head>
+<body class="inria-sans-regular h-screen custom-bg flex flex-col ">
+
+    <header class="flex w-full mx-auto bg-transparent p-4 md:p-2 border-b-[10px] border-[#10420C]">
+        <div class="gap-4 my-2 max-w-screen-2xl w-full mx-auto flex items-center px-4 md:px-0">
+            <img src="{% static 'images/header-logo.svg' %}" 
+                 alt="Caraga State University Cabadbaran Campus Logo" 
+                 class="pl-9 h-12 md:h-12 w-auto"
+                 loading="lazy">
         </div>
     </header>
 
-    <main class="max-w-[1500px] w-full mx-auto flex-1 mb-5 ">
+    <main class="max-w-[1500px] w-full mx-auto flex-1 px-4 md:px-6 lg:px-8">
         {% block content %}
         {% endblock %}
     </main>
     
 
-    <footer class="bg-[#10420C]  w-full border-t-10 border-t-white mt-15 py-5">
-        <div class="flex ml-10 gap-10 max-w-screen-2x  mx-auto mt-5 items-center">
-            <img src="{% static 'images/site-logo.svg' %}" alt="Logo" class="pl-9 h-13 md:h-20">
-            <p class=" text-white text-xs w-[700px]">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
-        </div>
-    </footer> 
-   
+    <footer class="bg-[#10420C] w-full border-t-10 border-t-white py-5 px-4 md:px-0">
+        {% comment %} 
+        <div class="flex flex-col md:flex-row md:ml-10 gap-4 md:gap-10 max-w-screen-2xl mx-auto md:items-center">
+            <div class="flex justify-center md:justify-start">
+                <img src="{% static 'images/site-logo.svg' %}" 
+                     alt="CSUCC Logo" 
+                     class="h-13 md:h-20 w-auto"
+                     loading="lazy">
+            </div>
+            <p class="text-white text-xs md:text-sm text-center md:text-left md:w-[700px] px-4 md:px-0">
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            </p>
+        </div> 
+        {% endcomment %}
+    </footer>
+
 </body>
 </html>

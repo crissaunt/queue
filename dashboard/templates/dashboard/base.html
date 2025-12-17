@@ -270,7 +270,7 @@
 
                 <!-- Authentication Links for Logged-in Users -->
                 <li>
-                    <form method="post" action="{% url 'logout' %}" class="m-0">
+                    <form method="post" action="{% url 'dashboard_logout' %}" class="m-0">
                         {% csrf_token %}
                         <button type="submit" class="flex flex-row items-center w-full h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
                             <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">

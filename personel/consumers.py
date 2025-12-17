@@ -2,7 +2,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from .models import Appointments
+from .models import Appointments, QueueControl
 from django.utils import timezone
 from django.db.models import Case, When, Value, IntegerField
 from django.utils.timezone import localtime
@@ -84,10 +84,15 @@ class QueueConsumer(AsyncWebsocketConsumer):
             print(f"   - Today's date: {today}")
             print(f"   - Current time: {now_ph}")
             
-            # 1) Next Queue (5 students) - MAKE SURE THIS INCLUDES PENDING STUDENTS
-            next_queue = []
+            # Get queue status
+            queue_control = QueueControl.get_queue_control()
+            is_queue_running = queue_control.is_running
+            print(f"   - Queue status: {'RUNNING' if is_queue_running else 'STOPPED'}")
             
-            # First add standby students
+            # 1) Get ALL students in the queue (standby + non-priority pending)
+            all_queue_students = []
+            
+            # First add ALL standby students
             standby_students = list(
                 Appointments.objects.filter(
                     status="standby",
@@ -95,32 +100,38 @@ class QueueConsumer(AsyncWebsocketConsumer):
                 ).order_by("datetime")
             )
             print(f"   - Standby students: {len(standby_students)}")
-            next_queue.extend(standby_students)
+            all_queue_students.extend(standby_students)
             
-            # Then add non-priority pending students (up to 5 total)
-            if len(next_queue) < 5:
-                non_priority_students = list(
-                    Appointments.objects.filter(
-                        status="pending",
-                        is_priority="no",
-                        datetime__date=today
-                    ).order_by("datetime")
-                )
-                print(f"   - Non-priority pending: {len(non_priority_students)}")
-                
-                for student in non_priority_students:
-                    if len(next_queue) >= 5:
-                        break
-                    next_queue.append(student)
+            # Then add ALL non-priority pending students
+            non_priority_students = list(
+                Appointments.objects.filter(
+                    status="pending",
+                    is_priority="no",
+                    datetime__date=today
+                ).order_by("datetime")
+            )
+            print(f"   - Non-priority pending: {len(non_priority_students)}")
+            all_queue_students.extend(non_priority_students)
             
-            print(f"   - Final next_queue count: {len(next_queue)}")
+            print(f"   - Total queue students: {len(all_queue_students)}")
             
-            # Build the next_queue_list for WebSocket
+            # Build the next_queue_list for WebSocket (first 5 for sidebar)
             next_queue_list = []
-            for queue_item in next_queue[:5]:
+            for queue_item in all_queue_students[:5]:  # First 5 for sidebar
                 next_queue_list.append({
                     'ticket_number': queue_item.ticket_number,
                 })
+
+            # FIXED: Build FULL queue list for modal (students beyond the first 5)
+            full_queue_list = []
+            # Get ALL students starting from index 5 (student #6 and beyond)
+            for queue_item in all_queue_students[5:]:  
+                full_queue_list.append({
+                    'ticket_number': queue_item.ticket_number,
+                })
+
+            print(f"   - Next queue (sidebar): {len(next_queue_list)} items")
+            print(f"   - Full queue (modal): {len(full_queue_list)} items")
 
             # 2) Priority Queue (all priority students)
             priority_students = list(
@@ -168,7 +179,7 @@ class QueueConsumer(AsyncWebsocketConsumer):
                     'lastName': student.lastName,
                 })
 
-            # 4) Current serving student - EXTENSIVE DEBUGGING
+            # 4) Current serving student
             current_student = Appointments.objects.filter(
                 status="current",
                 datetime__date=today
@@ -179,8 +190,6 @@ class QueueConsumer(AsyncWebsocketConsumer):
                 print(f"   - Current student details:")
                 print(f"     - Ticket: {current_student.ticket_number}")
                 print(f"     - Status: {current_student.status}")
-                print(f"     - Date: {current_student.datetime.date() if current_student.datetime else 'No date'}")
-                print(f"     - Time: {localtime(current_student.datetime).strftime('%H:%M:%S') if current_student.datetime else 'No time'}")
                 
                 current_data = {
                     'id': current_student.id,
@@ -189,27 +198,33 @@ class QueueConsumer(AsyncWebsocketConsumer):
                     'middleName': current_student.middleName or '',
                     'lastName': current_student.lastName,
                     'courses': str(current_student.courses) if current_student.courses else '',
-                    
                     'requestType': str(current_student.requestType) if current_student.requestType else current_student.custom_request or 'No Request',
                 }
             else:
                 print(f"   - No current student found for date: {today}")
-                # Debug: Check all students for today
-                all_today_students = Appointments.objects.filter(datetime__date=today)
-                print(f"   - Total students today: {all_today_students.count()}")
-                for student in all_today_students:
-                    print(f"     - {student.ticket_number}: {student.status} (Date: {student.datetime.date() if student.datetime else 'None'})")
                 current_data = None
 
-            # Build complete payload
+            # Build complete payload - INCLUDES QUEUE STATUS
             complete_data = {
                 'next_queue': next_queue_list,
+                'full_queue': full_queue_list,
                 'priority_queue': priority_queue_list,
                 'skipped_list': skipped_list,
                 'current_student': current_data,
+                'queue_status': {
+                    'is_running': is_queue_running,
+                    'status_text': 'RUNNING' if is_queue_running else 'STOPPED'
+                }
             }
 
-            print(f"📊 Complete data prepared: {len(next_queue_list)} next, {len(priority_queue_list)} priority, {len(skipped_list)} skipped, current: {current_data is not None}")
+            print(f"📊 Complete data prepared:")
+            print(f"   - Next queue: {len(next_queue_list)} items")
+            print(f"   - Full queue: {len(full_queue_list)} items") 
+            print(f"   - Priority: {len(priority_queue_list)} items")
+            print(f"   - Skipped: {len(skipped_list)} items")
+            print(f"   - Current: {'Yes' if current_data else 'No'}")
+            print(f"   - Queue running: {is_queue_running}")
+
             return complete_data
 
         except Exception as e:
@@ -218,7 +233,12 @@ class QueueConsumer(AsyncWebsocketConsumer):
             traceback.print_exc()
             return {
                 'next_queue': [],
+                'full_queue': [],
                 'priority_queue': [],
                 'skipped_list': [],
                 'current_student': None,
+                'queue_status': {
+                    'is_running': True,
+                    'status_text': 'RUNNING'
+                }
             }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Caraga State University Cabadbaran Campus(CSUCC)</title>
+    <title>Caraga State University Cabadbaran Campus (CSUCC)</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/site-logo.svg' %}">
     <link href="{% static 'src/output.css' %}" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,66 +13,285 @@
         
     <style>
         .odor-mean-chey-regular {
-                                font-family: "Odor Mean Chey", serif;
-                                font-weight: 400;
-                                font-style: normal;
-                                }
+            font-family: "Odor Mean Chey", serif;
+            font-weight: 400;
+            font-style: normal;
+        }
 
         .medula-one-regular {
-                            font-family: "Medula One", system-ui;
-                            font-weight: 400;
-                            font-style: normal;
-                            }
+            font-family: "Medula One", system-ui;
+            font-weight: 400;
+            font-style: normal;
+        }
 
         .inria-sans-regular {
-                            font-family: "Inria Sans", sans-serif;
-                            font-weight: 400;
-                            font-style: normal;
-                            }
+            font-family: "Inria Sans", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
         .font-poppins {
-                    font-family: 'Poppins', sans-serif;
-                    }                    
+            font-family: 'Poppins', sans-serif;
+        }                    
 
-         .custom-bg {
-                background-image: url("{% static 'images/bg-image.svg' %}");
-                background-size: cover;        /* fill the screen */
-                /* background-position: center;   center the image */
-                background-repeat: no-repeat;  /* don’t repeat */
-                background-attachment: scroll; /* make background scroll with content */
-                }
+        .custom-bg {
+            background-image: url("{% static 'images/bg-image.svg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            background-position: center;
+        }
 
-                
         .sora-regular {
-        font-family: "Sora", sans-serif;
-        font-optical-sizing: auto;
-        font-weight:700;
-        font-style: normal;
+            font-family: "Sora", sans-serif;
+            font-optical-sizing: auto;
+            font-weight:700;
+            font-style: normal;
         }
 
         .la-belle-aurore-regular {
-        font-family: "La Belle Aurore", cursive;
-        font-weight: 400;
-        font-style: normal;
+            font-family: "La Belle Aurore", cursive;
+            font-weight: 400;
+            font-style: normal;
         }
 
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            main.max-w-\[1312px\] {
+                max-width: 95% !important;
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .custom-bg {
+                background-size: cover;
+                background-position: center center;
+                background-attachment: scroll;
+            }
+            
+            header.p-4 {
+                padding: 1rem !important;
+            }
+            
+            .h-12.md\:h-16 {
+                height: 2.5rem !important;
+            }
+            
+            .pl-4.md\:pl-8 {
+                padding-left: 1rem !important;
+            }
+            
+            .mb-15 {
+                margin-bottom: 3rem !important;
+            }
+            
+            .min-h-\[50px\] {
+                min-height: 40px !important;
+            }
+            
+            footer.px-4.md\:px-6 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            main.mb-15 {
+                margin-bottom: 2rem !important;
+                padding-bottom: 1rem !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .custom-bg {
+                background-size: cover;
+            }
+            
+            header.p-4 {
+                padding: 0.75rem !important;
+            }
+            
+            .h-12.md\:h-16 {
+                height: 2rem !important;
+            }
+            
+            .pl-4.md\:pl-8 {
+                padding-left: 0.5rem !important;
+            }
+            
+            .mb-15 {
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .min-h-\[50px\] {
+                min-height: 35px !important;
+            }
+            
+            footer.text-sm.md\:text-base {
+                font-size: 0.75rem !important;
+                text-align: center;
+                padding: 0.5rem 1rem;
+            }
+            
+            p.text-sm {
+                line-height: 1.4;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .custom-bg {
+                background-size: cover;
+                background-position: center;
+            }
+            
+            header.p-4 {
+                padding: 0.5rem !important;
+            }
+            
+            .h-12.md\:h-16 {
+                height: 1.75rem !important;
+            }
+            
+            .pl-4.md\:pl-8 {
+                padding-left: 0.25rem !important;
+            }
+            
+            footer.min-h-\[50px\] {
+                min-height: 30px !important;
+            }
+            
+            .mb-15 {
+                margin-bottom: 1rem !important;
+            }
+            
+            main.flex-1 {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .custom-bg {
+                background-size: cover;
+                background-position: center top;
+            }
+            
+            .min-h-screen {
+                min-height: 100vh;
+            }
+            
+            .mb-15 {
+                margin-bottom: 1rem !important;
+            }
+        }
+
+        /* Tablet portrait optimization */
+        @media (min-width: 641px) and (max-width: 768px) {
+            .custom-bg {
+                background-size: cover;
+                background-position: center;
+            }
+            
+            .max-w-\[1312px\] {
+                max-width: 95% !important;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .custom-bg {
+                background-image: none !important;
+                background-color: white !important;
+            }
+            
+            footer {
+                display: none !important;
+            }
+            
+            header img {
+                filter: grayscale(100%) !important;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High contrast mode */
+        @media (prefers-contrast: high) {
+            .bg-\[\#10420C\] {
+                background-color: #000000 !important;
+            }
+            
+            .text-white {
+                color: #000000 !important;
+            }
+            
+            footer {
+                border-top: 2px solid #000000 !important;
+            }
+        }
+
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .custom-bg {
+                filter: brightness(0.9);
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            button, a {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Safe area insets for notched phones */
+        @supports (padding: max(0px)) {
+            header, footer {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            footer {
+                padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Performance optimizations */
+        @media (prefers-reduced-data: reduce) {
+            .custom-bg {
+                background-image: none !important;
+                background-color: #f8f9fa;
+            }
+        }
     </style>
 </head>
 <body class="custom-bg inria-sans-regular flex flex-col min-h-screen">
     <header class="w-full bg-transparent p-4 md:p-6">
-        <div class="flex items-center justify-start max-w-[1312px] mx-auto">
-            <img src="{% static 'images/header-logo.svg' %}" alt="CSUCC Logo" class="h-12 md:h-16 pl-4 md:pl-8">
+        <div class="flex items-center justify-start max-w-[1312px] mx-auto px-4 md:px-6 lg:px-8">
+            <img src="{% static 'images/header-logo.svg' %}" 
+                 alt="Caraga State University Cabadbaran Campus Logo" 
+                 class="h-12 md:h-16 pl-4 md:pl-8 w-auto"
+                 loading="lazy">
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col w-full max-w-[1312px] mx-auto mb-15 ">
+    <main class="flex-1 flex flex-col w-full max-w-[1312px] mx-auto mb-15 px-4 md:px-6 lg:px-8">
         {% block content %}
         {% endblock %}
     </main>
 
-
-<footer class="bg-[#10934F] w-full min-h-[50px] flex items-center justify-center text-white px-4 md:px-6">
-        <p class="text-sm md:text-base">&copy; {{ now|date:"Y" }} Caraga State University Cabadbaran Campus</p>
+    <footer class="bg-[#10420C] w-full min-h-[50px] flex items-center justify-center text-white px-4 md:px-6 py-2 md:py-3">
+        <p class="text-sm md:text-base text-center px-2">
+            &copy; {{ now|date:"Y" }} Caraga State University Cabadbaran Campus
+        </p>
     </footer>
 </body>
-
 </html>
