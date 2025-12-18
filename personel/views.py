@@ -336,8 +336,28 @@ def done_current_number(request):
                 current_number.skip_count = 0
                 current_number.served_by = personel
                 current_number.save()
+                
+                # UPDATE THE CODE STATUS TO 'used' WHEN APPOINTMENT IS DONE
+                try:
+                    code_obj = Code.objects.get(appointments=current_number)
+                    code_obj.status = 'pending'
+                    code_obj.save()
+                    print(f"✅ Updated code {code_obj.code} status to 'used'")
+                except Code.DoesNotExist:
+                    print(f"⚠️ No code found for appointment {current_number.id}")
+                except Code.MultipleObjectsReturned:
+                    # If there are multiple codes, update all of them
+                    code_objs = Code.objects.filter(appointments=current_number)
+                    code_objs.update(status='used')
+                    print(f"✅ Updated {code_objs.count()} codes to 'used'")
+                
                 broadcast_update()
                 broadcast_queue_update()
+                
+                messages.success(request, f"Student {current_number.ticket_number} marked as done.")
+                broadcast_update()
+                broadcast_queue_update()
+                
                 messages.success(request, f"Student {current_number.ticket_number} marked as done.")
                 
             elif action == 'skip':

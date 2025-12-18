@@ -180,12 +180,13 @@ class Appointments(models.Model):
 class Code(models.Model):
     STATUS_CHOICES = [
         ('unused', 'Unused'),
+        ('pending', 'Pending'),
         ('used', 'Used'),
     ]
     appointments = models.ForeignKey(Appointments, on_delete=models.PROTECT,  null=True)
     code = models.CharField(max_length=10, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unused' , null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending' , null=True)
 
     def __str__(self):
         return self.code

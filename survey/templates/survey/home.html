@@ -2,44 +2,131 @@
 
 {% block content %}
 {% load static %}
-<div class="flex items-end justify-end   w-full">
-    <a href="{% url 'student_form' %}" class="flex gap-2 text-center max-w-[200px] py-1 w-full bg-[#f9dc07] text-[#10420C] items-center justify-center   hover:bg-[#10420C] hover:text-[#f9dc07] border border-gray-400 text-[#10420C] text-sm font-semibold transition">
+<style>
+    /* Animation styles */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInFromRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .animate-float {
+        animation: float 2s ease-in-out infinite;
+    }
+    
+    .animate-slide-left {
+        animation: slideInFromLeft 0.3s ease-out forwards;
+    }
+    
+    .animate-slide-right {
+        animation: slideInFromRight 0.3s ease-out forwards;
+    }
+    
+    .animation-delay-200 {
+        animation-delay: 0.1s;
+        opacity: 0;
+    }
+    
+    .animation-delay-400 {
+        animation-delay: 0.2s;
+        opacity: 0;
+    }
+    
+    .animation-delay-600 {
+        animation-delay: 0.3s;
+        opacity: 0;
+    }
+    
+    .animation-delay-800 {
+        animation-delay: 0.3s;
+        opacity: 0;
+    }
+    
+    /* Smooth transitions for modal */
+    #codeModal, #surveySuccessModal {
+        transition: opacity 0.1s ease;
+    }
+</style>
+
+<div class="flex items-end justify-end w-full animate-fade-in animation-delay-600">
+    <a href="{% url 'student_form' %}" class="flex gap-2 text-center max-w-[200px] py-1 w-full bg-[#f9dc07] text-[#10420C] items-center justify-center hover:bg-[#10420C] hover:text-[#f9dc07] border border-gray-400 text-[#10420C] text-sm font-semibold transition transform hover:scale-[1.02] active:scale-[0.98]">
         Make a request 
-        <span class="text-xl">→</span>
+        <span class="text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
     </a>
 </div>
+
 <!-- NEW: Success Survey Modal -->
 <div id="surveySuccessModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center border">
-    <div class="bg-white shadow-2xl w-[600px] max-w-[90%] p-10 relative">
+    <div class="bg-white shadow-2xl w-[600px] max-w-[90%] p-10 relative rounded-sm">
         <!-- Close Button -->
         <button onclick="closeSurveySuccessModal()" 
-                class="absolute top-4 right-4 text-3xl font-bold text-gray-500 hover:text-gray-800 cursor-pointer">
+                class="absolute top-4 right-4 text-3xl font-bold text-gray-500 hover:text-gray-800 cursor-pointer transition-colors duration-200">
             &times;
         </button>
         
         <!-- Success Content -->
         <div class="text-center">
-            <!-- Success Icon -->
+            <!-- Success Icon with animation -->
             <div class="mb-6">
-                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <svg class="w-16 h-16 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto animate-fade-in">
+                    <svg class="w-16 h-16 text-green-600 " fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                     </svg>
                 </div>
             </div>
             
             <!-- Success Message -->
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Survey Submitted Successfully!</h2>
-            <p class="text-gray-600 text-lg mb-2">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4 animate-fade-in animation-delay-400">Survey Submitted Successfully!</h2>
+            <p class="text-gray-600 text-lg mb-2 animate-fade-in animation-delay-500">
                 Thank you for your valuable feedback!
             </p>
-            <p class="text-gray-500 mb-8">
+            <p class="text-gray-500 mb-8 animate-fade-in animation-delay-600">
                 Your responses have been recorded and will help us improve our services.
             </p>
             
             <!-- Action Button -->
             <button onclick="closeSurveySuccessModal()" 
-                    class="bg-[#10420C] hover:bg-[#10420C] text-white font-semibold py-3 px-8  transition duration-300">
+                    class="bg-[#10420C] hover:bg-[#10420C] text-white font-semibold py-3 px-8 transition duration-300 transform hover:scale-[1.02] active:scale-[0.98] animate-fade-in animation-delay-800">
                 Return to Survey Home
             </button>
         </div>
@@ -48,12 +135,12 @@
 
 <!-- Flash messages with filtering -->
 {% if messages %}
-<div id="flashMessage" class="fixed top-25 left-1/2 transform -translate-x-1/2 z-50">
+<div id="flashMessage" class="fixed top-25 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
     {% for message in messages %}
         {# Only show messages that are likely from survey app #}
         {% if "code" in message|lower or "survey" in message|lower or "thank you" in message|lower or "feedback" in message|lower %}
-        <div class="px-6 py-3 rounded-xs text-white font-semibold
-                    {% if message.tags == 'error' %}bg-red-400{% else %}bg-green-500{% endif %}">
+        <div class="px-8 py-3 rounded-xs text-white text-lg font-semibold animate-fade-in
+                    {% if message.tags == 'error' %}bg-red-500{% else %}bg-green-500{% endif %}">
             {{ message }}
         </div>
         {% endif %}
@@ -64,53 +151,68 @@
   // Hide flash message after 2 seconds
   setTimeout(() => {
     const flash = document.getElementById("flashMessage");
-    if(flash) flash.remove();
+    if(flash) {
+        flash.style.opacity = "0";
+        flash.style.transition = "opacity 0.5s ease";
+        setTimeout(() => {
+            if(flash.parentNode) flash.parentNode.removeChild(flash);
+        }, 500);
+    }
   }, 2000);
 </script>
 {% endif %}
 
 <div class="w-full flex justify-center">
-    <div class="flex  items-center space-x-10">
-        <div class="">
-            <img src="{% static 'pictures/feedback.svg' %}" alt="" class="w-120 h-120">
+    <div class="flex items-center space-x-10">
+        <!-- Left Image with floating animation -->
+        <div class="animate-slide-left">
+            <img src="{% static 'pictures/feedback.svg' %}" alt="Feedback Illustration" class="w-120 h-120 animate-float">
         </div>
 
-        <div class="flex flex-col  items-center justify-center">
+        <!-- Right Content with staggered animations -->
+        <div class="flex flex-col items-center justify-center">
             <div class="flex flex-col items-center">
-                <h1 class="sora-regular gap-1 font-bold text-[40px]">Client Satisfaction</h1>
-                <h1 class="sora-regular gap-1 font-bold text-[40px]">Measurement <span class="text-[#FFCC00]"> Survey</span> </h1>
+                <h1 class="sora-regular gap-1 font-bold text-[40px] animate-fade-in">Client Satisfaction</h1>
+                <h1 class="sora-regular gap-1 font-bold text-[40px] animate-fade-in animation-delay-200">
+                    Measurement <span class="text-[#FFCC00] animate-fade-in animation-delay-300">Survey</span>
+                </h1>
             </div>
-            <p class="la-belle-aurore-regular text-center text-[26px]">Help us to serve you better!</p>
+            <p class="la-belle-aurore-regular text-center text-[26px] animate-fade-in animation-delay-400">
+                Help us to serve you better!
+            </p>
 
-            <div class="flex justify-center items-center gap-2 w-full flex-col">
-                <h1 class="text-xs text-gray-500 text-center">(Click the button below to make a survey)</h1>
-                <button id="openModal" class="text-center py-2 border-4 w-full max-w-[200px] border-double text-lg border-white bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer text-white">
+            <div class="flex justify-center items-center gap-2 w-full flex-col animate-fade-in animation-delay-600">
+                <h1 class="text-xs text-gray-500 text-center animate-fade-in animation-delay-700">
+                    (Click the button below to make a survey)
+                </h1>
+                <button id="openModal" class="text-center  hover:shadow-2xl/80 py-2 border-4 w-full max-w-[200px] border-double text-lg border-white bg-[#10420C] hover:bg-[#10420C]/80 cursor-pointer text-white transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.95]  animate-fade-in animation-delay-800">
                     Survey here!
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
+<!-- Code Modal -->
 <div id="codeModal" class="hidden fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white shadow-lg w-[400px] px-10 pt-5 pb-10 relative">
-        <button id="closeModal" class="absolute top-2 right-3 text-gray-500 hover:text-black text-2xl">
+    <div class="bg-white shadow-lg w-[400px] px-10 pt-5 pb-10 relative ">
+        <button id="closeModal" class="absolute top-2 right-3 text-gray-500 hover:text-black text-2xl transition-colors duration-200">
             &times;
         </button>
 
         <div class="flex items-center justify-center flex-1 mx-auto flex-col gap-4 mb-7">
-            <img src="{% static 'pictures/csulogo.png' %}" alt="CSUCC Logo" class="h-20 md:h-18 pl-2 md:pl-8">
-            <p class="text-sm text-gray-400">Please enter your 4-digit code to continue.</p>
+            <img src="{% static 'pictures/csulogo.png' %}" alt="CSUCC Logo" class="h-20 md:h-18 pl-2 md:pl-8 ">
+            <p class="text-sm text-gray-400  ">Please enter your 4-digit code to continue.</p>
         </div>
         
         <form method="post" action="{% url 'validate_code' %}" class="flex flex-col gap-2">
             {% csrf_token %}
-            <label for="">Enter Code:</label>
+            <label class=" ">Enter Code:</label>
             <input type="text" name="code" placeholder="Enter Code" 
-                   class="border text-base px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black" required />
+                   class="border text-base px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black transition-all   " 
+                   required />
             
-            <button type="submit" class="bg-[#10420C] hover:bg-[#10420C]/80 text-white text-base cursor-pointer mt-5 px-4 py-2">
+            <button type="submit" class="bg-[#10420C] hover:bg-[#10420C]/80 text-white text-base cursor-pointer mt-5 px-4 py-2 transition-all  transform hover:scale-[1.02] active:scale-[0.98] ">
                 Submit
             </button>
         </form>
@@ -118,37 +220,71 @@
 </div>
 
 <script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Trigger animations for main content
+        const elements = document.querySelectorAll('.animate-fade-in, .animate-slide-left, .animate-slide-right');
+        elements.forEach(el => {
+            // Remove opacity: 0 after animation completes
+            const delay = parseFloat(getComputedStyle(el).animationDelay) * 1000 || 0;
+            setTimeout(() => {
+                el.style.opacity = '1';
+            }, delay + 800); // Animation duration + delay
+        });
+    });
+
     const openModal = document.getElementById("openModal");
     const closeModal = document.getElementById("closeModal");
     const modal = document.getElementById("codeModal");
 
     openModal.addEventListener("click", () => {
         modal.classList.remove("hidden");
+        // Add a slight animation when modal opens
+        setTimeout(() => {
+            modal.style.opacity = "1";
+        }, 10);
     });
 
     closeModal.addEventListener("click", () => {
-        modal.classList.add("hidden");
+        modal.style.opacity = "0";
+        setTimeout(() => {
+            modal.classList.add("hidden");
+        }, 300);
     });
 
     modal.addEventListener("click", (e) => {
         if (e.target === modal) {
-            modal.classList.add("hidden");
+            modal.style.opacity = "0";
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
         }
     });
 
     // NEW: Survey Success Modal Functions
     function showSurveySuccessModal() {
-        document.getElementById('surveySuccessModal').classList.remove('hidden');
+        const modal = document.getElementById('surveySuccessModal');
+        modal.classList.remove('hidden');
         document.body.style.overflow = "hidden";
+        
+        // Fade in animation
+        setTimeout(() => {
+            modal.style.opacity = "1";
+        }, 10);
     }
 
     function closeSurveySuccessModal() {
-        document.getElementById('surveySuccessModal').classList.add('hidden');
-        document.body.style.overflow = "";
+        const modal = document.getElementById('surveySuccessModal');
+        modal.style.opacity = "0";
         
-        // Optional: Clear URL parameter
-        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = "";
+            
+            // Optional: Clear URL parameter
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }, 100);
     }
 
     // Check if we should show the success modal on page load
@@ -163,13 +299,31 @@
             // Wait a bit for page to load completely
             setTimeout(() => {
                 showSurveySuccessModal();
-            }, 500);
+            }, 800); // Wait for initial animations to complete
             
             // Clean the URL (remove the parameter without reloading)
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
         }
+        
+        // Add hover effect to request button
+        const requestBtn = document.querySelector('a[href*="student_form"]');
+        if (requestBtn) {
+            requestBtn.classList.add('group');
+        }
     };
+    
+    // Add a subtle pulse animation to the survey button
+    const surveyBtn = document.getElementById('openModal');
+    if (surveyBtn) {
+        // Add initial pulse animation
+        setTimeout(() => {
+            surveyBtn.classList.add('animate-pulse');
+            setTimeout(() => {
+                surveyBtn.classList.remove('animate-pulse');
+            }, 2000);
+        }, 1500);
+    }
 </script>
 
 {% endblock %}

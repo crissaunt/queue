@@ -45,36 +45,163 @@
         .font-poppins {
             font-family: 'Poppins', sans-serif;
         }
+
+        /* Animation styles */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .animate-slide-left {
+            animation: slideInFromLeft 0.3s ease-out forwards;
+        }
+        
+        .animate-slide-right {
+            animation: slideInFromRight 0.3s ease-out forwards;
+        }
+        
+        .animate-fade-in-scale {
+            animation: fadeInScale 0.3s ease-out forwards;
+        }
+        
+        .animate-pulse-once {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        .animate-float {
+            animation: float 1s ease-in-out infinite;
+        }
+        
+        .animation-delay-200 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+        
+        .animation-delay-400 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        
+        .animation-delay-600 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        
+        .animation-delay-800 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        
+        .animation-delay-1000 {
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+        
+        /* Modal animations */
+        #studentModal, #guestModal, #successModal {
+            transition: opacity 0.2s ease;
+        }
+        
+        /* Carousel animations */
+        .mySlides {
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        /* Button hover effects */
+        .button-hover {
+            transition: all 0.2s ease;
+        }
+        
+        .button-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body class="bg-cover bg-center bg-no-repeat bg-fixed min-h-screen flex flex-col space-y-2 md:space-y-5" 
       style="background-image: url('{% static 'images/bg-image.svg' %}')">
     
-    <header class="flex w-full justify-between mx-auto bg-transparent p-4  md:p-2 border-t-[20px]  border-[#10420C]">
-        <div class="gap-4  max-w-screen-2xl  px-4 md:px-0 mx-2 ">
+    <header class="flex w-full justify-between mx-auto bg-transparent p-4 md:p-2 border-t-[20px] border-[#10420C] ">
+        <div class="gap-4 max-w-screen-2xl px-4 md:px-0 mx-2">
             <img src="{% static 'images/header-logo.svg' %}" 
                  alt="CSUCC Logo" 
-                 class="pl-4 md:pl-9 h-10 md:h-12 w-auto">
+                 class="pl-4 md:pl-9 h-10 md:h-12 w-auto animate-slide-left">
         </div>
-        <div class="max-w-[200px] w-full  flex items-end justify-end mx-2">
-            <a href="{% url 'survey' %}" class="flex items-center justify-center w-full hover:bg-[#10420C] hover:text-[#f9dc07] px-4 py-1 gap-3 border border-gray-400 bg-[#f9dc07] text-[#10420C] text-sm font-semibold  transition duration-300 ">
-                Go to Survey
-                <span class="text-xl">→</span>
-            </a>
-        </div>
+
     </header>
 
-    <main class="flex justify-between flex-1 max-w-screen-2xl w-full mx-auto   md:px-4 lg:px-6 flex-col lg:flex-row lg:gap-[70px] ">
+    <main class="flex justify-between flex-1 max-w-screen-2xl w-full mx-auto md:px-4 lg:px-6 flex-col lg:flex-row lg:gap-[70px]">
         <!-- Left Column -->
-        <div class="flex flex-col flex-1 w-full lg:w-[889px]  ">
+        <div class="flex flex-col flex-1 w-full lg:w-[889px] animate-fade-in animation-delay-400">
             <!-- Carousel -->
             <div class="flex flex-col text-center relative space-y-1">
-                <div class="relative w-full min-h-[300px]   overflow-hidden ">
-                    <img class="mySlides absolute  object-cover" src="{% static 'images/carousel1.svg' %}" alt="Campus Image 1">
-                    <img class="mySlides absolute  object-cover" src="{% static 'images/carousel2.svg' %}" alt="Campus Image 2">
-                    <img class="mySlides absolute  object-cover" src="{% static 'images/carousel3.svg' %}" alt="Campus Image 3">
+                <div class="relative w-full min-h-[300px] overflow-hidden animate-fade-in-scale">
+                    <img class="mySlides absolute object-cover" src="{% static 'images/carousel1.svg' %}" alt="Campus Image 1">
+                    <img class="mySlides absolute object-cover" src="{% static 'images/carousel2.svg' %}" alt="Campus Image 2">
+                    <img class="mySlides absolute object-cover" src="{% static 'images/carousel3.svg' %}" alt="Campus Image 3">
                 </div>
-                <div class="flex justify-end mt-3 gap-1">
+                <div class="flex justify-end mt-3 gap-1 animate-fade-in animation-delay-600">
                     <span class="dot w-1.5 h-1.5 rounded-full bg-black"></span>
                     <span class="dot w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                     <span class="dot w-1.5 h-1.5 rounded-full bg-gray-400"></span>
@@ -85,15 +212,15 @@
             <div class="flex flex-col space-y-5 md:space-y-[27px] mt-6 md:mt-3">
                 <!-- First Row -->
                 <div class="flex flex-col lg:flex-row gap-4 md:gap-[83px]">
-                    <div class="flex-1 text-center space-y-3 md:space-y-4">
+                    <div class="flex-1 text-center space-y-3 md:space-y-4 animate-slide-left animation-delay-600">
                         <h1 class="text-xl md:text-2xl lg:text-3xl text-black odor-mean-chey-regular">Vision</h1>
-                        <p class="inria-sans-regular text-sm  md:text-sm leading-snug">
+                        <p class="inria-sans-regular text-sm md:text-sm leading-snug">
                             A socially-engaged digital, innovation, and entrepreneurial university excelling globally in science, engineering, and the arts by 2028.
                         </p>
                     </div>
-                    <div class="flex-1 text-center space-y-3 md:space-y-4">
+                    <div class="flex-1 text-center space-y-3 md:space-y-4 animate-slide-right animation-delay-600">
                         <h1 class="text-xl md:text-2xl lg:text-3xl text-black odor-mean-chey-regular">General Mandate</h1>
-                        <p class="inria-sans-regular text-sm  md:text-sm leading-snug">
+                        <p class="inria-sans-regular text-sm md:text-sm leading-snug">
                             Caraga State University shall primarily provide advanced education, higher technological, professional instruction and training in various fields including agriculture, engineering, education, medicine, and information technology.
                         </p>
                     </div>
@@ -101,18 +228,18 @@
 
                 <!-- Second Row -->
                 <div class="flex flex-col lg:flex-row gap-4 md:gap-[40px]">
-                    <div class="flex-1 text-center space-y-1 md:space-y-2">
+                    <div class="flex-1 text-center space-y-1 md:space-y-2 animate-slide-left animation-delay-800">
                         <h1 class="text-xl md:text-2xl lg:text-3xl text-black odor-mean-chey-regular">Mission</h1>
-                        <p class="inria-sans-regular text-sm  md:text-sm leading-snug">
+                        <p class="inria-sans-regular text-sm md:text-sm leading-snug">
                             As a transformative university, CSU is a responsible steward of problem-solvers and value creators who are driven to create a sustainable future for the region, the nation, and beyond.
                         </p>
                     </div>
-                    <div class="flex-1 text-center space-y-3 md:space-y-4">
+                    <div class="flex-1 text-center space-y-3 md:space-y-4 animate-slide-right animation-delay-800">
                         <h1 class="text-xl md:text-2xl lg:text-3xl text-black odor-mean-chey-regular">Core Values</h1>
                         <div class="flex flex-col ">
-                            <p class="inria-sans-regular text-sm  md:text-sm leading-snug">Competence</p>
-                            <p class="inria-sans-regular text-sm  md:text-sm leading-snug">Service</p>
-                            <p class="inria-sans-regular text-sm  md:text-sm leading-snug">Uprightness</p>
+                            <p class="inria-sans-regular text-sm md:text-sm leading-snug">Competence</p>
+                            <p class="inria-sans-regular text-sm md:text-sm leading-snug">Service</p>
+                            <p class="inria-sans-regular text-sm md:text-sm leading-snug">Uprightness</p>
                         </div>
                     </div>
                 </div>
@@ -120,24 +247,33 @@
         </div>
 
         <!-- Right Column -->
-        <div class="flex flex-col w-full justify-start gap-20  lg:w-auto max-w-[300px] flex-1">
-            <div class="flex flex-col text-center space-y-6 md:space-y-[41px] items-center pt-5">
-                <h1 class="text-xl md:text-2xl lg:text-3xl text-black odor-mean-chey-regular">Notice</h1>
-                <div class="flex w-full max-w-[317px]">
-                    <p class="inria-sans-regular text-sm  md:text-sm leading-snug">
+        <div class="flex flex-col w-full justify-start gap-20 lg:w-auto max-w-[300px] flex-1 animate-fade-in animation-delay-1000">
+            <div class="flex items-end justify-end mx-2  w-full">
+                <a href="{% url 'survey' %}" class="flex items-center max-w-[200px] justify-center w-full hover:bg-[#10420C] hover:text-[#f9dc07] px-4 py-1 gap-3 border border-gray-400 bg-[#f9dc07] text-[#10420C] text-sm font-semibold transition duration-300 button-hover animate-slide-right animation-delay-200">
+                    Go to Survey
+                    <span class="text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </a>
+            </div>
+            <div class="flex flex-col text-center space-y-2  items-center pt-3 ">
+                <h1 class="text-xl md:text-2xl lg:text-3xl text-red-500 odor-mean-chey-regular animate-fade-in">Notice</h1>
+                <div class="flex w-full max-w-[317px] animate-fade-in animation-delay-200">
+                    <p class="inria-sans-regular text-sm md:text-sm leading-snug">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                     </p>
                 </div>
             </div>
             
             <div class="flex flex-col items-center space-y-6 md:space-y-[40px]">
-                <h1 class="text-xs   text-gray-500 text-center">(Click the button below to make an appointments)</h1>
+                <h1 class="text-xs text-gray-500 text-center animate-fade-in animation-delay-400">
+                    (Click the button below to make an appointments)
+                </h1>
                 <button type="button" onclick="openModal()" 
-                    class="bg-[#10420C] hover:bg-[#10420C]/80 w-full max-w-[270px] h-14 md:h-[71px] text-lg md:text-2xl lg:text-[32px] medula-one-regular text-white cursor-pointer  transition duration-300">
+                    class="bg-[#10420C] hover:bg-[#10420C]/80 w-full shadow-xl/80 max-w-[270px] h-14 md:h-[71px] text-lg md:text-2xl lg:text-[32px] medula-one-regular text-white cursor-pointer transition duration-100 button-hover animate-pulse-once ">
                     Student
                 </button>
                 <button type="button" onclick="openGuestModal()"
-                    class="bg-[#10420C] hover:bg-[#10420C]/80 w-full max-w-[270px] h-14 md:h-[71px] text-lg md:text-2xl lg:text-[32px] medula-one-regular text-white cursor-pointer  transition duration-300">
+                    class="bg-[#10420C] hover:bg-[#10420C]/80 w-full shadow-xl/80 max-w-[270px] h-14 md:h-[71px] text-lg md:text-2xl lg:text-[32px] medula-one-regular text-white cursor-pointer transition duration-100 button-hover animate-pulse-once ">
                     Guest
                 </button>
             </div>
@@ -146,36 +282,36 @@
         <!-- Student Modal -->
         <div id="studentModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white shadow-xl w-full max-w-md lg:w-[450px] py-6 md:py-10 px-4 md:px-8 lg:px-12 text-black relative ">
-                <button onclick="closeModal()" class="absolute top-3 right-4 text-2xl md:text-3xl font-bold text-[#10420C] cursor-pointer">&times;</button>
-                <p class="inria-sans-regular text-sm  text-black text-center mb-4 md:mb-6">Please enter your information to login</p>
+                <button onclick="closeModal()" class="absolute top-3 right-4 text-2xl md:text-3xl font-bold text-[#10420C] cursor-pointer hover:scale-110 transition-transform ">&times;</button>
+                <p class="inria-sans-regular text-sm text-black text-center mb-4 md:mb-6 ">Please enter your information to request</p>
                 
                 <form id="studentForm" action="{% url 'student_submit' %}" method="post">
                     {% csrf_token %}
                     <div class="space-y-3 md:space-y-4">
-                        <div>
+                        <div class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="firstName">First Name</label>
                             <input type="text" id="firstName" name="firstName" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                         </div>
-                        <div>
+                        <div class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="lastName">Last Name</label>
                             <input type="text" id="lastName" name="lastName" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                         </div>
-                        <div>
+                        <div class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="course">Course</label>
                             <select id="course" name="course" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                                 <option value="">Select Course</option>
                                 {% for c in courses %}
                                 <option value="{{ c.id }}">{{ c.courses }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div id="request-container">
+                        <div id="request-container" class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="request">Request Type</label>
                             <select id="request" name="request" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                                 <option value="">Select Request</option>
                                 {% for r in requests %}
                                     <option value="{{ r.id }}">{{ r.request }}</option>
@@ -185,16 +321,16 @@
                             <div id="custom-request-container" class="hidden mt-3">
                                 <label class="block mb-1 md:mb-2 text-sm md:text-base" for="custom_request">Custom Request</label>
                                 <input type="text" id="custom_request" name="custom_request" placeholder="Enter your request"
-                                    class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                    class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                             </div>
                         </div>
-                        <div class="flex items-center">
+                        <div class="flex items-center ">
                             <input type="checkbox" id="is_priority" name="is_priority"
-                                class="mr-2 w-4 h-4 md:w-5 md:h-5 text-[#10934F] border-gray-300 ">
-                            <label for="is_priority" class="text-sm md:text-base">Priority (PWD/Senior)</label>
+                                class="mr-2 w-4 h-4 md:w-5 md:h-5 text-[#10934F] border-gray-300 hover:scale-110 transition-transform duration-200 cursor-pointer">
+                            <label for="is_priority" class="text-sm md:text-base cursor-pointer">Priority (PWD/Senior)</label>
                         </div>
                         <button type="submit"
-                            class="w-full py-2 md:py-3 bg-[#10420C] text-white hover:bg-[#10420C]/90 cursor-pointer transition duration-300 text-sm md:text-base ">
+                            class="w-full py-2 md:py-3 bg-[#10420C] text-white hover:bg-[#10420C]/90 cursor-pointer transition  text-sm md:text-base button-hover ">
                             Submit
                         </button>
                     </div>
@@ -205,26 +341,26 @@
         <!-- Guest Modal -->
         <div id="guestModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white shadow-xl w-full max-w-md lg:w-[450px] py-6 md:py-10 px-4 md:px-8 lg:px-12 text-black relative ">
-                <button onclick="closeGuestModal()" class="absolute top-3 right-4 text-2xl md:text-3xl font-bold text-[#10420C] cursor-pointer">&times;</button>
-                <p class="inria-sans-regular text-sm  text-black text-center mb-4 md:mb-6">Please enter your information to make a request</p>
+                <button onclick="closeGuestModal()" class="absolute top-3 right-4 text-2xl md:text-3xl font-bold text-[#10420C] cursor-pointer hover:scale-110 transition-transform duration-200">&times;</button>
+                <p class="inria-sans-regular text-sm text-black text-center mb-4 md:mb-6 animate-fade-in">Please enter your information to make a request</p>
                 
                 <form id="guestForm" action="{% url 'guest_submit' %}" method="post">
                     {% csrf_token %}
                     <div class="space-y-3 md:space-y-4">
-                        <div>
+                        <div class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="guestFirstName">First Name</label>
                             <input type="text" id="guestFirstName" name="firstName" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                         </div>
-                        <div>
+                        <div class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="guestLastName">Last Name</label>
                             <input type="text" id="guestLastName" name="lastName" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                         </div>
-                        <div id="guest-request-container">
+                        <div id="guest-request-container" class="">
                             <label class="block mb-1 md:mb-2 text-sm md:text-base" for="guestRequest">Request Type</label>
                             <select id="guestRequest" name="request" required
-                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                                 <option value="">Select Request</option>
                                 {% for r in requests %}
                                 <option value="{{ r.id }}">{{ r.request }}</option>
@@ -234,16 +370,16 @@
                             <div id="guest-custom-request-container" class="hidden mt-3">
                                 <label class="block mb-1 md:mb-2 text-sm md:text-base" for="guest_custom_request">Custom Request</label>
                                 <input type="text" id="guest_custom_request" name="custom_request" placeholder="Enter your request"
-                                    class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base ">
+                                    class="w-full p-2 md:p-3 border border-black focus:outline-none focus:ring-2 focus:ring-black text-sm md:text-base transition-all duration-300 focus:border-[#10420C]">
                             </div>
                         </div>
-                        <div class="flex items-center">
+                        <div class="flex items-center ">
                             <input type="checkbox" id="guestPriority" name="is_priority"
-                                class="mr-2 w-4 h-4 md:w-5 md:h-5 text-[#10934F] border-gray-300 ">
-                            <label for="guestPriority" class="text-sm md:text-base">Priority (PWD/Senior)</label>
+                                class="mr-2 w-4 h-4 md:w-5 md:h-5 text-[#10934F] border-gray-300 hover:scale-110 transition-transform ">
+                            <label for="guestPriority" class="text-sm md:text-base cursor-pointer">Priority (PWD/Senior)</label>
                         </div>
                         <button type="submit"
-                            class="w-full py-2 md:py-3 bg-[#10420C] text-white hover:bg-[#10420C]/90 cursor-pointer transition duration-300 text-sm md:text-base ">
+                            class="w-full py-2 md:py-3 bg-[#10420C] text-white hover:bg-[#10420C]/90 cursor-pointer transition text-sm md:text-base  ">
                             Submit
                         </button>
                     </div>
@@ -253,39 +389,39 @@
 
         <!-- Success Modal -->
         <div id="successModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-            <div class="  relative flex flex-row  w-full max-w-7xl ">
+            <div class="relative flex flex-row w-full max-w-7xl ">
                 <button onclick="closeSuccessModal()" 
-                    class="absolute top-4 right-4 text-sm font-bold rounded-xs text-gray-100 bg-red-500 px-5 py-1 hover:bg-red-400 cursor-pointer z-10">
+                    class="absolute top-4 right-4 text-sm font-bold rounded-xs text-gray-100 bg-red-500 px-5 py-1 hover:bg-red-400 cursor-pointer z-10 button-hover ">
                     Close
                 </button>
 
                 <div class="flex-1 p-4 md:p-8 flex justify-around flex-1 w-full gap-10">
                     <!-- Queue Number Section -->
-                    <div class="flex-1 text-center my-4 md:my-8 bg-white flex-1 w-full p-5 rounded-sm">
+                    <div class="flex-1 text-center my-4 md:my-8 bg-white flex-1 w-full p-5 py-8 rounded-sm ">
                         <h2 class="font-bold text-[#10420C] mb-4 font-poppins text-xl md:text-2xl lg:text-4xl">Queue Number</h2>
                         <p class="mb-4 md:mb-8 text-sm text-red-500 md:text-base lg:text-lg inria-sans-regular">
                             Please take a picture of your number so that you won't forget
                         </p>
                         <div class="bg-white border-2 border-gray-200 shadow-lg inline-block px-6 md:px-10 py-4 md:py-6 ">
-                            <p id="successTicket" class="font-bold text-6xl md:text-8xl lg:text-[120px] xl:text-[220px] medula-one-regular leading-none text-[#10420C]">R-202</p>
+                            <p id="successTicket" class="font-bold text-6xl md:text-8xl lg:text-[120px] xl:text-[220px] medula-one-regular leading-none text-[#10420C] ">R-202</p>
                         </div>
-                        <p class="mt-4 md:mt-8 inria-sans-regular text-sm md:text-base">
+                        <p class="mt-4 md:mt-8 inria-sans-regular text-sm md:text-base ">
                             <span class="text-red-500">Notice:</span> After you take a picture of your Queue Number, your name will be called shortly.
                         </p>
                     </div>
 
                     <!-- Survey Code Section -->
-                    <div class="flex-1 text-center my-4 md:my-8 bg-white flex-1 w-full p-5 rounded-sm">
-                        <h2 class="font-bold mb-4 font-poppins text-lg md:text-xl lg:text-3xl text-[#F0B100]">
+                    <div class="flex-1 text-center my-4 md:my-8 bg-white flex-1 w-full p-5 py-8 rounded-sm ">
+                        <h2 class="font-bold mb-4 font-poppins text-lg md:text-xl lg:text-3xl text-[#F0B100] ">
                             Code for the Client Survey Satisfaction
                         </h2>
-                        <p class="text-gray-600 mb-4 md:mb-8 inria-sans-regular font-semibold text-sm md:text-base text-red-500 lg:text-lg">
+                        <p class="text-gray-600 mb-4 md:mb-8 inria-sans-regular font-semibold text-sm md:text-base text-red-500 lg:text-lg ">
                             Please take a picture of your code, you may use this after you are done serving
                         </p>
-                        <div class="bg-white border border-gray-200 max-w-full break-words px-4 md:px-8 lg:px-[4vh] py-6 md:py-8 lg:py-[3vh] flex justify-center shadow-lg">
-                            <p id="successSurvey" class="font-bold text-[#FFCC00] medula-one-regular text-4xl md:text-6xl lg:text-[80px] xl:text-[128px] leading-none">XI-6747</p>
+                        <div class="bg-white border border-gray-200 max-w-full break-words px-4 md:px-8 lg:px-[4vh] py-6 md:py-8 lg:py-[3vh] flex justify-center shadow-lg ">
+                            <p id="successSurvey" class="font-bold text-[#FFCC00] medula-one-regular text-4xl md:text-6xl lg:text-[80px] xl:text-[128px] leading-none ">XI-6747</p>
                         </div>
-                        <p class=" mt-4 md:mt-8 mb-6 md:mb-10 text-sm md:text-xs lg:text-base inria-sans-regular">
+                        <p class="mt-4 md:mt-8 mb-6 md:mb-10 text-sm md:text-xs lg:text-base inria-sans-regular ">
                              <span class="text-red-500">Notice:</span>This code is for the Client Satisfaction Survey form for students and guests, designed to improve the quality of service we provide.
                         </p>
                     </div>
@@ -295,20 +431,52 @@
 
     </main>
 
-   
-
     <script>
+        // Initialize animations when DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trigger animations for all animated elements
+            const animatedElements = document.querySelectorAll('.animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-fade-in-scale');
+            animatedElements.forEach(el => {
+                const delay = parseFloat(getComputedStyle(el).animationDelay) * 1000 || 0;
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, delay + 800);
+            });
+
+            // Add initial pulse animation to buttons
+            const studentBtn = document.querySelector('button[onclick="openModal()"]');
+            const guestBtn = document.querySelector('button[onclick="openGuestModal()"]');
+            
+            if (studentBtn && guestBtn) {
+                setTimeout(() => {
+                    studentBtn.classList.add('animate-pulse-once');
+                    setTimeout(() => {
+                        studentBtn.classList.remove('animate-pulse-once');
+                    }, 1000);
+                }, 1500);
+
+                setTimeout(() => {
+                    guestBtn.classList.add('animate-pulse-once');
+                    setTimeout(() => {
+                        guestBtn.classList.remove('animate-pulse-once');
+                    }, 1000);
+                }, 2000);
+            }
+        });
+
         // Student modal
         const studentSelect = document.getElementById('request');
         const studentCustom = document.getElementById('custom-request-container');
 
         studentSelect.addEventListener('change', function() {
             if (this.value === 'other') {
-                studentSelect.classList.add('hidden');
                 studentCustom.classList.remove('hidden');
+                studentCustom.classList.add('animate-fade-in');
                 document.getElementById('custom_request').required = true;
+                setTimeout(() => {
+                    document.getElementById('custom_request').focus();
+                }, 300);
             } else {
-                studentSelect.classList.remove('hidden');
                 studentCustom.classList.add('hidden');
                 document.getElementById('custom_request').required = false;
             }
@@ -320,87 +488,168 @@
 
         guestSelect.addEventListener('change', function() {
             if (this.value === 'other') {
-                guestSelect.classList.add('hidden');
                 guestCustom.classList.remove('hidden');
+                guestCustom.classList.add('animate-fade-in');
                 document.getElementById('guest_custom_request').required = true;
+                setTimeout(() => {
+                    document.getElementById('guest_custom_request').focus();
+                }, 300);
             } else {
-                guestSelect.classList.remove('hidden');
                 guestCustom.classList.add('hidden');
                 document.getElementById('guest_custom_request').required = false;
             }
         });
 
-        // Modal functions
+        // Modal functions with animation
         function openModal() {
-            document.getElementById('studentModal').classList.remove('hidden');
+            const modal = document.getElementById('studentModal');
+            modal.classList.remove('hidden');
             document.body.style.overflow = "hidden";
+            
+            // Fade in animation
+            setTimeout(() => {
+                modal.style.opacity = "1";
+            }, 10);
         }
         
         function closeModal() {
-            document.getElementById('studentModal').classList.add('hidden');
-            document.body.style.overflow = "";
+            const modal = document.getElementById('studentModal');
+            modal.style.opacity = "0";
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = "";
+            }, 300);
         }
 
         function openGuestModal() {
-            document.getElementById('guestModal').classList.remove('hidden');
+            const modal = document.getElementById('guestModal');
+            modal.classList.remove('hidden');
             document.body.style.overflow = "hidden";
+            
+            // Fade in animation
+            setTimeout(() => {
+                modal.style.opacity = "1";
+            }, 10);
         }
 
         function closeGuestModal() {
-            document.getElementById('guestModal').classList.add('hidden');
-            document.body.style.overflow = "";
+            const modal = document.getElementById('guestModal');
+            modal.style.opacity = "0";
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = "";
+            }, 300);
         }
 
-        // Form submission
+        // Form submission with animation
         document.getElementById('studentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Add loading animation
+            submitBtn.innerHTML = 'Submitting...';
+            submitBtn.disabled = true;
+            
             const formData = new FormData(form);
 
-            const response = await fetch(form.action, { method: "POST", body: formData });
-            const data = await response.json();
+            try {
+                const response = await fetch(form.action, { method: "POST", body: formData });
+                const data = await response.json();
 
-            if (data.success) {
-                showSuccessModal(data.ticket, data.survey_code);
-                form.reset();
-                closeModal();
-            } else {
-                alert("Failed to submit form!");
+                if (data.success) {
+                    // Reset button
+                    submitBtn.innerHTML = 'Submit';
+                    submitBtn.disabled = false;
+                    
+                    showSuccessModal(data.ticket, data.survey_code);
+                    form.reset();
+                    closeModal();
+                } else {
+                    submitBtn.innerHTML = 'Submit';
+                    submitBtn.disabled = false;
+                    alert("Failed to submit form!");
+                }
+            } catch (error) {
+                submitBtn.innerHTML = 'Submit';
+                submitBtn.disabled = false;
+                alert("An error occurred. Please try again.");
             }
         });
 
         document.getElementById('guestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Add loading animation
+            submitBtn.innerHTML = 'Submitting...';
+            submitBtn.disabled = true;
+            
             const formData = new FormData(form);
 
-            const response = await fetch(form.action, { method: "POST", body: formData });
-            const data = await response.json();
+            try {
+                const response = await fetch(form.action, { method: "POST", body: formData });
+                const data = await response.json();
 
-            if (data.success) {
-                showSuccessModal(data.ticket, data.survey_code);
-                form.reset();
-                closeGuestModal();
-            } else {
-                alert("Failed to submit guest form!");
+                if (data.success) {
+                    // Reset button
+                    submitBtn.innerHTML = 'Submit';
+                    submitBtn.disabled = false;
+                    
+                    showSuccessModal(data.ticket, data.survey_code);
+                    form.reset();
+                    closeGuestModal();
+                } else {
+                    submitBtn.innerHTML = 'Submit';
+                    submitBtn.disabled = false;
+                    alert("Failed to submit guest form!");
+                }
+            } catch (error) {
+                submitBtn.innerHTML = 'Submit';
+                submitBtn.disabled = false;
+                alert("An error occurred. Please try again.");
             }
         });
 
-        // Success modal
+        // Success modal with animation
         function showSuccessModal(ticket, surveyCode) {
+            const modal = document.getElementById("successModal");
+            
+            // Update content
             document.getElementById("successTicket").textContent = ticket;
             document.getElementById("successSurvey").textContent = surveyCode ?? "N/A";
-            document.getElementById("successModal").classList.remove("hidden");
+            
+            // Show modal with animation
+            modal.classList.remove("hidden");
             document.body.style.overflow = "hidden";
+            
+            // Trigger animations for modal content
+            setTimeout(() => {
+                const animatedElements = modal.querySelectorAll('.animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-fade-in-scale');
+                animatedElements.forEach(el => {
+                    const delay = parseFloat(getComputedStyle(el).animationDelay) * 1000 || 0;
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                    }, delay);
+                });
+            }, 10);
         }
 
         function closeSuccessModal() {
-            document.getElementById("successModal").classList.add("hidden");
-            document.body.style.overflow = "";
-            location.reload();
+            const modal = document.getElementById("successModal");
+            modal.style.opacity = "0";
+            
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                document.body.style.overflow = "";
+                location.reload();
+            }, 100);
         }
 
-        // Carousel
+        // Carousel with improved animation
         let slideIndex = 0;
         const slides = document.getElementsByClassName("mySlides");
         const dots = document.getElementsByClassName("dot");
@@ -408,19 +657,37 @@
         function showSlides() {
             for (let i = 0; i < slides.length; i++) {
                 slides[i].style.opacity = "0";
+                slides[i].style.zIndex = "0";
             }
             for (let i = 0; i < dots.length; i++) {
                 dots[i].classList.remove("bg-black");
                 dots[i].classList.add("bg-gray-400");
             }
+            
             slides[slideIndex].style.opacity = "1";
+            slides[slideIndex].style.zIndex = "1";
+            
             dots[slideIndex].classList.remove("bg-gray-400");
             dots[slideIndex].classList.add("bg-black");
+            
             slideIndex = (slideIndex + 1) % slides.length;
         }
 
+        // Initialize carousel
         showSlides();
-        setInterval(showSlides, 2000);
+        const carouselInterval = setInterval(showSlides, 4000); // 4 seconds per slide
+
+        // Pause carousel on hover
+        const carouselContainer = document.querySelector('.relative.w-full.min-h-\\[300px\\]');
+        if (carouselContainer) {
+            carouselContainer.addEventListener('mouseenter', () => {
+                clearInterval(carouselInterval);
+            });
+            
+            carouselContainer.addEventListener('mouseleave', () => {
+                carouselInterval = setInterval(showSlides, 4000);
+            });
+        }
     </script>
 </body>
 </html>
