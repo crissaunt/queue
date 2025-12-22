@@ -23,9 +23,26 @@ from django.db.models import Count, Avg, Q
 from survey.models import SatisfactionSurvey, SurveyYear, CCquestion, ServiceQualityDimension,SQDResponse
 from personel.models import Appointments, Code
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
+from django.contrib import messages
+from django.template import loader
+from django.contrib import messages
+from django.db import transaction
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Avg, Q
+from survey.models import SurveyYear, CCquestion, CCchoices, QuestionYear, ServiceQualityDimension, SQDYear, SatisfactionSurvey, CCResponse, SQDResponse
+from personel.models import Appointments, Code, RequestType, Courses
+from django.db.models import Count, Avg, Q
+from django.utils import timezone
+from datetime import datetime, timedelta
+from collections import defaultdict
+
 @login_required(login_url='/h/auth/login/')
 def home(request):
-    """Dashboard focused on graphs and time-based analytics"""
+    """Dashboard with comprehensive analytics and question breakdowns"""
     
     # Get time period from request or default to 7 days
     period = request.GET.get('period', '7days')
@@ -38,55 +55,131 @@ def home(request):
     elif period == '30days':
         start_date = end_date - timedelta(days=30)
         days_count = 30
-    else:  # month
+    elif period == '90days':
         start_date = end_date - timedelta(days=90)
         days_count = 90
+    else:  # year
+        start_date = end_date - timedelta(days=365)
+        days_count = 365
     
-    # Generate date labels for charts
+    # Generate data based on period
     date_labels = []
-    current_date = start_date
-    while current_date <= end_date:
-        if period == '7days':
-            date_labels.append(current_date.strftime('%a'))
-        elif period == '30days':
-            if current_date.day % 5 == 0 or current_date == start_date or current_date == end_date:
-                date_labels.append(current_date.strftime('%m/%d'))
-            else:
-                date_labels.append('')
-        else:  # monthly
-            if current_date.day == 1 or current_date == start_date or current_date == end_date:
-                date_labels.append(current_date.strftime('%b %Y'))
-            else:
-                date_labels.append('')
-        current_date += timedelta(days=1)
-    
-    # Appointments data
     appointments_data = []
     surveys_data = []
     satisfaction_data = []
+    response_rates = []
     
-    current_date = start_date
-    while current_date <= end_date:
-        # Appointments count for this date
-        appointments_count = Appointments.objects.filter(
-            datetime__date=current_date
-        ).count()
-        appointments_data.append(appointments_count)
+    if period == '7days':
+        # Daily data for 7 days
+        current_date = start_date
+        while current_date <= end_date:
+            date_labels.append(current_date.strftime('%a'))
+            
+            appointments_count = Appointments.objects.filter(
+                datetime__date=current_date
+            ).count()
+            appointments_data.append(appointments_count)
+            
+            surveys_count = SatisfactionSurvey.objects.filter(
+                submitted_at__date=current_date
+            ).count()
+            surveys_data.append(surveys_count)
+            
+            # Calculate daily response rate
+            daily_rate = round((surveys_count / appointments_count * 100), 1) if appointments_count > 0 else 0
+            response_rates.append(daily_rate)
+            
+            daily_satisfaction = SQDResponse.objects.filter(
+                survey__submitted_at__date=current_date
+            ).aggregate(avg_rating=Avg('rating'))
+            satisfaction_score = round(daily_satisfaction['avg_rating'] or 0, 1)
+            satisfaction_data.append(satisfaction_score)
+            
+            current_date += timedelta(days=1)
+            
+    elif period == '30days':
+        # Weekly data for 30 days
+        for week in range(4):
+            week_start = start_date + timedelta(days=week * 7)
+            week_end = week_start + timedelta(days=6)
+            if week_end > end_date:
+                week_end = end_date
+            
+            date_labels.append(f"Week {week+1}")
+            
+            appointments_count = Appointments.objects.filter(
+                datetime__date__range=[week_start, week_end]
+            ).count()
+            appointments_data.append(appointments_count)
+            
+            surveys_count = SatisfactionSurvey.objects.filter(
+                submitted_at__date__range=[week_start, week_end]
+            ).count()
+            surveys_data.append(surveys_count)
+            
+            # Calculate weekly response rate
+            weekly_rate = round((surveys_count / appointments_count * 100), 1) if appointments_count > 0 else 0
+            response_rates.append(weekly_rate)
+            
+            weekly_satisfaction = SQDResponse.objects.filter(
+                survey__submitted_at__date__range=[week_start, week_end]
+            ).aggregate(avg_rating=Avg('rating'))
+            satisfaction_score = round(weekly_satisfaction['avg_rating'] or 0, 1)
+            satisfaction_data.append(satisfaction_score)
+            
+    else:  # 90 days or year
+        # Monthly data
+        month_count = 3 if period == '90days' else 12
+        month_data = []
         
-        # Surveys count for this date
-        surveys_count = SatisfactionSurvey.objects.filter(
-            submitted_at__date=current_date
-        ).count()
-        surveys_data.append(surveys_count)
+        for month_offset in range(month_count):
+            month_date = end_date.replace(day=1)
+            if month_offset > 0:
+                # Subtract months
+                for _ in range(month_offset):
+                    month_date = (month_date - timedelta(days=1)).replace(day=1)
+            
+            month_start = month_date
+            if month_offset == 0:
+                month_end = end_date
+            else:
+                next_month = (month_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+                month_end = next_month - timedelta(days=1)
+            
+            month_label = month_start.strftime('%b %Y')
+            
+            appointments_count = Appointments.objects.filter(
+                datetime__date__range=[month_start, month_end]
+            ).count()
+            
+            surveys_count = SatisfactionSurvey.objects.filter(
+                submitted_at__date__range=[month_start, month_end]
+            ).count()
+            
+            # Calculate monthly response rate
+            monthly_rate = round((surveys_count / appointments_count * 100), 1) if appointments_count > 0 else 0
+            
+            monthly_satisfaction = SQDResponse.objects.filter(
+                survey__submitted_at__date__range=[month_start, month_end]
+            ).aggregate(avg_rating=Avg('rating'))
+            satisfaction_score = round(monthly_satisfaction['avg_rating'] or 0, 1)
+            
+            month_data.append({
+                'label': month_label,
+                'appointments': appointments_count,
+                'surveys': surveys_count,
+                'rate': monthly_rate,
+                'satisfaction': satisfaction_score
+            })
         
-        # Average satisfaction for this date
-        daily_satisfaction = SQDResponse.objects.filter(
-            survey__submitted_at__date=current_date
-        ).aggregate(avg_rating=Avg('rating'))
-        satisfaction_score = round(daily_satisfaction['avg_rating'] or 0, 1)
-        satisfaction_data.append(satisfaction_score)
-        
-        current_date += timedelta(days=1)
+        # Sort by date and extract data
+        month_data.sort(key=lambda x: datetime.strptime(x['label'], '%b %Y'))
+        for data in month_data:
+            date_labels.append(data['label'])
+            appointments_data.append(data['appointments'])
+            surveys_data.append(data['surveys'])
+            response_rates.append(data['rate'])
+            satisfaction_data.append(data['satisfaction'])
     
     # Overall statistics for cards
     total_appointments = Appointments.objects.filter(
@@ -106,6 +199,162 @@ def home(request):
     if total_appointments > 0:
         response_rate = round((total_surveys / total_appointments) * 100, 1)
     
+    # Get Customer Care Questions with response data
+    cc_questions_data = []
+    current_year = timezone.now().year
+    survey_year = SurveyYear.objects.filter(year=current_year).first()
+    
+    if survey_year:
+        question_years = QuestionYear.objects.filter(year=survey_year).select_related('question')
+        
+        for qy in question_years:
+            question = qy.question
+            
+            # Get all responses for this question in the date range
+            responses = CCResponse.objects.filter(
+                question_year=qy,
+                survey__submitted_at__date__range=[start_date, end_date]
+            ).select_related('choice')
+            
+            # Count responses by choice
+            choice_counts = defaultdict(int)
+            total_responses = 0
+            
+            for response in responses:
+                if response.choice:
+                    choice_counts[response.choice.name] += 1
+                    total_responses += 1
+            
+            # Prepare data for template
+            choices_list = list(question.choices.values_list('name', flat=True))
+            response_counts = [choice_counts.get(choice, 0) for choice in choices_list]
+            
+            # Get top choices
+            top_choices = sorted(
+                [(choice, count) for choice, count in choice_counts.items()],
+                key=lambda x: x[1],
+                reverse=True
+            )
+            
+            cc_questions_data.append({
+                'name': question.name,
+                'choices_list': choices_list,
+                'response_counts': response_counts,
+                'total_responses': total_responses,
+                'top_choices': top_choices[:5]  # Top 5 choices
+            })
+    
+    # Get Service Quality Dimensions for current year
+    sqd_questions_data = []
+    if survey_year:
+        # Get all SQD questions for current year
+        sqd_years = SQDYear.objects.filter(year=survey_year).select_related('sqd')
+        
+        for sqdy in sqd_years:
+            dimension = sqdy.sqd
+            
+            # Get all ratings for this SQD question in the date range
+            responses = SQDResponse.objects.filter(
+                sqd_year=sqdy,
+                survey__submitted_at__date__range=[start_date, end_date]
+            )
+            
+            # Calculate rating distribution (1-5 stars, ignoring 0)
+            rating_distribution = [0, 0, 0, 0, 0]  # Index 0-4 for ratings 1-5
+            total_rating = 0
+            total_responses = 0
+            
+            for response in responses:
+                if response.rating is not None and 1 <= response.rating <= 5:
+                    rating_distribution[response.rating - 1] += 1
+                    total_rating += response.rating
+                    total_responses += 1
+            
+            # Calculate average rating with protection against division by zero
+            avg_rating = 0
+            if total_responses > 0:
+                avg_rating = round(total_rating / total_responses, 2)
+            
+            # Prepare distribution preview for template
+            distribution_preview = []
+            for i in range(5):
+                stars = i + 1
+                count = rating_distribution[i]
+                percentage = (count / total_responses * 100) if total_responses > 0 else 0
+                distribution_preview.append({
+                    'stars': stars,
+                    'count': count,
+                    'percentage': round(percentage, 1)
+                })
+            
+            # Create rating labels
+            rating_labels = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars']
+            
+            sqd_questions_data.append({
+                'name': dimension.name,
+                'avg_rating': avg_rating,
+                'rating_distribution': rating_distribution,  # [count_1star, count_2star, ...]
+                'rating_labels': rating_labels,
+                'distribution_preview': distribution_preview[:3],  # Show top 3 ratings in preview
+                'total_responses': total_responses
+            })
+    
+    # Get ALL Service Quality Dimensions (from the ServiceQualityDimension model directly)
+    sqd_dimensions_data = []
+    # Get all Service Quality Dimensions directly (not through SQDYear)
+    all_dimensions = ServiceQualityDimension.objects.all()
+    
+    for dimension in all_dimensions:
+        # Get all SQD responses for this dimension through SQDYear
+        # First get all SQDYear objects for this dimension
+        sqd_years = SQDYear.objects.filter(sqd=dimension)
+        
+        # Get all responses for these SQD years in the date range
+        responses = SQDResponse.objects.filter(
+            sqd_year__in=sqd_years,
+            survey__submitted_at__date__range=[start_date, end_date]
+        )
+        
+        # Calculate rating distribution (1-5 stars, ignoring 0)
+        rating_distribution = [0, 0, 0, 0, 0]  # Index 0-4 for ratings 1-5
+        total_rating = 0
+        total_responses = 0
+        
+        for response in responses:
+            if response.rating is not None and 1 <= response.rating <= 5:
+                rating_distribution[response.rating - 1] += 1
+                total_rating += response.rating
+                total_responses += 1
+        
+        # Calculate average rating with protection against division by zero
+        avg_rating = 0
+        if total_responses > 0:
+            avg_rating = round(total_rating / total_responses, 2)
+        
+        # Prepare distribution preview for template
+        distribution_preview = []
+        for i in range(5):
+            stars = i + 1
+            count = rating_distribution[i]
+            percentage = (count / total_responses * 100) if total_responses > 0 else 0
+            distribution_preview.append({
+                'stars': stars,
+                'count': count,
+                'percentage': round(percentage, 1)
+            })
+        
+        # Create rating labels
+        rating_labels = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars']
+        
+        sqd_dimensions_data.append({
+            'name': dimension.name,
+            'avg_rating': avg_rating,
+            'rating_distribution': rating_distribution,  # [count_1star, count_2star, ...]
+            'rating_labels': rating_labels,
+            'distribution_preview': distribution_preview[:3],  # Show top 3 ratings in preview
+            'total_responses': total_responses
+        })
+    
     template = loader.get_template('dashboard/home.html')
     context = {
         'period': period,
@@ -113,12 +362,16 @@ def home(request):
         'appointments_data': appointments_data,
         'surveys_data': surveys_data,
         'satisfaction_data': satisfaction_data,
+        'response_rates': response_rates,
         'total_appointments': total_appointments,
         'total_surveys': total_surveys,
         'avg_satisfaction_score': avg_satisfaction_score,
         'response_rate': response_rate,
         'start_date': start_date,
         'end_date': end_date,
+        'cc_questions': cc_questions_data,
+        'sqd_questions': sqd_questions_data,  # For current year SQDs
+        'sqd_dimensions': sqd_dimensions_data,  # For ALL Service Quality Dimensions
     }
     return HttpResponse(template.render(context, request))
 

@@ -1,90 +1,23 @@
 {% extends 'dashboard/base.html' %}
 
 {% block title %}
-Dashboard Overview
+Dashboard Analytics
 {% endblock %}
 
 {% block page_title %}
-Dashboard Overview
+Dashboard Analytics
 {% endblock %}
 
 {% block page_subtitle %}
-Key metrics and performance indicators
+Comprehensive metrics and survey insights
 {% endblock %}
 
 {% block content %}
 {% load static %}
 
-<div class="space-y-6">
-    <!-- Quick Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Appointments Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Appointments</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_appointments }}</p>
-                    <p class="text-xs text-gray-500 mt-1">Current period</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-calendar text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Surveys Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Survey Responses</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_surveys }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ response_rate }}% response rate</p>
-                </div>
-                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-clipboard text-green-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Satisfaction Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Satisfaction</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ avg_satisfaction_score }}/5</p>
-                    <div class="flex items-center mt-1">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= avg_satisfaction_score %}
-                                <i class="bx bxs-star text-yellow-400 text-xs mr-0.5"></i>
-                            {% else %}
-                                <i class="bx bx-star text-gray-300 text-xs mr-0.5"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-happy text-amber-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Response Rate Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Response Rate</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ response_rate }}%</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ total_surveys }}/{{ total_appointments }}</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-trending-up text-purple-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<div class="space-y-6 mt-2">
     <!-- Time Period Filter -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <div class="bg-white  shadow-sm border border-gray-200 p-4">
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-base font-semibold text-gray-900">Time Period</h3>
@@ -109,52 +42,276 @@ Key metrics and performance indicators
                           {% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                     3 Months
                 </a>
+                <a href="?period=year" 
+                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 
+                          {% if period == 'year' %}bg-blue-600 text-white
+                          {% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    1 Year
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Main Charts -->
+    <!-- Quick Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Appointments Card -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Appointments</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_appointments }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ start_date|date:"M d" }} - {{ end_date|date:"M d" }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-calendar text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Surveys Card -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Survey Responses</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ total_surveys }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ response_rate }}% response rate</p>
+                </div>
+                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-clipboard text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Satisfaction Card -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Avg. Satisfaction</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ avg_satisfaction_score }}/5</p>
+                    <div class="flex items-center mt-1">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_satisfaction_score|add:"0" %}
+                                <i class="bx bxs-star text-yellow-400 text-xs mr-0.5"></i>
+                            {% else %}
+                                <i class="bx bx-star text-gray-300 text-xs mr-0.5"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-happy text-amber-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Rate Card -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Response Rate</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ response_rate }}%</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ total_surveys }}/{{ total_appointments }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-trending-up text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Combined Activity Chart -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <!-- Appointments vs Surveys Line Chart -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Activity Overview</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Appointments vs Survey Responses</h3>
                 <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-bar-chart-alt-2 text-blue-600"></i>
+                    <i class="bx bx-line-chart text-blue-600"></i>
                 </div>
             </div>
             <div class="h-72">
-                <canvas id="activityChart"></canvas>
+                <canvas id="appointmentsVsSurveysChart"></canvas>
             </div>
         </div>
 
-        <!-- Satisfaction Trend -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <!-- Response Rate Trend -->
+        <div class="bg-white  shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Satisfaction Trend</h3>
-                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
-                    <i class="bx bx-trending-up text-amber-600"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Response Rate Trend</h3>
+                <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                    <i class="bx bx-trending-up text-green-600"></i>
                 </div>
             </div>
             <div class="h-72">
-                <canvas id="satisfactionChart"></canvas>
+                <canvas id="responseRateChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Response Rate Progress -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Survey Response Progress</h3>
-            <span class="text-2xl font-bold text-gray-900">{{ response_rate }}%</span>
+    <!-- Customer Care Questions Section -->
+    <div class="bg-white  shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Customer Care Questions Analysis</h3>
+            <span class="text-sm font-medium text-gray-600">{{ cc_questions|length }} questions</span>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-3">
-            <div class="bg-green-600 h-3 rounded-full transition-all duration-500" 
-                 style="width: {{ response_rate }}%"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for question in cc_questions %}
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all duration-200 cursor-pointer" 
+                 onclick="showCCQuestionModal('{{ question.name|escapejs }}', {{ question.choices_list|safe }}, {{ question.response_counts|safe }})">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900 mb-2 line-clamp-2">{{ question.name }}</h4>
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <i class="bx bx-bar-chart-alt mr-1"></i>
+                            <span>{{ question.total_responses }} responses</span>
+                        </div>
+                        <!-- Preview of top 3 answers -->
+                        <div class="space-y-1">
+                            {% for choice in question.top_choices|slice:":3" %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-600 truncate">{{ choice.0 }}</span>
+                                <span class="text-xs font-medium text-gray-900">{{ choice.1 }}</span>
+                            </div>
+                            {% endfor %}
+                            {% if question.top_choices|length > 3 %}
+                            <div class="text-xs text-gray-400 text-center">+{{ question.top_choices|length|add:"-3" }} more</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="bx bx-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center py-8 text-gray-500">
+                <i class="bx bx-clipboard text-3xl mb-2"></i>
+                <p>No customer care questions available</p>
+            </div>
+            {% endfor %}
         </div>
-        <div class="flex justify-between text-sm text-gray-500 mt-2">
-            <span>{{ total_surveys }} surveys completed</span>
-            <span>{{ total_appointments }} total appointments</span>
+    </div>
+
+    <!-- Service Quality Dimensions Section -->
+    <div class="bg-white  shadow-sm border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Service Quality Dimensions Analysis</h3>
+            <span class="text-sm font-medium text-gray-600">{{ sqd_dimensions|length }} dimensions</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for dimension in sqd_dimensions %}
+            <div class="border border-gray-200 rounded-lg p-4 hover:border-amber-300 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                 onclick="showSQDModal('{{ dimension.name|escapejs }}', {{ dimension.rating_distribution|safe }}, {{ dimension.avg_rating|floatformat:1 }}, {{ dimension.rating_labels|safe }})">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900 mb-2">{{ dimension.name }}</h4>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= dimension.avg_rating %}
+                                <i class="bx bxs-star text-yellow-400 text-sm mr-0.5"></i>
+                                {% else %}
+                                <i class="bx bx-star text-gray-300 text-sm mr-0.5"></i>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-sm font-bold text-gray-900">{{ dimension.avg_rating|floatformat:1 }}</span>
+                        </div>
+                        <!-- Rating distribution preview -->
+                        <div class="space-y-1">
+                            {% for rating in dimension.distribution_preview %}
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 w-6">{{ rating.stars }}</span>
+                                <div class="flex-1 ml-2">
+                                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-amber-500 rounded-full" style="width: {{ rating.percentage }}%"></div>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-600 ml-2 w-8">{{ rating.count }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <i class="bx bx-chevron-right text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center py-8 text-gray-500">
+                <i class="bx bx-star text-3xl mb-2"></i>
+                <p>No service quality dimensions available</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- CC Question Modal -->
+<div id="ccQuestionModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white  shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="ccQuestionTitle" class="text-xl font-semibold text-gray-900"></h3>
+                <button onclick="closeModal('ccQuestionModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="bx bx-x text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-4">Response Distribution</h4>
+                    <div class="h-64">
+                        <canvas id="ccQuestionChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-4">Response Details</h4>
+                    <div id="ccQuestionDetails" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SQD Modal -->
+<div id="sqdModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white  shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="sqdTitle" class="text-xl font-semibold text-gray-900"></h3>
+                <button onclick="closeModal('sqdModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="bx bx-x text-2xl"></i>
+                </button>
+            </div>
+            <div class="mt-2">
+                <div class="flex items-center">
+                    <span id="sqdAvgRating" class="text-2xl font-bold text-gray-900 mr-2"></span>
+                    <div id="sqdStars" class="flex"></div>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-4">Rating Distribution</h4>
+                    <div class="h-64">
+                        <canvas id="sqdChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-4">Detailed Breakdown</h4>
+                    <div id="sqdDetails" class="space-y-3"></div>
+                </div>
+            </div>
+            <!-- Additional insights -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h4 class="font-medium text-gray-900 mb-4">Rating Insights</h4>
+                <div id="sqdInsights" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -169,34 +326,58 @@ document.addEventListener('DOMContentLoaded', function() {
         green: 'rgb(16, 185, 129)',
         amber: 'rgb(245, 158, 11)',
         purple: 'rgb(139, 92, 246)',
+        red: 'rgb(239, 68, 68)',
+        indigo: 'rgb(99, 102, 241)',
+        cyan: 'rgb(6, 182, 212)',
         lightBlue: 'rgba(59, 130, 246, 0.1)',
         lightGreen: 'rgba(16, 185, 129, 0.1)',
-        lightAmber: 'rgba(245, 158, 11, 0.1)'
+        lightAmber: 'rgba(245, 158, 11, 0.1)',
+        lightPurple: 'rgba(139, 92, 246, 0.1)'
     };
 
-    const chartOptions = {
+    // Base chart options for brush-style lines
+    const brushChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
             intersect: false,
             mode: 'index'
         },
+        elements: {
+            line: {
+                tension: 0.4, // Smooth brush-like curve
+                borderWidth: 3,
+                borderCapStyle: 'round',
+                borderJoinStyle: 'round'
+            },
+            point: {
+                radius: 0, // Hide points for clean brush look
+                hoverRadius: 6,
+                hoverBorderWidth: 2
+            }
+        },
         scales: {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: 'rgba(0, 0, 0, 0.05)'
+                    color: 'rgba(0, 0, 0, 0.05)',
+                    drawBorder: false
                 },
                 ticks: {
-                    color: '#6B7280'
+                    color: '#6B7280',
+                    callback: function(value) {
+                        return value % 1 === 0 ? value : '';
+                    }
                 }
             },
             x: {
                 grid: {
-                    display: false
+                    color: 'rgba(0, 0, 0, 0.05)',
+                    drawBorder: false
                 },
                 ticks: {
-                    color: '#6B7280'
+                    color: '#6B7280',
+                    maxTicksLimit: 10
                 }
             }
         },
@@ -206,100 +387,530 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: {
                     color: '#374151',
                     usePointStyle: true,
-                    padding: 15
+                    padding: 15,
+                    font: {
+                        size: 12
+                    }
                 }
             },
             tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 titleColor: 'white',
-                bodyColor: 'white'
+                bodyColor: 'white',
+                titleFont: {
+                    size: 13
+                },
+                bodyFont: {
+                    size: 12
+                },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: true,
+                boxPadding: 4
             }
         }
     };
 
-    // Activity Chart (Combined Appointments and Surveys)
-    const activityCtx = document.getElementById('activityChart').getContext('2d');
-    new Chart(activityCtx, {
-        type: 'bar',
+    // Appointments vs Surveys Chart with Brush Style
+    const avsCtx = document.getElementById('appointmentsVsSurveysChart').getContext('2d');
+    new Chart(avsCtx, {
+        type: 'line',
         data: {
             labels: {{ date_labels|safe }},
             datasets: [
                 {
                     label: 'Appointments',
                     data: {{ appointments_data }},
-                    backgroundColor: colors.lightBlue,
                     borderColor: colors.blue,
-                    borderWidth: 2,
-                    borderRadius: 4,
-                    borderSkipped: false,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    borderWidth: 3,
+                    pointBackgroundColor: colors.blue,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8,
+                    tension: 0.4,
+                    fill: true,
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Survey Responses',
                     data: {{ surveys_data }},
-                    backgroundColor: colors.lightGreen,
                     borderColor: colors.green,
-                    borderWidth: 2,
-                    borderRadius: 4,
-                    borderSkipped: false,
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 3,
+                    pointBackgroundColor: colors.green,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8,
+                    tension: 0.4,
+                    fill: true,
+                    cubicInterpolationMode: 'monotone'
                 }
             ]
         },
-        options: chartOptions
+        options: brushChartOptions
     });
 
-    // Satisfaction Chart
-    const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
-    new Chart(satisfactionCtx, {
+    // Response Rate Chart with Brush Style
+    const responseRateCtx = document.getElementById('responseRateChart').getContext('2d');
+    new Chart(responseRateCtx, {
         type: 'line',
         data: {
             labels: {{ date_labels|safe }},
             datasets: [{
-                label: 'Satisfaction Score',
-                data: {{ satisfaction_data }},
-                backgroundColor: colors.lightAmber,
-                borderColor: colors.amber,
+                label: 'Response Rate',
+                data: {{ response_rates|safe }},
+                borderColor: colors.purple,
+                backgroundColor: 'rgba(139, 92, 246, 0.05)',
                 borderWidth: 3,
-                pointBackgroundColor: colors.amber,
+                pointBackgroundColor: colors.purple,
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                pointHoverRadius: 8,
                 tension: 0.4,
-                fill: true
+                fill: true,
+                cubicInterpolationMode: 'monotone'
             }]
         },
         options: {
-            ...chartOptions,
+            ...brushChartOptions,
             scales: {
-                ...chartOptions.scales,
+                ...brushChartOptions.scales,
                 y: {
-                    ...chartOptions.scales.y,
-                    min: 0,
-                    max: 5,
+                    ...brushChartOptions.scales.y,
                     ticks: {
-                        ...chartOptions.scales.y.ticks,
-                        stepSize: 1
+                        ...brushChartOptions.scales.y.ticks,
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                ...brushChartOptions.plugins,
+                tooltip: {
+                    ...brushChartOptions.plugins.tooltip,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;
+                        }
                     }
                 }
             }
         }
     });
 });
+
+// Modal Functions
+let ccQuestionChart = null;
+let sqdChart = null;
+
+function showCCQuestionModal(question, choices, responseCounts) {
+    document.getElementById('ccQuestionTitle').textContent = question;
+    document.getElementById('ccQuestionModal').classList.remove('hidden');
+    
+    // Create details HTML
+    const detailsDiv = document.getElementById('ccQuestionDetails');
+    detailsDiv.innerHTML = '';
+    
+    const totalResponses = responseCounts.reduce((sum, count) => sum + count, 0);
+    
+    choices.forEach((choice, index) => {
+        const count = responseCounts[index] || 0;
+        const percentage = totalResponses > 0 ? ((count / totalResponses) * 100).toFixed(1) : 0;
+        
+        const detailDiv = document.createElement('div');
+        detailDiv.className = 'border border-gray-200 rounded-lg p-3';
+        detailDiv.innerHTML = `
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-900">${choice}</span>
+                <span class="font-bold text-blue-600">${count}</span>
+            </div>
+            <div class="flex items-center">
+                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
+                    <div class="h-full bg-blue-500 rounded-full" style="width: ${percentage}%"></div>
+                </div>
+                <span class="text-sm text-gray-600">${percentage}%</span>
+            </div>
+        `;
+        detailsDiv.appendChild(detailDiv);
+    });
+    
+    // Destroy previous chart if exists
+    if (ccQuestionChart) {
+        ccQuestionChart.destroy();
+    }
+    
+    // Create pie chart
+    const ctx = document.getElementById('ccQuestionChart').getContext('2d');
+    ccQuestionChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: choices,
+            datasets: [{
+                data: responseCounts,
+                backgroundColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)',
+                    'rgb(139, 92, 246)',
+                    'rgb(239, 68, 68)',
+                    'rgb(99, 102, 241)',
+                    'rgb(6, 182, 212)'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#374151',
+                        padding: 15,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function showSQDModal(dimensionName, ratingDistribution, avgRating, ratingLabels) {
+    document.getElementById('sqdTitle').textContent = dimensionName;
+    document.getElementById('sqdAvgRating').textContent = avgRating;
+    
+    // Create stars
+    const starsDiv = document.getElementById('sqdStars');
+    starsDiv.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('i');
+        star.className = i <= Math.round(avgRating) ? 'bx bxs-star text-yellow-400 text-lg mr-0.5' : 'bx bx-star text-gray-300 text-lg mr-0.5';
+        starsDiv.appendChild(star);
+    }
+    
+    document.getElementById('sqdModal').classList.remove('hidden');
+    
+    // Create details HTML
+    const detailsDiv = document.getElementById('sqdDetails');
+    detailsDiv.innerHTML = '';
+    
+    const totalResponses = ratingDistribution.reduce((sum, count) => sum + count, 0);
+    
+    // Create insights HTML
+    const insightsDiv = document.getElementById('sqdInsights');
+    insightsDiv.innerHTML = '';
+    
+    // Calculate insights with NaN protection
+    const maxRating = Math.max(...ratingDistribution);
+    const maxRatingIndex = ratingDistribution.indexOf(maxRating);
+    
+    // Calculate satisfaction rate (4 & 5 star ratings) with NaN protection
+    let satisfactionRate = 0;
+    if (totalResponses > 0) {
+        const fourStarCount = ratingDistribution[3] || 0; // index 3 = 4 stars
+        const fiveStarCount = ratingDistribution[4] || 0; // index 4 = 5 stars
+        satisfactionRate = ((fourStarCount + fiveStarCount) / totalResponses * 100).toFixed(1);
+    }
+    
+    // Add insight cards
+    const insights = [
+        {
+            title: 'Most Common Rating',
+            value: totalResponses > 0 ? `${ratingLabels[maxRatingIndex]}` : 'No ratings',
+            icon: 'bx-trophy',
+            color: 'text-green-600',
+            bg: 'bg-green-50'
+        },
+        {
+            title: 'Satisfaction Rate',
+            value: `${satisfactionRate}%`,
+            description: '4 & 5 Star Ratings',
+            icon: 'bx-like',
+            color: 'text-blue-600',
+            bg: 'bg-blue-50'
+        },
+        {
+            title: 'Total Responses',
+            value: totalResponses,
+            icon: 'bx-user',
+            color: 'text-purple-600',
+            bg: 'bg-purple-50'
+        }
+    ];
+    
+    insights.forEach(insight => {
+        const insightCard = document.createElement('div');
+        insightCard.className = 'bg-gray-50 rounded-lg p-4';
+        insightCard.innerHTML = `
+            <div class="flex items-center">
+                <div class="${insight.bg} w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                    <i class="bx ${insight.icon} ${insight.color} text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">${insight.title}</p>
+                    <p class="text-lg font-bold text-gray-900">${insight.value}</p>
+                    ${insight.description ? `<p class="text-xs text-gray-500">${insight.description}</p>` : ''}
+                </div>
+            </div>
+        `;
+        insightsDiv.appendChild(insightCard);
+    });
+    
+    // Show rating distribution (1-5 stars) - only if there are responses
+    if (totalResponses > 0) {
+        [5, 4, 3, 2, 1].forEach((rating, index) => {
+            const count = ratingDistribution[5 - rating] || 0;
+            const percentage = ((count / totalResponses) * 100).toFixed(1);
+            
+            const detailDiv = document.createElement('div');
+            detailDiv.className = 'border border-gray-200 rounded-lg p-3';
+            detailDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <div class="flex items-center">
+                        <div class="flex mr-2">
+                            ${Array.from({length: 5}, (_, i) => 
+                                `<i class="bx ${i < rating ? 'bxs-star' : 'bx-star'} ${i < rating ? 'text-yellow-400' : 'text-gray-300'} text-xs mr-0.5"></i>`
+                            ).join('')}
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${rating} Star${rating !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span class="font-bold text-amber-600">${count}</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
+                        <div class="h-full bg-amber-500 rounded-full" style="width: ${percentage}%"></div>
+                    </div>
+                    <span class="text-sm text-gray-600">${percentage}%</span>
+                </div>
+            `;
+            detailsDiv.appendChild(detailDiv);
+        });
+    } else {
+        // Show message when no responses
+        const noDataDiv = document.createElement('div');
+        noDataDiv.className = 'text-center py-6 text-gray-500';
+        noDataDiv.innerHTML = `
+            <i class="bx bx-bar-chart-alt text-3xl mb-2"></i>
+            <p>No rating responses available for this dimension</p>
+        `;
+        detailsDiv.appendChild(noDataDiv);
+    }
+    
+    // Destroy previous chart if exists
+    if (sqdChart) {
+        sqdChart.destroy();
+    }
+    
+    // Create bar chart for SQD - only if there are responses
+    if (totalResponses > 0) {
+        const ctx = document.getElementById('sqdChart').getContext('2d');
+        sqdChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'],
+                datasets: [{
+                    data: ratingDistribution.slice().reverse(),
+                    backgroundColor: [
+                        'rgb(245, 158, 11)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(245, 158, 11, 0.6)',
+                        'rgba(245, 158, 11, 0.4)',
+                        'rgba(245, 158, 11, 0.2)'
+                    ],
+                    borderColor: 'rgb(245, 158, 11)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            color: '#6B7280',
+                            stepSize: Math.ceil(Math.max(...ratingDistribution) / 5)
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6B7280'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw || 0;
+                                const percentage = ((value / totalResponses) * 100).toFixed(1);
+                                return `Responses: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        // Hide chart container if no data
+        document.getElementById('sqdChart').parentElement.innerHTML = `
+            <div class="h-64 flex items-center justify-center text-gray-500">
+                <div class="text-center">
+                    <i class="bx bx-bar-chart-alt text-4xl mb-2"></i>
+                    <p>No data available</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+// Close modals when clicking outside
+document.getElementById('ccQuestionModal').addEventListener('click', function(e) {
+    if (e.target.id === 'ccQuestionModal') {
+        closeModal('ccQuestionModal');
+    }
+});
+
+document.getElementById('sqdModal').addEventListener('click', function(e) {
+    if (e.target.id === 'sqdModal') {
+        closeModal('sqdModal');
+    }
+});
 </script>
 
 <style>
-    /* Smooth transitions for all interactive elements */
-    .bg-white {
-        transition: box-shadow 0.2s ease-in-out;
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Smooth transitions for modals */
+.modal-transition {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Custom scrollbar for modals */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Brush chart styling */
+.chart-container {
+    position: relative;
+}
+
+/* Smooth hover effects for cards */
+.border.border-gray-200.rounded-lg {
+    transition: all 0.2s ease-in-out;
+}
+
+.border.border-gray-200.rounded-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient overlay for charts */
+.chart-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.3) 30%,
+        rgba(255, 255, 255, 0.1) 100%);
+}
+
+/* Modal backdrop blur effect */
+.fixed.inset-0.bg-black\/50 {
+    backdrop-filter: blur(4px);
+}
+
+/* Button hover effects */
+a.bg-gray-100:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+        grid-template-columns: 1fr;
     }
     
-    .bg-white:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    .h-72 {
+        height: 48vh;
     }
-    
-    /* Progress bar animation */
-    .bg-green-600 {
-        transition: width 1s ease-in-out;
+}
+
+/* Animation for modal entry */
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
     }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.fixed.bg-black\/50.flex.items-center.justify-center.p-4.z-50:not(.hidden) > div {
+    animation: modalEnter 0.2s ease-out;
+}
+
+/* Star rating styling */
+.bxs-star {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
 </style>
 {% endblock %}

@@ -283,7 +283,7 @@
                 {% else %}
                 <!-- Authentication Links for Guests -->
                 <li>
-                    <a href="{% url 'login' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                    <a href="{% url 'dashboard_login' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
                         <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
                             <i class='bx bx-log-in'></i>
                         </span>
@@ -291,7 +291,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'register' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
+                    <a href="{% url 'dashboard_register' %}" class="flex flex-row items-center h-12 transform hover:translate-x-2 transition-transform ease-in duration-200 text-white hover:text-gray-200 px-4">
                         <span class="inline-flex items-center justify-center h-12 w-12 text-lg text-white flex-shrink-0">
                             <i class='bx bx-user-plus'></i>
                         </span>
@@ -303,7 +303,7 @@
         </div>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col main-content overflow-hidden" id="main-content">
+        <main class="flex-1 flex flex-col main-content mx-5 overflow-hidden" id="main-content">
             {% block content %}
             {% endblock %}
         </main>
